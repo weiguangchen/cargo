@@ -1,0 +1,1 @@
+<view class="radio-group"><view wx:for="{{a}}" wx:for-item="item" class="{{['radio-box', item.b && 'active']}}" bindtap="{{item.c}}"><view class="radio"/> {{item.a}}</view></view>

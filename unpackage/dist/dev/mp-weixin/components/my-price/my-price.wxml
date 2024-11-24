@@ -1,0 +1,1 @@
+<text class="my-price data-v-f30cd5b4" style="{{f + ';' + g}}"><text class="symbol data-v-f30cd5b4">￥</text><text class="number data-v-f30cd5b4">{{a}}</text><text wx:if="{{b}}" class="unit data-v-f30cd5b4" style="{{d + ';' + e}}">/{{c}}</text></text>

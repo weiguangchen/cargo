@@ -1,0 +1,8 @@
+{
+  "component": true,
+  "usingComponents": {
+    "uv-image": "../../../uni_modules/uv-image/components/uv-image/uv-image",
+    "uv-load-more": "../../../uni_modules/uv-load-more/components/uv-load-more/uv-load-more",
+    "my-empty": "../../../components/my-empty/my-empty"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "navigationBarTitleText": "",
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "uv-search": "../../uni_modules/uv-search/components/uv-search/uv-search",
+    "uv-navbar": "../../uni_modules/uv-navbar/components/uv-navbar/uv-navbar",
+    "uv-drop-down-item": "../../uni_modules/uv-drop-down/components/uv-drop-down-item/uv-drop-down-item",
+    "uv-drop-down": "../../uni_modules/uv-drop-down/components/uv-drop-down/uv-drop-down",
+    "uv-drop-down-popup": "../../uni_modules/uv-drop-down/components/uv-drop-down-popup/uv-drop-down-popup",
+    "my-empty": "../../components/my-empty/my-empty",
+    "uv-load-more": "../../uni_modules/uv-load-more/components/uv-load-more/uv-load-more",
+    "my-login-drawer": "../../components/my-login-drawer/my-login-drawer",
+    "my-tabbar": "../../components/my-tabbar/my-tabbar",
+    "item": "./components/Item"
+  }
+}

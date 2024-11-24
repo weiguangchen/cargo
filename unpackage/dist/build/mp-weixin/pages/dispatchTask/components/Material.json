@@ -1,0 +1,11 @@
+{
+  "component": true,
+  "usingComponents": {
+    "uv-image": "../../../uni_modules/uv-image/components/uv-image/uv-image",
+    "uv-form-item": "../../../uni_modules/uv-form/components/uv-form-item/uv-form-item",
+    "my-number-box": "../../../components/my-number-box/my-number-box",
+    "uv-form": "../../../uni_modules/uv-form/components/uv-form/uv-form",
+    "my-drawer": "../../../components/my-drawer/my-drawer",
+    "my-radio": "./MyRadio"
+  }
+}

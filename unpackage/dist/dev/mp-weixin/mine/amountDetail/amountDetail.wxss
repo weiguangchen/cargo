@@ -1,0 +1,138 @@
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.navbar-content.data-v-4dae311c {
+  padding-left: 46px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.stat.data-v-4dae311c {
+  padding: 24rpx;
+  background-color: #ffffff;
+  margin-bottom: 32rpx;
+}
+.stat .item-wrapper.data-v-4dae311c {
+  flex: 1;
+  padding: 32rpx 32rpx 28rpx;
+  border-radius: 24rpx;
+}
+.stat .item-wrapper .title.data-v-4dae311c {
+  font-weight: bold;
+  font-size: 28rpx;
+  color: var(--title-color);
+  line-height: 40rpx;
+}
+.stat .item-wrapper .amount.data-v-4dae311c {
+  font-weight: bold;
+  font-size: 36rpx;
+  color: var(--red-color);
+  line-height: 64rpx;
+}
+.stat .total-wrapper.data-v-4dae311c {
+  display: flex;
+}
+.stat .box1.data-v-4dae311c {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABIBAMAAACnw650AAAAFVBMVEUAAAD1W0b2XEn2WkPzWkj2WUb4WkWjmnBfAAAAB3RSTlMAGRMECA8MWaLCUgAAAddJREFUSMftVsFygjAQdcR6bqJwNuJ4DmI9Yzv1DE7pGbT+/y/UxLCP7Wb6Be4pgbcvb3ezC5On/bHkdF5vw/K8iWM+jbpb59dTpaoYzUV5W/ldodQygukVB8Wo3gMGx0mqtwAh4UZSzbxm/VXSk52kOjrM1tI+RjXzmPD21nprQAWiNPAUioxRJU7PsG8ACfmAyHzYGAEiZ02i+zGoZrJz2r0omOanWWzLh/X8tJ7HCnrN01YL0JETzXFanCgUPBNEBRER8UqCiIiyVEuQ80ywN5BkR0L1XdeGggNxn6JPTpVjs4gjpTBzn1pL+auQgYzC1NZlraOIOtRqgarlrkYdia/HICTQuNQiQuRyNb7pKOSUgV7HVx1qd1Emfz1UVgIkmNDEG7gL4YrMknCAllAEVUgBkhkBIZkoCzoO+0oUeO57O23bjl8Pv4YDAoI3FbtmIESUji/hgoGwXrJGiIH6sKbQrQQl4c5AeY03FSRpG2/zwxWdxtpxGmvhBKNGjh6MGpwshximSMq9QCUfwQ3hQgF0shENr2GIC8fM8i9WJWNxXOHxvkFjCVVKf3+Uyf72WON0MZi1ERNcfhTRVVG7CEycS2KkHUzQdf3/56Fdr9sfO3kat1/sclc8POmvTAAAAABJRU5ErkJggg==) no-repeat right 12rpx top 12rpx/72rpx 72rpx rgba(241, 89, 72, 0.08);
+  margin-bottom: 24rpx;
+}
+.stat .box1 .amount.data-v-4dae311c {
+  color: var(--red-color);
+}
+.stat .box2.data-v-4dae311c {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABIBAMAAACnw650AAAAFVBMVEUAAAAAuDIAuDEAtzEAuDEAujQAuDAVuUSyAAAAB3RSTlMAGRMFDwsHF++vPgAAAe5JREFUSMflVcF2gjAQ9Enh3EX0TFB7Rml7xpZ61toPwOrr/39Cl41miBvaD3AOsITJ7GTZkNF9ofo5yf21HaScCyLqXieUDlCSDXXIOTwS1UFObEgwYbpwQzqGHOlIYaVoQxfsRIjKAOloGYuPg40nIUNCWVYcilAaEpJk7xB9CnAeiDGX0DpKC4u+4J7HZ5d4RT3MfUdpiQnAFKQV6jJMMkSZe1iH08VegaMb48iGjz5US+MPRliGP7iTCMpK6sFlwyz1gVdYqSoJyq06LNB0BpYgJUMJtgMMRK1cy1Fk2GV3LWEzdQ3TdteUNbq3YySNiTIXzfiVM83RIyowcxFLGfdqjHIhjIn5Y6wM00Fio0wwUn+kV5nXfhPFCGUNkIIQSJ5SJV2ZVeWwEnoyA0kZN4Strldnw4gccjcdxZzekmpHUp8Fm6m89kKuPnDSNG/80DQHtyNy9JPMhNdQo23EgyZFNq9TnYRIsfhADaY90sQfxwwqXQzS3sbIXcPszh+Gc+jGW2RDAvWopmIvzkP/49yfpH8je3sW+fnmWmiqfyOt+rHX+tDI+gm/CeWGdV/9GZ3nSzHrqnUmCKnTLt0yLXphP8oREjCKwmCHKnwSgGUEjk4gRUEU6y8OFmWxRC6N5Ktg64vT6D+Uo/vCLxu2UPYlmd9aAAAAAElFTkSuQmCC) no-repeat right 12rpx top 12rpx/72rpx 72rpx rgba(2, 183, 46, 0.08);
+  margin-right: 22rpx;
+}
+.stat .box2 .amount.data-v-4dae311c {
+  color: var(--main-color);
+}
+.stat .box3.data-v-4dae311c {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABIBAMAAACnw650AAAAFVBMVEUAAAD/hCj/gyb/hCb/gyb/gyf/hCiuXpjhAAAAB3RSTlMAGQUVChEOZ2waFwAAAeBJREFUSMftVsGWgjAM9LHivQKeK+CeBfQO+vRsV/S8PPfx/5+wpRSnaYEvcE4QJskkJIXFBxa8670onic+R7lkTCE6TXNebEDwM8VpmIEJ1pkR/I5xdjpRUWT9BR9Jph4du8LiXn/okqrOXmvvpejuSulKwi076wFxRR9KkKRbadyYTlkXasXYzVQEpahj/cXYHiZfmnIqUki3ipAat2TfbpeHQCSUBIeXG2hXn1VLYanQOsRWiGDKdKnASpNC4sbHSTkkoZF2upvZ7vXE4JTQ/fZ4RWpCu4lLBe2AGDyWSkQin+mJJ8UFHP3yssEnfRj9lh54FfsEUmglG9QUZJBCBy5ECWihQ8IlaiJYoU1xowLFc6SEaeQzJKw577M/OSVBEV5Hw3JHuAcS1/ehW50YOBEaiGZGmt62Qt60bQlvkDDK5qr5SiymlxMSrnNz68ox0taczIp678mc4QFy+/D2ehnoZmRUwR2zs1Lp+3hO6MwICJm2btFaYGmNsU/ukS2gRy/aBpu9spV79iQ4wYx8BydQYAXPbFVnDDEJHhkJv7E0NDrbcHKME9lYlCPXcTLnC4QPBQvqUxynd6yVs1gEeAVOQiAopz6dLsfFZYYDaMlBzWd/HtLr4/kXLz6w8A+DqFAvriUnNwAAAABJRU5ErkJggg==) no-repeat right 12rpx top 12rpx/72rpx 72rpx rgba(252, 126, 44, 0.08);
+}
+.stat .box3 .amount.data-v-4dae311c {
+  color: #FC7E2C;
+}
+.list-wrapper.data-v-4dae311c {
+  padding: 24rpx;
+}
+.list-wrapper .list-title.data-v-4dae311c {
+  font-weight: bold;
+  font-size: 32rpx;
+  color: var(--title-color);
+  line-height: 40rpx;
+  margin-bottom: 20rpx;
+  padding-left: 8rpx;
+}
+.list-wrapper .item.data-v-4dae311c {
+  padding: 28rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  margin-bottom: 20rpx;
+}
+.list-wrapper .item .mfrs.data-v-4dae311c {
+  font-weight: bold;
+  font-size: 32rpx;
+  color: var(--title-color);
+  line-height: 48rpx;
+  margin-bottom: 24rpx;
+}
+.list-wrapper .item .amount-wrapper .type.data-v-4dae311c {
+  font-size: 24rpx;
+  color: var(--sub-color);
+  line-height: 40rpx;
+}
+.list-wrapper .item .amount-wrapper .amount-box.data-v-4dae311c {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  line-height: 48rpx;
+}
+.list-wrapper .item .amount-wrapper .amount-box .amount.data-v-4dae311c {
+  font-weight: bold;
+  font-size: 34rpx;
+  color: var(--red-color);
+}
+.list-wrapper .item .amount-wrapper .amount-box .date.data-v-4dae311c {
+  font-size: 24rpx;
+  color: var(--sub-color);
+}
+.list-wrapper .item .info.data-v-4dae311c {
+  padding: 24rpx;
+  font-size: 24rpx;
+  color: var(--content-color);
+  line-height: 36rpx;
+  background: var(--page-bg);
+  border-radius: 16rpx;
+  margin-top: 28rpx;
+  display: flex;
+  align-items: center;
+}
+.list-wrapper .item .info .text.data-v-4dae311c {
+  flex: 1;
+}
+.list-wrapper .item .info .label.data-v-4dae311c {
+  color: var(--sub-color);
+}
