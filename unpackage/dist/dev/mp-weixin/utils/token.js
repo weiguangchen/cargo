@@ -1,6 +1,6 @@
 "use strict";
 const common_vendor = require("../common/vendor.js");
-const tokenKey = "cargo-dev-token";
+const tokenKey = "cargo-test-token";
 function setToken(data) {
   return common_vendor.index.setStorageSync(tokenKey, data);
 }

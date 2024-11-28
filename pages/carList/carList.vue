@@ -4,7 +4,7 @@
 		<uv-checkbox-group v-model="checkboxValue" shape="circle" activeColor="var(--red-color)" icon="32rpx">
 			<view class="car-wrapper" :class="{'my-border-bottom': index < list.length - 1}" v-for="(item,index) in list" :key="item.Id">
 				<view class="left">
-					<uv-checkbox v-if="isEdit" :customStyle="{ marginRight: '6px' }" :name="item" >京RTY9012</uv-checkbox>
+					<uv-checkbox v-if="isEdit" :customStyle="{ marginRight: '6px' }" :name="item" >{{ item.Carno }}</uv-checkbox>
 					<view class="" v-else>{{ item.Carno }}</view>
 				</view>
 				<view class="btn" @click="remove(item)">

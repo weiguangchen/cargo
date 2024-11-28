@@ -164,20 +164,21 @@ const _sfc_main = {
         a: common_vendor.t(list.value.length),
         b: common_vendor.f(list.value, (item, index, i0) => {
           return common_vendor.e(isEdit.value ? {
-            a: "c2a962ca-1-" + i0 + ",c2a962ca-0",
-            b: common_vendor.p({
+            a: common_vendor.t(item.Carno),
+            b: "c2a962ca-1-" + i0 + ",c2a962ca-0",
+            c: common_vendor.p({
               customStyle: {
                 marginRight: "6px"
               },
               name: item
             })
           } : {
-            c: common_vendor.t(item.Carno)
+            d: common_vendor.t(item.Carno)
           }, {
-            d: "c2a962ca-2-" + i0 + ",c2a962ca-0",
-            e: common_vendor.o(($event) => remove(item), item.Id),
-            f: index < list.value.length - 1 ? 1 : "",
-            g: item.Id
+            e: "c2a962ca-2-" + i0 + ",c2a962ca-0",
+            f: common_vendor.o(($event) => remove(item), item.Id),
+            g: index < list.value.length - 1 ? 1 : "",
+            h: item.Id
           });
         }),
         c: isEdit.value,
