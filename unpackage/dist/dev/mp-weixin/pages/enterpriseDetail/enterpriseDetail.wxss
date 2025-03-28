@@ -61,12 +61,17 @@
   padding: 0 12rpx;
 }
 .info-wrapper .status-wrapper .status {
+  background-color: var(--page-bg);
+  color: var(--main-color);
+}
+.info-wrapper .status-wrapper .status.signed {
   background-color: var(--main-color);
   color: #FFFFFF;
 }
 .info-wrapper .status-wrapper .price {
   background-color: var(--page-bg);
   color: var(--main-color);
+  border-left: 1px solid var(--main-color);
 }
 .info-wrapper .notice {
   display: flex;
@@ -198,10 +203,12 @@
   flex-direction: column;
   justify-content: space-between;
   margin-right: 24rpx;
+  padding-top: 14rpx;
+  padding-bottom: 6rpx;
 }
 .category-wrapper .category-item .materials-list .material .info .name {
   font-weight: 600;
-  font-size: 30rpx;
+  font-size: 34rpx;
   color: var(--title-color);
   line-height: 36rpx;
   margin-bottom: 8rpx;

@@ -187,7 +187,8 @@ const _sfc_main = {
           ...m,
           MaterialsList: ((_a = m.MaterialsList) == null ? void 0 : _a.map((n) => ({
             ...n,
-            Limittype: "0"
+            Limittype: "0",
+            EstimiteWeight: n.minWgtLeft
           }))) ?? []
         };
       });
@@ -213,14 +214,14 @@ const _sfc_main = {
       if (!order.value.MaterialsList || order.value.MaterialsList && order.value.MaterialsList.length === 0)
         return price;
       const total = order.value.MaterialsList.map((m) => {
-        const { TaxPrice, Limittype, EstimateWeight, EstimateTimes } = m;
+        const { TaxPrice, Limittype, EstimiteWeight, EstimiteTimes } = m;
         const SingleWeight = order.value.SingleWeight;
         if (Limittype === "0")
           price = common_vendor.Big(0).toFixed(2);
         if (Limittype === "1")
-          price = common_vendor.Big(EstimateWeight || 0).times(TaxPrice || 0).toFixed(2);
+          price = common_vendor.Big(EstimiteWeight || 0).times(TaxPrice || 0).toFixed(2);
         if (Limittype === "2")
-          price = common_vendor.Big(EstimateTimes || 0).times(SingleWeight || 0).times(TaxPrice || 0).toFixed(2);
+          price = common_vendor.Big(EstimiteTimes || 0).times(SingleWeight || 0).times(TaxPrice || 0).toFixed(2);
         console.log("price", price);
         return price;
       }).reduce((p, n) => common_vendor.Big(p).plus(n).toFixed(2), 0);
@@ -277,9 +278,9 @@ const _sfc_main = {
         //订单主键
         Orderno: order.value.SSOrderNo,
         // 订单编码
-        StartTime: startTime.value ? common_vendor.dayjs(startTime.value).format("YYYY-MM-DD HH:mm:ss") : "",
+        StartTime: startTime.value ? common_vendor.dayjs(startTime.value).format("YYYY-MM-DD HH:mm") : "",
         //开始进厂时间
-        EndTime: endTime.value ? common_vendor.dayjs(endTime.value).format("YYYY-MM-DD HH:mm:ss") : "",
+        EndTime: endTime.value ? common_vendor.dayjs(endTime.value).format("YYYY-MM-DD HH:mm") : "",
         // 截止接单时间
         Carno: model.Carno.join(","),
         // 限制车牌，多个‘,’分隔
@@ -293,9 +294,9 @@ const _sfc_main = {
             EstimatePrice: m.TaxPrice
           };
           if (m.Limittype === "1")
-            item.EstimateWeight = m.EstimateWeight;
+            item.EstimiteWeight = m.EstimiteWeight;
           if (m.Limittype === "2")
-            item.EstimateTimes = m.EstimateTimes;
+            item.EstimiteTimes = m.EstimiteTimes;
           return item;
         }),
         Memo: model.Memo,
@@ -310,7 +311,11 @@ const _sfc_main = {
           icon: "none"
         });
         common_vendor.index.navigateBack();
-      } catch {
+      } catch (err) {
+        common_vendor.index.showToast({
+          title: err.data,
+          icon: "none"
+        });
       } finally {
         submiting.value = false;
       }

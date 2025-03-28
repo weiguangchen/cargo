@@ -151,47 +151,57 @@ const _sfc_main = {
             fontWeight: 500
           }
         }),
-        d: common_vendor.t(supply.value.Name),
-        e: common_vendor.t(supply.value.Signed === "1" ? "已签约" : "未签约"),
-        f: supply.value.Balance
-      }, supply.value.Balance ? {
-        g: common_vendor.t(supply.value.Balance)
+        d: supply.value
+      }, supply.value ? {
+        e: common_vendor.p({
+          width: "100%",
+          height: "100%",
+          src: supply.value.Photo,
+          mode: "aspectFill"
+        })
       } : {}, {
-        h: supply.value.Notice
+        f: common_vendor.t(supply.value.Name),
+        g: common_vendor.t(supply.value.Signed === "1" ? "已签约" : "未签约"),
+        h: supply.value.Signed === "1" ? 1 : "",
+        i: supply.value.Balance
+      }, supply.value.Balance ? {
+        j: common_vendor.t(supply.value.Balance)
+      } : {}, {
+        k: supply.value.Notice
       }, supply.value.Notice ? {
-        i: common_vendor.p({
+        l: common_vendor.p({
           src: "/static/images/enterpriseDetail/notice.png",
           width: "72rpx",
           height: "40rpx"
         }),
-        j: common_vendor.t(supply.value.Notice),
-        k: common_vendor.p({
+        m: common_vendor.t(supply.value.Notice),
+        n: common_vendor.p({
           src: "/static/images/enterpriseDetail/arrow.png",
           width: "32rpx",
           height: "32rpx"
         }),
-        l: common_vendor.o(openNotice)
+        o: common_vendor.o(openNotice)
       } : {}, {
-        m: dis.value
+        p: dis.value
       }, dis.value ? {
-        n: common_vendor.t(dis.value)
+        q: common_vendor.t(dis.value)
       } : {}, {
-        o: common_vendor.t(supply.value.Province || ""),
-        p: common_vendor.t(supply.value.City || ""),
-        q: common_vendor.t(supply.value.Address || ""),
-        r: common_vendor.p({
+        r: common_vendor.t(supply.value.Province || ""),
+        s: common_vendor.t(supply.value.City || ""),
+        t: common_vendor.t(supply.value.Address || ""),
+        v: common_vendor.p({
           src: "/static/images/enterpriseDetail/phone.png",
           width: "48rpx",
           height: "48rpx"
         }),
-        s: common_vendor.o(takePhone),
-        t: common_vendor.p({
+        w: common_vendor.o(takePhone),
+        x: common_vendor.p({
           src: "/static/images/enterpriseDetail/location.png",
           width: "48rpx",
           height: "48rpx"
         }),
-        v: common_vendor.o(openMapApp),
-        w: common_vendor.f(list.value, (item, index, i0) => {
+        y: common_vendor.o(openMapApp),
+        z: common_vendor.f(list.value, (item, index, i0) => {
           return {
             a: common_vendor.t(item.typeName),
             b: active.value === index ? 1 : "",
@@ -199,52 +209,44 @@ const _sfc_main = {
             d: common_vendor.o(($event) => chooseCate(item))
           };
         }),
-        x: intoView.value,
-        y: common_vendor.p({
+        A: intoView.value,
+        B: common_vendor.p({
           index: "cate",
           customNavHeight: common_vendor.unref(ctx).$uv.addUnit(customNavHeight.value)
         }),
-        z: common_vendor.f(list.value, (item, k0, i0) => {
+        C: common_vendor.f(list.value, (item, k0, i0) => {
           return {
             a: common_vendor.t(item.typeName),
             b: common_vendor.f(item.materialList, (cate, j, i1) => {
               return {
-                a: "5aa14b16-7-" + i0 + "-" + i1 + "," + ("5aa14b16-6-" + i0 + "-" + i1),
-                b: "5aa14b16-6-" + i0 + "-" + i1,
-                c: common_vendor.p({
+                a: "5aa14b16-7-" + i0 + "-" + i1,
+                b: common_vendor.p({
                   width: "100%",
                   height: "100%",
                   duration: 0,
                   src: cate.Image,
-                  mode: "aspectFit"
+                  mode: "aspectFill"
                 }),
-                d: common_vendor.t(cate.MaterialName),
-                e: "5aa14b16-8-" + i0 + "-" + i1,
-                f: common_vendor.t(cate.TaxPrice),
-                g: j < item.materialList.length - 1 ? 1 : "",
-                h: cate.MaterialId
+                c: common_vendor.t(cate.MaterialName),
+                d: "5aa14b16-8-" + i0 + "-" + i1,
+                e: common_vendor.p({
+                  price: cate.TaxPrice,
+                  color: "var(--red-color)",
+                  unit: "吨"
+                }),
+                f: j < item.materialList.length - 1 ? 1 : "",
+                g: cate.MaterialId
               };
             }),
             c: item.typeId
           };
         }),
-        A: common_vendor.p({
-          width: "100%",
-          height: "100%",
-          duration: 0,
-          src: "/static/images/mfrs/mat.png",
-          mode: "aspectFit"
-        }),
-        B: common_vendor.p({
-          color: "var(--red-color)",
-          unit: "吨"
-        }),
-        C: common_vendor.t(supply.value.Notice),
-        D: common_vendor.sr(noticeDrawer, "5aa14b16-9", {
+        D: common_vendor.t(supply.value.Notice),
+        E: common_vendor.sr(noticeDrawer, "5aa14b16-9", {
           "k": "noticeDrawer"
         }),
-        E: common_vendor.o((e) => show.value = e.show),
-        F: common_vendor.p({
+        F: common_vendor.o((e) => show.value = e.show),
+        G: common_vendor.p({
           title: "生产企业公告",
           closeable: true
         })

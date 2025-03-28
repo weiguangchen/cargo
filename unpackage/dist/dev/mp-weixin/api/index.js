@@ -21,6 +21,12 @@ function GetSupplyMaterialByOwner(data) {
 function GetSupplyOnwayDetail(data) {
   return utils_request.request.post("/api/permission/WechatApi/GetSupplyOnwayDetail", data);
 }
+function DisableOnwayEnt(data) {
+  return utils_request.request.post("/api/permission/WechatApi/DisableOnwayEnt", data);
+}
+function UnloadConfirm(data) {
+  return utils_request.request.post("/api/permission/WechatApi/UnloadConfirm", data);
+}
 function GetOnwayTimeTree(data) {
   return utils_request.request.post("/api/permission/WechatApi/GetOnwayTimeTree", data);
 }
@@ -81,11 +87,17 @@ function GetOwnerOrderList(data) {
 function SetAssignTicket(data) {
   return utils_request.request.post("/api/permission/WechatApi/SetAssignTicket", data);
 }
-function GetAssignCarList(data) {
-  return utils_request.request.post("/api/permission/WechatApi/GetAssignCarList", data);
+function GetAssignCarListWithCount(data) {
+  return utils_request.request.post("/api/permission/WechatApi/GetAssignCarListWithCount", data);
 }
 function GetAssignDetail(data) {
   return utils_request.request.post("/api/permission/WechatApi/GetAssignDetail", data);
+}
+function SetAssignStatusChg(data) {
+  return utils_request.request.post("/api/permission/WechatApi/SetAssignStatusChg", data);
+}
+function ResetAssignStatusChg(data) {
+  return utils_request.request.post("/api/permission/WechatApi/ResetAssignStatusChg", data);
 }
 function GetOrderListByTab(data) {
   return utils_request.request.post("/api/permission/WechatApi/GetOrderListByTab", data);
@@ -93,20 +105,21 @@ function GetOrderListByTab(data) {
 function GetOrderDetail(data) {
   return utils_request.request.post("/api/permission/WechatApi/GetOrderDetail", data);
 }
-function GetOwnerOnwayList(data) {
-  return utils_request.request.post("/api/permission/WechatApi/GetOwnerOnwayList", data);
+function GetOnwayOwnerWithCount(data) {
+  return utils_request.request.post("/api/permission/WechatApi/GetOnwayOwnerWithCount", data);
 }
-function GetOnwayOwner(data) {
-  return utils_request.request.post("/api/permission/WechatApi/GetOnwayOwner", data);
+function GetOwnerFilterList(data) {
+  return utils_request.request.post("/api/permission/WechatApi/GetOwnerFilterList", data);
 }
 exports.CreateOwnerUserCarno = CreateOwnerUserCarno;
 exports.DeleteUnloadPlace = DeleteUnloadPlace;
 exports.DelteUserCarno = DelteUserCarno;
-exports.GetAssignCarList = GetAssignCarList;
+exports.DisableOnwayEnt = DisableOnwayEnt;
+exports.GetAssignCarListWithCount = GetAssignCarListWithCount;
 exports.GetAssignDetail = GetAssignDetail;
 exports.GetGoodsOrderCount = GetGoodsOrderCount;
 exports.GetLocationByJW = GetLocationByJW;
-exports.GetOnwayOwner = GetOnwayOwner;
+exports.GetOnwayOwnerWithCount = GetOnwayOwnerWithCount;
 exports.GetOnwayTimeTree = GetOnwayTimeTree;
 exports.GetOrderDetail = GetOrderDetail;
 exports.GetOrderListByTab = GetOrderListByTab;
@@ -114,8 +127,8 @@ exports.GetOwnerAmountDetail = GetOwnerAmountDetail;
 exports.GetOwnerBalanceTotal = GetOwnerBalanceTotal;
 exports.GetOwnerBySupply = GetOwnerBySupply;
 exports.GetOwnerCarMgr = GetOwnerCarMgr;
+exports.GetOwnerFilterList = GetOwnerFilterList;
 exports.GetOwnerMaterialsList = GetOwnerMaterialsList;
-exports.GetOwnerOnwayList = GetOwnerOnwayList;
 exports.GetOwnerOrderList = GetOwnerOrderList;
 exports.GetOwnerSupplyList = GetOwnerSupplyList;
 exports.GetOwnerTotal = GetOwnerTotal;
@@ -127,7 +140,10 @@ exports.GetSupplyMaterialByOwner = GetSupplyMaterialByOwner;
 exports.GetSupplyOnwayDetail = GetSupplyOnwayDetail;
 exports.GetUnloadPlace = GetUnloadPlace;
 exports.GetUnloadPlaceList = GetUnloadPlaceList;
+exports.ResetAssignStatusChg = ResetAssignStatusChg;
+exports.SetAssignStatusChg = SetAssignStatusChg;
 exports.SetAssignTicket = SetAssignTicket;
+exports.UnloadConfirm = UnloadConfirm;
 exports.UptOwnerUserNickName = UptOwnerUserNickName;
 exports.UptUnloadPlace = UptUnloadPlace;
 exports.getPhoneByCode = getPhoneByCode;

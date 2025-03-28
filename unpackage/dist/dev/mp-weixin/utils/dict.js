@@ -1,32 +1,4 @@
 "use strict";
-const BillStatus = [{
-  value: 1,
-  label: "待入厂"
-}, {
-  value: 2,
-  label: "待入厂"
-}, {
-  value: 3,
-  label: "已入厂"
-}, {
-  value: 4,
-  label: "已入厂"
-}, {
-  value: 5,
-  label: "装车中"
-}, {
-  value: 6,
-  label: "已装车"
-}, {
-  value: 7,
-  label: "已出厂"
-}, {
-  value: 8,
-  label: "已完成"
-}, {
-  value: 9,
-  label: "已取消"
-}];
 const CarTypeOptions = [
   {
     value: "自卸车",
@@ -70,7 +42,6 @@ const ManifestStatusOptions = [{
   name: "已完结",
   value: 5
 }];
-exports.BillStatus = BillStatus;
 exports.CarTypeOptions = CarTypeOptions;
 exports.ManifestStatusOptions = ManifestStatusOptions;
 exports.OrderStatusOptions = OrderStatusOptions;

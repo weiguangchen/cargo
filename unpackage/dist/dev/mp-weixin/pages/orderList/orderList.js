@@ -45,7 +45,7 @@ const _sfc_main = {
     common_vendor.ref();
     function toDetail(record) {
       common_vendor.index.navigateTo({
-        url: `/pages/orderDetail/orderDetail?orderId=${record.SSOrderId}`
+        url: `/pages/orderDetail/orderDetail?orderId=${record.SSOrderId}&supplyId=${record.SupplyId}`
       });
     }
     common_vendor.onLoad(() => {

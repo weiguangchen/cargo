@@ -46,11 +46,14 @@ const _sfc_main = {
       });
     }
     common_vendor.onLoad(async () => {
-      utils_authorize.getLocationInfo();
       if (!utils_token.getToken()) {
         return;
       }
-      getList();
+      try {
+        await utils_authorize.getLocationInfo();
+      } finally {
+        getList();
+      }
     });
     const keyword = common_vendor.ref("");
     const navbarPad = common_vendor.ref(0);

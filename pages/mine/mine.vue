@@ -7,8 +7,8 @@
 				<uv-image :src="getToken() ? '/static/images/mine/avatar.png' : '/static/images/mine/no-avatar.png'" width="100%" height="100%" :duration="0" />
 			</view>
 			<view class="user" v-if="getToken()">
-				<view class="name">{{ getToken().userInfo.Nickname || '暂无昵称' }}</view>
-				<view class="phone">{{ getToken().userInfo.Mobile || '' }}</view>
+				<view class="name">{{ userInfo.Nickname || '暂无昵称' }}</view>
+				<view class="phone">{{ userInfo.Mobile || '' }}</view>
 			</view>
 			<view class="no-login" v-else @click="openLoginDrawer">
 				请登录 <uv-image src="/static/images/arrow3.png" :duration="0" width="32rpx" height="32rpx" :custom-style="{ flex: 'none' }"/>
@@ -88,16 +88,16 @@
 					:custom-style="{ marginBottom: '4rpx' }" :duration="0" />
 				<view class="name">联系客服</view>
 			</button>
-			<view class="menu" @click="navigate('操作指南')">
+			<view class="menu" @click="toGuide">
 				<uv-image src="/static/images/mine/guide.png" width="56rpx" height="56rpx"
 					:custom-style="{ marginBottom: '4rpx' }" :duration="0" />
 				<view class="name">操作指南</view>
 			</view>
-			<view class="menu"  @click="navigate('问题反馈')">
+			<button open-type="feedback" class="menu">
 				<uv-image src="/static/images/mine/feedback.png" width="56rpx" height="56rpx"
 					:custom-style="{ marginBottom: '4rpx' }" :duration="0" />
 				<view class="name">问题反馈</view>
-			</view>
+			</button>
 			<view class="menu" @click="navigate('设置')">
 				<uv-image src="/static/images/mine/setting.png" width="56rpx" height="56rpx"
 					:custom-style="{ marginBottom: '4rpx' }" :duration="0" />
@@ -127,8 +127,12 @@
 	} from '@/stores/app.js'
 	import { getToken } from '@/utils/token.js'
 	import QrcodeModal from './components/qrcodeModal.vue'
-	
+	import { useUserStore } from '@/stores/user.js'
+	import { storeToRefs } from 'pinia'
+
 	const appStore = useAppStore();
+	const userStore = useUserStore();
+	const { userInfo } = storeToRefs(userStore);
 	const {
 		ctx
 	} = getCurrentInstance();
@@ -149,6 +153,11 @@
 				})
 				break;
 			case '数据统计':
+				uni.showToast({
+					title:'敬请期待',
+					icon: 'none'
+				})
+				return;
 				uni.navigateTo({
 					url: '/mine/statistics/statistics'
 				})
@@ -164,11 +173,21 @@
 				})
 				break;
 			case '司机黑名单':
+				uni.showToast({
+					title:'敬请期待',
+					icon: 'none'
+				})
+				return;
 				uni.navigateTo({
 					url:'/mine/forbidden/forbidden'
 				})
 				break;
 			case '成员管理':
+				uni.showToast({
+					title:'敬请期待',
+					icon: 'none'
+				})
+				return;
 				uni.navigateTo({
 					url:'/mine/member/member'
 				})
@@ -228,14 +247,21 @@
 	// 关注公众号
 	function follow(){
 		const src = 'https://mp.weixin.qq.com/s?__biz=MzkxOTcyODM5OA==&mid=2247483675&idx=1&sn=3f1378b5f85fe5ed6144eb9446f63a32&chksm=c19cf97af6eb706cee30883335ba2e11ab4ebd79c23dac68af13106c2b56e20eee02ddfe656c#rd'
-		uni.navigateTo({
-			url: `/pages/webview/webview?src=${encodeURIComponent(src)}`
+		// uni.navigateTo({
+		// 	url: `/pages/webview/webview?src=${encodeURIComponent(src)}`
+		// })
+		uni.openOfficialAccountArticle({
+			url: src
 		})
 	}
 	// 操作指南
 	function toGuide() {
-		uni.navigateTo({
-			url: '/pages/guide/guide'
+		const src = 'https://mp.weixin.qq.com/s/giY3v4K_9eQWPaeKfiqgJw'
+		// uni.navigateTo({
+		// 	url: `/pages/webview/webview?src=${encodeURIComponent(src)}`
+		// })
+		uni.openOfficialAccountArticle({
+			url: src
 		})
 	}
 	// 登录
@@ -411,15 +437,19 @@
 		.menus {
 			display: flex;
 			flex-wrap: wrap;
-			font-size: 24rpx;
-
 			.menu {
+				line-height: 40rpx;
+				font-size: 24rpx;
 				flex: none;
 				width: 25%;
 				display: flex;
 				flex-direction: column;
 				align-items: center;
 				margin-bottom: 32rpx;
+				background-color: transparent;
+				&::after {
+					display: none;
+				}
 			}
 		}
 	}

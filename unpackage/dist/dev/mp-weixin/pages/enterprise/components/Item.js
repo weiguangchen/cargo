@@ -50,8 +50,8 @@ const _sfc_main = {
         a: common_vendor.p({
           width: "100%",
           height: "100%",
-          duration: 0,
-          src: "/static/images/mfrs/avatar.png"
+          src: __props.record.Photo,
+          mode: "aspectFill"
         }),
         b: common_vendor.t(__props.record.Name),
         c: common_vendor.t(__props.record.Signed === "1" ? "已签约" : "未签约"),

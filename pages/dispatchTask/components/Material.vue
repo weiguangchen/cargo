@@ -3,8 +3,8 @@
 		<view class="name">{{ model.SSMaterialName }}</view>
 		<view class="status">
 			<template v-if="modelValue.Limittype === '0'">不拉运</template>
-			<template v-if="modelValue.Limittype === '1'">最大 {{ modelValue.EstimateWeight }} 吨</template>
-			<template v-if="modelValue.Limittype === '2'">最大 {{ modelValue.EstimateTimes }} 车次</template>
+			<template v-if="modelValue.Limittype === '1'">最大 {{ modelValue.EstimiteWeight }} 吨</template>
+			<template v-if="modelValue.Limittype === '2'">最大 {{ modelValue.EstimiteTimes }} 车次</template>
 			<uv-image src="/static/images/arrow.png" :duration="0" width="24rpx" height="24rpx"
 				:custom-style="{ marginLeft: '4rpx' }" />
 		</view>
@@ -22,17 +22,17 @@
 			<uv-form labelPosition="left" :model="model" :rules="rules" ref="form" label-width="auto">
 				<uv-form-item label="装运设置" prop="Limittype" :customStyle="{ padding: '44rpx 0!important' }">
 					<view style="display: flex;justify-content: flex-end;">
-						<MyRadio v-model="model.Limittype" @change="typeChange"/>
+						<MyRadio :record="model" v-model="model.Limittype" @change="typeChange"/>
 					</view>
 				</uv-form-item>
-				<uv-form-item label="最大装运重量" prop="EstimateWeight" v-if="model.Limittype === '1'">
-					<view style="display: flex;justify-content: flex-end;">
-						<my-number-box v-model="model.EstimateWeight" :max="model.LeftWeight"/>
+				<uv-form-item labelPosition="top" label="最大装运重量" prop="EstimiteWeight" v-if="model.Limittype === '1'">
+					<view style="display: flex;justify-content: center;padding-top:32rpx;">
+						<my-number-box v-model="model.EstimiteWeight" decimal-length="2" :max="model.LeftWeight !== null ? model.LeftWeight : undefined" :max-limit-msg="max => `重量最多为${max}吨`" :min="model.minWgtLeft" :min-limit-msg="min => `重量最少为${min}吨`" :step="10"/>
 					</view>
 				</uv-form-item>
-				<uv-form-item label="最大装运车次" prop="EstimateTimes" v-if="model.Limittype === '2'">
-					<view style="display: flex;justify-content: flex-end;">
-						<my-number-box v-model="model.EstimateTimes" :max="maxCarNumber" unit="车次"/>
+				<uv-form-item labelPosition="top" label="最大装运车次" prop="EstimiteTimes" v-if="model.Limittype === '2'">
+					<view style="display: flex;justify-content: center;padding-top:32rpx;">
+						<my-number-box v-model="model.EstimiteTimes" decimal-length="0" :max="maxCarNumber":max-limit-msg="max => `车次最多为${max}`" :min="1" :min-limit-msg="min => `车次最少为${min}`" unit="车次"/>
 					</view>
 				</uv-form-item>
 			</uv-form>
@@ -49,6 +49,7 @@
 	} from 'vue'
 	import MyRadio from './MyRadio.vue';
 	import Big from 'big.js'
+	import { sleep } from '@/utils/index.js'
 	const props = defineProps({
 		modelValue: {
 			type: Object,
@@ -67,34 +68,45 @@
 
 	const model = ref({
 		Limittype: '0',
-		EstimateWeight: 1,
-		EstimateTimes: 1
+		EstimiteWeight: 1,
+		EstimiteTimes: 1
 	});
-	const rules = ref()
+	const rules = ref();
 	watchEffect(() => {
 		model.value = {
 			...model.value,
 			...props.modelValue,
+			EstimiteWeight: props.modelValue?.EstimiteWeight ?? 1,
+			EstimiteTimes: props.modelValue?.EstimiteTimes ?? 1,
 		};
 	})
 	
 	// 当选择按车次时,根据每辆车能装运重量计算出最多能选择多少车次
 	const maxCarNumber = computed(() => {
-		if(!props.modelValue.LeftWeight || !props.order.SingleWeight) return null;
+		if(!props.modelValue.LeftWeight || !props.order.SingleWeight) return undefined;
 		const no = Big(props.modelValue.LeftWeight).div(props.order.SingleWeight).toFixed(0)
 		console.log('maxCarNumber', no)
-		return no;
+		return +no;
 	})
 
 	const drawer = ref();
 	function openDrawer() {
+		model.value = {
+			...model.value,
+			...props.modelValue,
+			EstimiteWeight: props.modelValue?.EstimiteWeight ?? 1,
+			EstimiteTimes: props.modelValue?.EstimiteTimes ?? 1,
+		};
 		drawer.value.popup.open();
 	}
 	async function typeChange() {
 		await nextTick()
 		drawer.value.resize()
 	}
-	function confirm() {
+	async function confirm() {
+		await uni.hideKeyboard();
+		await sleep(200)
+		console.log('confirm')
 		console.log('model',model.value)
 		emits('update:modelValue', model.value);
 	}

@@ -49,7 +49,7 @@
 	<!-- end -->
 	<!-- menus -->
 	<view class="menus">
-		<view class="menu">
+		<view class="menu" @click="navigate('扫码助手')">
 			<uv-image src="/static/images/home/scan.png" width="80rpx" height="80rpx" :duration="0" :custom-style="{ marginBottom: '14rpx' }"/>
 			<view class="">扫码助手</view>
 		</view>
@@ -61,10 +61,10 @@
 			<uv-image src="/static/images/home/guide.png" width="80rpx" height="80rpx" :duration="0" :custom-style="{ marginBottom: '14rpx' }"/>
 			<view class="">操作指南</view>
 		</view>
-		<view class="menu" @click="navigate('问题反馈')">
+		<button open-type="feedback" class="menu" @click="navigate('问题反馈')">
 			<uv-image src="/static/images/home/feedback.png" width="80rpx" height="80rpx" :duration="0" :custom-style="{ marginBottom: '14rpx' }"/>
 			<view class="">问题反馈</view>
-		</view>
+		</button>
 	</view>
 	<!-- end -->
 	<!-- banner -->
@@ -94,10 +94,11 @@
 	} from '@/stores/app.js'
 	import { getToken } from '@/utils/token.js'
 	import { GetGoodsOrderCount } from '@/api/index.js'
+	import { sleep } from '@/utils/index.js'
 	const {
 		ctx
 	} = getCurrentInstance();
-
+	
 	const appStore = useAppStore();
 	onLoad(() => {
 		appStore.switchTab(0)
@@ -105,13 +106,15 @@
 
 	
 	onLoad(async() => {
-		// 定位授权
-		getLocationInfo();
-		
 		if(!getToken()) {
 			return;
 		}
-		getCount()
+		try {
+			// 定位授权
+			await getLocationInfo();
+		}finally {
+			getCount()
+		}
 	})
 	// 登录
 	const loginDrawer = ref()
@@ -147,10 +150,14 @@
 				})
 			},
 			events: {
-				confirm(res) {
+				async confirm(res) {
 					console.log('confirm',res)
 					if(res.type === 1) supply.value = res.data;
 					if(res.type === 2) unload.value = res.data;
+					await sleep(500)
+					if(supply.value && unload.value) {
+						dispatch();
+					}
 				}
 			}
 		})
@@ -175,15 +182,22 @@
 		})
 	}
 	function toGuide() {
-		uni.navigateTo({
-			url: '/pages/guide/guide'
+		const src = 'https://mp.weixin.qq.com/s/giY3v4K_9eQWPaeKfiqgJw'
+		// uni.navigateTo({
+		// 	url: `/pages/webview/webview?src=${encodeURIComponent(src)}`
+		// })
+		uni.openOfficialAccountArticle({
+			url: src
 		})
 	}
 	// 关注公众号
 	function follow(){
 		const src = 'https://mp.weixin.qq.com/s?__biz=MzkxOTcyODM5OA==&mid=2247483675&idx=1&sn=3f1378b5f85fe5ed6144eb9446f63a32&chksm=c19cf97af6eb706cee30883335ba2e11ab4ebd79c23dac68af13106c2b56e20eee02ddfe656c#rd'
-		uni.navigateTo({
-			url: `/pages/webview/webview?src=${encodeURIComponent(src)}`
+		// uni.navigateTo({
+		// 	url: `/pages/webview/webview?src=${encodeURIComponent(src)}`
+		// })
+		uni.openOfficialAccountArticle({
+			url: src
 		})
 	}
 	// 跳转
@@ -194,13 +208,24 @@
 		}
 		switch (type) {
 			case '数据统计':
+				uni.showToast({
+					title: '敬请期待',
+					icon: 'none'
+				})
+				return;
 				uni.navigateTo({
 					url: '/pages/statistics/statistics'
 				})
 				break;
 			case '问题反馈':
+				return;
 				uni.navigateTo({
 					url: '/pages/feedback/feedback'
+				})
+				break;
+			case '扫码助手':
+				uni.scanCode({
+					
 				})
 				break;
 		}
@@ -358,6 +383,9 @@
 		margin-bottom: 20rpx;
 
 		.menu {
+			// all: unset;
+			background-color: transparent;
+			border: none;
 			flex: 1;
 			display: flex;
 			align-items: center;
@@ -366,6 +394,10 @@
 			font-size: 26rpx;
 			color: var(--title-color);
 			line-height: 36rpx;
+			padding: 0;
+			&::after {
+				display: none;
+			}
 		}
 	}
 

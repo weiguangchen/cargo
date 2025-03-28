@@ -50,6 +50,12 @@ export function GetSupplyOnwayDetail(data) {
 export function DisableOnwayEnt(data) {
 	return request.post("/api/permission/WechatApi/DisableOnwayEnt", data);
 }
+/**
+ * 确认卸货
+*/
+export function UnloadConfirm(data) {
+	return request.post("/api/permission/WechatApi/UnloadConfirm", data);
+}
 
 /**
  * 获取运单时间树
@@ -226,10 +232,31 @@ export function GetAssignCarList(data) {
 }
 
 /**
+ * 货单列表
+*/
+export function GetAssignCarListWithCount(data) {
+	return request.post("/api/permission/WechatApi/GetAssignCarListWithCount", data);
+}
+
+/**
  * 货单详情
 */
 export function GetAssignDetail(data) {
 	return request.post("/api/permission/WechatApi/GetAssignDetail", data);
+}
+
+/**
+ * 完结或暂停货单
+*/
+export function SetAssignStatusChg(data) {
+	return request.post("/api/permission/WechatApi/SetAssignStatusChg", data);
+}
+
+/**
+ * 继续货单
+*/
+export function ResetAssignStatusChg(data) {
+	return request.post("/api/permission/WechatApi/ResetAssignStatusChg", data);
 }
 
 /**
@@ -254,4 +281,17 @@ export function GetOwnerOnwayList(data) {
 }
 export function GetOnwayOwner(data) {
 	return request.post("/api/permission/WechatApi/GetOnwayOwner", data);
+}
+/**
+ * 运单列表（带筛选）
+*/
+export function GetOnwayOwnerWithCount(data) {
+	return request.post("/api/permission/WechatApi/GetOnwayOwnerWithCount", data);
+}
+
+/**
+ * 货主公司筛选条件
+*/
+export function GetOwnerFilterList(data) {
+	return request.post("/api/permission/WechatApi/GetOwnerFilterList", data);
 }

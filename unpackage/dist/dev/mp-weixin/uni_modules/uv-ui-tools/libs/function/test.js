@@ -178,6 +178,7 @@ exports.func = func;
 exports.image = image;
 exports.number = number;
 exports.promise = promise;
+exports.range = range;
 exports.test = test;
 exports.url = url;
 exports.video = video;

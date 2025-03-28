@@ -30,6 +30,9 @@
   font-weight: bold;
   color: var(--title-color);
 }
+.symbol.data-v-f30cd5b4 {
+  margin-right: 2rpx;
+}
 .symbol.data-v-f30cd5b4,
 .unit.data-v-f30cd5b4 {
   font-size: 24rpx;

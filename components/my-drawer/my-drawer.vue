@@ -1,26 +1,28 @@
 <template>
-	<uv-popup ref="popup" mode="bottom" :custom-style="{ minHeight: '100rpx' }" :duration="duration" :overlay="overlay"
-		:zIndex="zIndex" :overlayOpacity="overlayOpacity" :overlayStyle="overlayStyle"
-		:closeOnClickOverlay="closeOnClickOverlay" :closeable="closeable" :closeIconPos="closeIconPos" :round="round"
-		safeAreaInsetBottom :bgColor="bgColor" @change="change" @maskClick="maskClick">
-		<view class="drawer-wrapper">
-			<view class="title-wrapper" v-if="showTitle">
-				<slot name="title" v-if="$slots.title"></slot>
-				<template v-else>{{ title }}</template>
-			</view>
-			<scroll-view scroll-y="true" class="scroll-view" :style="{height: `${scrollHeight}px` }">
-				<view class="scroll-view-wrapper">
-					<slot></slot>
+	<root-portal>
+		<uv-popup ref="popup" mode="bottom" :custom-style="{ minHeight: '100rpx' }" :duration="duration" :overlay="overlay"
+			:zIndex="zIndex" :overlayOpacity="overlayOpacity" :overlayStyle="overlayStyle"
+			:closeOnClickOverlay="closeOnClickOverlay" :closeable="closeable" :closeIconPos="closeIconPos" :round="round"
+			safeAreaInsetBottom :bgColor="bgColor" @change="change" @maskClick="maskClick">
+			<view class="drawer-wrapper">
+				<view class="title-wrapper" v-if="showTitle">
+					<slot name="title" v-if="$slots.title"></slot>
+					<template v-else>{{ title }}</template>
 				</view>
-			</scroll-view>
-			<view class="modal-footer" v-if="showConfirmButton || $slots.footer">
-				<slot name="footer">
-					<uv-button text="确认" color="linear-gradient( 270deg, #31CE57 0%, #07B130 100%);" @click="confirm"
-						:loading="loading" :custom-style="{ borderRadius: '16rpx' }" />
-				</slot>
+				<scroll-view scroll-y="true" class="scroll-view" :style="{height: `${scrollHeight}px` }">
+					<view class="scroll-view-wrapper">
+						<slot></slot>
+					</view>
+				</scroll-view>
+				<view class="modal-footer" v-if="showConfirmButton || $slots.footer">
+					<slot name="footer">
+						<uv-button text="确认" color="linear-gradient( 270deg, #31CE57 0%, #07B130 100%);" @click="confirm"
+							:loading="loading" :custom-style="{ borderRadius: '16rpx' }" />
+					</slot>
+				</view>
 			</view>
-		</view>
-	</uv-popup>
+		</uv-popup>
+	</root-portal>
 </template>
 
 <script setup>

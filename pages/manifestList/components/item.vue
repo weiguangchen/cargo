@@ -40,45 +40,48 @@
 				预估总价 <text style="font-weight: bold;">¥ {{ record.EstimateCarAmount || 0.00 }}</text> 
 			</view>
 		</view>
-		<uv-line color="var(--divider)" margin="24rpx 0"/>
-		<view class="footer">
-			<template v-if="record.Status === '1'">
-				<view class="btn" @click.stop>
-					<uv-button shape="circle" text="完结货单" color="var(--page-bg)"
-						:customTextStyle="{ color: 'var(--content-color)', fontSize: '26rpx' }"
-						:customStyle="{ height: '32px' }"></uv-button>
-				</view>
-				<view class="btn" @click.stop>
-					<uv-button shape="circle" text="暂停货单" color="var(--page-bg)"
-						:customTextStyle="{ color: 'var(--content-color)', fontSize: '26rpx' }"
-						:customStyle="{ height: '32px' }"></uv-button>
-				</view>
-			</template>
-			<template v-else-if="['2','3'].includes(record.Status)">
-				<view class="btn" @click.stop>
-					<uv-button shape="circle" text="完结货单" color="var(--page-bg)"
-						:customTextStyle="{ color: 'var(--content-color)', fontSize: '26rpx' }"
-						:customStyle="{ height: '32px' }"></uv-button>
-				</view>
-				<view class="btn" @click.stop>
-					<uv-button shape="circle" text="继续派单" color="linear-gradient( 270deg, #31CE57 0%, #07B130 100%);"
-						:customTextStyle="{ fontSize: '26rpx' }" :customStyle="{ height: '32px' }"></uv-button>
-				</view>
-			</template>
-			<template v-else-if="['4'].includes(record.Status)">
-				<view class="btn" @click.stop>
-					<uv-button shape="circle" text="继续派单" color="linear-gradient( 270deg, #31CE57 0%, #07B130 100%);"
-						:customTextStyle="{ fontSize: '26rpx' }" :customStyle="{ height: '32px' }"></uv-button>
-				</view>
-			</template>
-		</view>
+		<template v-if="['1','2','3','4'].includes(record.Status)">
+			<uv-line color="var(--divider)" margin="24rpx 0"/>
+			<view class="footer">
+				<template v-if="record.Status === '1'">
+					<view class="btn" @click.stop>
+						<uv-button shape="circle" text="完结货单" color="var(--page-bg)"
+							:customTextStyle="{ color: 'var(--content-color)', fontSize: '26rpx' }"
+							:customStyle="{ height: '32px' }" @click="finishHandle"/>
+					</view>
+					<view class="btn" @click.stop>
+						<uv-button shape="circle" text="暂停货单" color="var(--page-bg)"
+							:customTextStyle="{ color: 'var(--content-color)', fontSize: '26rpx' }"
+							:customStyle="{ height: '32px' }" @click="pauseHandle" />
+					</view>
+				</template>
+				<template v-else-if="['2','3'].includes(record.Status)">
+					<view class="btn" @click.stop>
+						<uv-button shape="circle" text="完结货单" color="var(--page-bg)"
+							:customTextStyle="{ color: 'var(--content-color)', fontSize: '26rpx' }"
+							:customStyle="{ height: '32px' }" @click="finishHandle" />
+					</view>
+					<view class="btn" @click.stop>
+						<uv-button shape="circle" text="继续派单" color="linear-gradient( 270deg, #31CE57 0%, #07B130 100%);" :customTextStyle="{ fontSize: '26rpx' }" :customStyle="{ height: '32px' }" @click="goOnHandle"/>
+					</view>
+				</template>
+				<template v-else-if="['4'].includes(record.Status)">
+					<view class="btn" @click.stop>
+						<uv-button shape="circle" text="继续派单" color="linear-gradient( 270deg, #31CE57 0%, #07B130 100%);" :customTextStyle="{ fontSize: '26rpx' }" :customStyle="{ height: '32px' }" @click="goOnHandle"/>
+					</view>
+				</template>
+			</view>
+		</template>
 	</view>
+	
+	<my-confirm ref="confirm"/>
 </template>
 
 <script setup>
-	import { computed } from 'vue';
+	import { computed, ref } from 'vue';
 	import { ManifestStatusOptions } from '@/utils/dict.js'
-	const emits = defineEmits(['toDetail']);
+	import { SetAssignStatusChg, ResetAssignStatusChg } from '@/api/index.js'
+	const emits = defineEmits(['toDetail','success']);
 	const props = defineProps({
 		record: {
 			default: () => {},
@@ -96,7 +99,114 @@
 	})
 	
 	function toDetail() {
-		emits('toDetail', props.record)
+		uni.navigateTo({
+			url: `/pages/manifestDetail/manifestDetail?assignId=${props.record.Id}&supplyId=${props.record.Supply}`
+		})
+	}
+	
+	const confirm = ref();
+	async function finishHandle() {
+		confirm.value.confirm({
+			title: '确定完结货单？',
+			content: '完结后将不再派发新的运单任务，当前进行中的运单任务不受影响',
+			cancelText: '再想想',
+			confirmText: '完结货单',
+			asyncClose: true,
+			async confirm() {
+				try {
+					await SetAssignStatusChg({
+						optType: 'end',
+						assignId: props.record.Id,
+						supplyId: props.record.Supply
+					})
+					uni.showToast({
+						title: '操作成功',
+						icon: 'none',
+						complete() {
+							setTimeout(() => {
+								emits('success')
+							},1500)
+						}
+					})
+					confirm.value.close();
+				} catch(err) {
+					uni.showToast({
+						icon: 'none',
+						title: err.data
+					})
+					confirm.value.closeLoading();
+				}
+			}
+		})
+	}
+	function pauseHandle() {
+		confirm.value.confirm({
+			title: '确定暂停货单？',
+			content: '暂停后将不再派发新的运单任务，后续可随时继续派单，当前进行中的运单任务不受影响',
+			cancelText: '再想想',
+			confirmText: '暂停货单',
+			confirmBgColor: 'var(--main-color)',
+			asyncClose: true,
+			async confirm() {
+				try {
+					await SetAssignStatusChg({
+						optType: 'pause',
+						assignId: props.record.Id,
+						supplyId: props.record.Supply
+					})
+					uni.showToast({
+						title: '操作成功',
+						icon: 'none',
+						complete() {
+							setTimeout(() => {
+								emits('success')
+							},1500)
+						}
+					})
+					confirm.value.close();
+				} catch(err) {
+					uni.showToast({
+						icon: 'none',
+						title: err.data
+					})
+					confirm.value.closeLoading();
+				}
+			}
+		})
+	}
+	function goOnHandle() {
+		confirm.value.confirm({
+			title: '确定继续派单？',
+			content: '将继续派发运单任务',
+			cancelText: '再想想',
+			confirmText: '继续派单',
+			confirmBgColor: 'var(--main-color)',
+			asyncClose: true,
+			async confirm() {
+				try {
+					await ResetAssignStatusChg({
+						assignId: props.record.Id,
+						supplyId: props.record.Supply
+					})
+					await uni.showToast({
+						title: '操作成功',
+						icon: 'none',
+						complete() {
+							setTimeout(() => {
+								emits('success')
+							},1500)
+						}
+					})
+					confirm.value.close();
+				} catch(err) {
+					uni.showToast({
+						icon: 'none',
+						title: err.data
+					})
+					confirm.value.closeLoading();
+				}
+			}
+		})
 	}
 </script>
 
@@ -127,11 +237,11 @@
 				color: var(--main-color);
 			}
 			&.pause {
-				background: rgba(252, 126, 44, .18);
-				color: #FC7E2C;
+				background: #FC7E2C;
+				color: #FFFFFF;
 			}
 			&.finish {
-				background: #C8D4DF;
+				background: var(--red-color);
 				color: #FFFFFF;
 			}
 		}

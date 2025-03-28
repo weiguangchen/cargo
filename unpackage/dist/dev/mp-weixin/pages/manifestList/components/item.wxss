@@ -49,11 +49,11 @@
   color: var(--main-color);
 }
 .bill .tag.pause.data-v-6d1eb3e7 {
-  background: rgba(252, 126, 44, 0.18);
-  color: #FC7E2C;
+  background: #FC7E2C;
+  color: #FFFFFF;
 }
 .bill .tag.finish.data-v-6d1eb3e7 {
-  background: #C8D4DF;
+  background: var(--red-color);
   color: #FFFFFF;
 }
 .bill .material-name.data-v-6d1eb3e7 {

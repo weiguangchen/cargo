@@ -9,14 +9,21 @@
 	<!-- end -->
 	<!-- 头图 -->
 	<view class="mfrs-avatar" style="width: 100%;height: 540rpx;">
-		<!-- <uv-image width="100%" height="100%" :duration="0" src="/static/images/mfrs/big.png" mode="aspectFit"/> -->
+		<uv-image v-if="supply" width="100%" height="100%" :src="supply.Photo" mode="aspectFill">
+			<template v-slot:loading>
+				<view style="background-color: #E3E9EF;" ></view>
+			</template>
+			<template v-slot:error>
+				<view style="background-color: #E3E9EF;" ></view>
+			</template>
+		</uv-image>
 	</view>
 	<!-- end -->
 	<!-- 详细信息 -->
 	<view class="info-wrapper">
 		<view class="title uv-line-2">{{ supply.Name }}</view>
 		<view class="status-wrapper">
-			<view class="status">{{ supply.Signed === '1' ? '已签约' : '未签约' }}</view>
+			<view class="status" :class="{ 'signed': supply.Signed === '1' }">{{ supply.Signed === '1' ? '已签约' : '未签约' }}</view>
 			<view class="price" v-if="supply.Balance">余额¥ {{ supply.Balance }}</view>
 		</view>
 		<view class="notice" @click="openNotice" v-if="supply.Notice">
@@ -26,7 +33,7 @@
 		</view>
 		<view class="location">
 			<view class="address-box my-border-right">
-				<view class="dis" v-if="dis">距离您{{ dis }}km</view>
+				<view class="dis" v-if="dis">距离您 {{ dis }} km</view>
 				<view class="address uv-line-1">{{ supply.Province || '' }}{{ supply.City || '' }}{{ supply.Address || '' }}</view>
 			</view>
 			<view class="handle-box">
@@ -53,6 +60,7 @@
 			<view class="category" :class="{'active': active === index}" v-for="(item,index) in list" :id="`category-${index}`"
 				@click="chooseCate(item,index)">{{ item.typeName }}</view>
 		</scroll-view>
+		<view style="font-size: 24rpx;color: #F15948;height:72rpx;display: flex;align-items: center;justify-content: center;background-color: #FFF0EE;">本页面价格仅供参考，最终价格请以实际签约为准</view>
 	</uv-sticky>
 	<!-- end -->
 	<!-- 物料 -->
@@ -62,24 +70,24 @@
 			<view class="materials-list">
 				<view class="material" :class="{'my-border-bottom': j < item.materialList.length - 1}" v-for="(cate,j) in item.materialList" :key="cate.MaterialId">
 					<view class="img">
-						<uv-image width="100%" height="100%" :duration="0" :src="cate.Image" mode="aspectFit">
+						<uv-image width="100%" height="100%" :duration="0" :src="cate.Image" mode="aspectFill">
 							<template v-slot:error>
-								<uv-image width="100%" height="100%" :duration="0" src="/static/images/mfrs/mat.png" mode="aspectFit" />
+								<view style="width: 100%;height: 100%;background-color: #E3E9EF;"/>
 							</template>
 						</uv-image>
 					</view>
 					<view class="info">
 						<view class="">
 							<view class="name">{{ cate.MaterialName }}</view>
-							<view class="desc">这是一个规格特征</view>
+							<!-- <view class="desc">这是一个规格特征</view> -->
 						</view>
 						<view class="price">
-							<my-price color="var(--red-color)" unit="吨"/>
-							<text class="old-price">{{ cate.TaxPrice }}</text>
+							<my-price :price="cate.TaxPrice" color="var(--red-color)" unit="吨"/>
+							<!-- <text class="old-price">{{ cate.TaxPrice }}</text> -->
 							<!-- <text class="seek">咨询企业获取价格</text> -->
 						</view>
 					</view>
-					<view class="dispatch">派单</view>
+					<!-- <view class="dispatch">派单</view> -->
 				</view>
 			</view>
 		</view>
@@ -290,13 +298,18 @@
 			}
 
 			.status {
-				background-color: var(--main-color);
-				color: #FFFFFF;
+				background-color: var(--page-bg);
+				color: var(--main-color);
+				&.signed {
+					background-color: var(--main-color);
+					color: #FFFFFF;
+				}
 			}
 
 			.price {
 				background-color: var(--page-bg);
 				color: var(--main-color);
+				border-left: 1px solid var(--main-color);
 			}
 		}
 
@@ -447,10 +460,11 @@
 						flex-direction: column;
 						justify-content: space-between;
 						margin-right: 24rpx;
-
+						padding-top: 14rpx;
+						padding-bottom: 6rpx;
 						.name {
 							font-weight: 600;
-							font-size: 30rpx;
+							font-size: 34rpx;
 							color: var(--title-color);
 							line-height: 36rpx;
 							margin-bottom: 8rpx;

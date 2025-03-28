@@ -77,7 +77,7 @@
 	// 运单相关
 	function toDetail(record) {
 		uni.navigateTo({
-			url: `/pages/orderDetail/orderDetail?orderId=${record.SSOrderId}`
+			url: `/pages/orderDetail/orderDetail?orderId=${record.SSOrderId}&supplyId=${record.SupplyId}`
 		})
 	}
 	

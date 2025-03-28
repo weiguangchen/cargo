@@ -28,9 +28,10 @@
 				:customStyle="iconStyle"
 			></uv-icon>
 		</view>
-		<slot name="input">
+		<!-- <slot name="input"> -->
 			<view class="input-wrapper">
 				<input
+				  ref="inputRef"
 				  :disabled="disabledInput || disabled"
 				  :cursor-spacing="getCursorSpacing"
 				  :class="{ 'uv-number-box__input--disabled': disabled || disabledInput }"
@@ -44,7 +45,7 @@
 				/>
 				<view class="unit">{{ unit }}</view>
 			</view>
-		</slot>
+		<!-- </slot> -->
 		<view
 		  class="uv-number-box__slot"
 		  @tap.stop="clickHandler('plus')"
@@ -79,6 +80,7 @@
 	import mpMixin from '@/uni_modules/uv-ui-tools/libs/mixin/mpMixin.js'
 	import mixin from '@/uni_modules/uv-ui-tools/libs/mixin/mixin.js'
 	import props from '@/uni_modules/uv-number-box/components/uv-number-box/props.js';
+	import Big from 'big.js';
 	/**
 	 * numberBox 步进器
 	 * @description 该组件一般用于商城购物选择物品数量的场景。
@@ -114,9 +116,21 @@
 		name: 'uv-number-box',
 		mixins: [mpMixin, mixin, props],
 		props: {
+			min: {
+				default: 0,
+				type: Number
+			},
 			unit: {
 				default: '吨',
 				type: String
+			},
+			minLimitMsg: {
+				default: null,
+				type: Function
+			},
+			maxLimitMsg: {
+				default: null,
+				type: Function
 			}
 		},
 		data() {
@@ -138,9 +152,9 @@
 				}
 			},
 			modelValue(newVal) {
-				if (newVal !== this.currentValue) {
-					this.currentValue = this.format(this.modelValue)
-				}
+				// if (newVal !== this.currentValue) {
+					this.currentValue = this.formatter(this.format(this.modelValue))
+				// }
 			}
 		},
 		computed: {
@@ -178,19 +192,21 @@
 			},
 			isDisabled() {
 				return (type) => {
+					const value = this.filter(this.currentValue);
+					const newVal = value === '' ? 0 : +value;
 					if (type === 'plus') {
-						// 在点击增加按钮情况下，判断整体的disabled，是否单独禁用增加按钮，以及当前值是否大于最大的允许值
+						// 在点击增加按钮情况下，判断整体的disabled，是否单独禁用增加按钮，以及当前值是否大于最大的允许值					   
 						return (
 							this.disabled ||
 							this.disablePlus ||
-							this.currentValue >= this.max
+							newVal >= this.max
 						)
 					}
 					// 点击减少按钮同理
 					return (
 						this.disabled ||
 						this.disableMinus ||
-						this.currentValue <= this.min
+						newVal <= this.min
 					)
 				}
 			},
@@ -201,7 +217,9 @@
 		methods: {
 			init() {
 				const value = this.value || this.modelValue;
-				this.currentValue = this.format(value)
+				// this.currentValue = this.format(value)
+				let val = this.format(value)
+				this.currentValue = this.formatter(val);
 			},
 			// 格式化整理数据，限制范围
 			format(value) {
@@ -209,12 +227,37 @@
 				// 如果为空字符串，那么设置为0，同时将值转为Number类型
 				value = value === '' ? 0 : +value
 				// 对比最大最小值，取在min和max之间的值
+				console.log('max',this.max,'min',this.min,'value',value);
+				if(Big(value || 0).gt(this.max || 0)) {
+					let maxMsg = `最大值为${this.max}`;
+					if(this.maxLimitMsg && typeof this.maxLimitMsg === 'function') {
+						maxMsg = this.maxLimitMsg(this.max);
+					}
+					uni.showToast({
+						title: maxMsg,
+						icon: 'none'
+					})
+				}
+				if(Big(value || 0).lt(this.min || 0)) {
+					let minMsg = `最小值为${this.min}`;
+					if(this.minLimitMsg && typeof this.minLimitMsg === 'function') {
+						minMsg = this.minLimitMsg(this.min);
+					}
+					uni.showToast({
+						title: minMsg,
+						icon: 'none'
+					})
+				}
 				value = Math.max(Math.min(this.max, value), this.min)
 				// 如果设定了最大的小数位数，使用toFixed去进行格式化
 				if (this.decimalLength !== null) {
 					value = value.toFixed(this.decimalLength)
 				}
 				return value
+			},
+			formatter(value) {
+				return value;
+				// return `${value} ${this.unit}`
 			},
 			// 过滤非法的字符
 			filter(value) {
@@ -243,7 +286,17 @@
 			// 输入框失去焦点
 			onBlur(event) {
 				// 对输入值进行格式化
-				const value = this.format(event.detail.value)
+				let value = this.format(event.detail.value)
+				// value = this.formatter(value);
+				if (!this.asyncChange) {
+					console.log('onBlur',value)
+					this.$nextTick(() => {
+						this.$emit('input', value);
+						this.$emit('update:modelValue', value);
+						this.currentValue = this.formatter(value);
+						this.$forceUpdate();
+					})
+				}
 				// 发出blur事件
 				this.$emit(
 					'blur', {
@@ -258,15 +311,15 @@
 					value = ''
 				} = e.detail || {}
 				// 为空返回
-				if (value === '') return
+				// if (value === '') return;
 				let formatted = this.filter(value)
 				// 最大允许的小数长度
-				if (this.decimalLength !== null && formatted.indexOf('.') !== -1) {
-					const pair = formatted.split('.');
-					formatted = `${pair[0]}.${pair[1].slice(0, this.decimalLength)}`
-				}
-				formatted = this.format(formatted)
-				this.emitChange(formatted);
+				// if (this.decimalLength !== null && formatted.indexOf('.') !== -1) {
+				// 	const pair = formatted.split('.');
+				// 	formatted = `${pair[0]}.${pair[1].slice(0, this.decimalLength)}`
+				// }
+				// formatted = this.format(formatted)
+				// this.emitChange(formatted);
 			},
 			// 发出change事件
 			emitChange(value) {
@@ -275,7 +328,8 @@
 					this.$nextTick(() => {
 						this.$emit('input', value)
 						this.$emit('update:modelValue', value)
-						this.currentValue = value
+						// this.currentValue = value;
+						this.currentValue = this.formatter(value)
 						this.$forceUpdate()
 					})
 				}
@@ -291,8 +345,10 @@
 				if (this.isDisabled(type)) {
 					return this.$emit('overlimit', type)
 				}
-				const diff = type === 'minus' ? -this.step : +this.step
-				const value = this.format(this.add(+this.currentValue, diff))
+				const diff = type === 'minus' ? -this.step : +this.step;
+				const inputValue = this.filter(this.currentValue)
+				let value = this.format(this.add(+inputValue, diff))
+				// value = this.formatter(value);
 				this.emitChange(value)
 				this.$emit(type)
 			},
@@ -333,6 +389,10 @@
 			clearTimeout() {
 				clearTimeout(this.longPressTimer)
 				this.longPressTimer = null
+			},
+			clickUnit() {
+				console.log(this.$refs['inputRef'])
+				// this.$refs.input.focus()
 			}
 		}
 	}
@@ -362,8 +422,8 @@
 		}
 		&__plus,
 		&__minus {
-			width: 72rpx;
-			height: 72rpx;
+			width: 112rpx;
+			height: 88rpx;
 			@include flex;
 			justify-content: center;
 			align-items: center;
@@ -393,23 +453,23 @@
 			display: flex;
 			flex-direction: row;
 			align-items: center;
-			width: 208rpx;
-			// padding: 0 40rpx;
-			height: 72rpx;
+			flex:none;
+			width: 304rpx;
+			padding: 0 20rpx;
+			height: 88rpx;
 			border: 2rpx solid var(--page-bg);
 			.unit {
-				flex:1;
+				flex:none;
 				font-weight: bold;
 				font-size: 28rpx;
-				margin-left: 6rpx;
 				color: var(--title-color);
 			}
 		}
 		&__input {
 			flex:1;
 			position: relative;
-			text-align: right;
-			font-size: 28rpx;
+			text-align: center;
+			font-size: 32rpx;
 			font-weight: bold;
 			// padding: $uv-numberBox-input-padding;
 			// margin: $uv-numberBox-input-margin;

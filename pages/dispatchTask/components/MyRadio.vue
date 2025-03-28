@@ -2,7 +2,6 @@
 	<view class="radio-group">
 		<view class="radio-box" :class="{'active':item.value === modelValue}" v-for="item in options"
 			@click="select(item)">
-			<view class="radio" />
 			{{ item.label }}
 		</view>
 	</view>
@@ -22,6 +21,10 @@
 	const props = defineProps({
 		modelValue: {
 			default: '',
+		},
+		record: {
+			default: () => {},
+			type: Object
 		}
 	})
 	const emits = defineEmits(['update:modelValue','change'])
@@ -41,8 +44,23 @@
 	])
 
 	function select(item) {
-		emits('update:modelValue', item.value)
-		emits('change',item.value)
+		console.log('select',item,props.record)
+		if(item.value === '0') {
+			emits('update:modelValue', item.value)
+			emits('change',item.value)
+			return;
+		}
+			
+		if(props.record.LeftStatus === '0') {
+			uni.showToast({
+				title: '订单剩余量过低，不满足装运条件',
+				icon: 'none'
+			})
+		}else if(props.record.LeftStatus === '1'){
+			emits('update:modelValue', item.value)
+			emits('change',item.value)
+		}
+		
 		
 	}
 </script>
@@ -55,45 +73,22 @@
 		justify-content: flex-end;
 
 		.radio-box {
-			width: fit-content;
+			width: 156rpx;
+			height: 72rpx;
 			display: flex;
 			align-items: center;
+			justify-content: center;
 			font-size: 28rpx;
-			color: var(--content-color);
-			line-height: 48rpx;
-
+			color: var(--sub-color);
+			background: var(--page-bg);
+			border-radius: 8rpx;
 			&:not(:last-child) {
 				margin-right: 20rpx;
 			}
 
-			.radio {
-				width: 20rpx;
-				height: 20rpx;
-				border: 2rpx solid var(--divider);
-				border-radius: 50%;
-				background-color: #fff;
-				margin-right: 12rpx;
-			}
-
 			&.active {
-				color: var(--main-color);
-
-				.radio {
-					display: flex;
-					align-items: center;
-					justify-content: center;
-					border-color: var(--main-color);
-
-					&::after {
-						content: '';
-						display: block;
-						width: 12rpx;
-						height: 12rpx;
-						border-radius: 50%;
-						background-color: var(--main-color);
-					}
-				}
-
+				background: var(--main-color);
+				color: #FFF;
 			}
 		}
 	}

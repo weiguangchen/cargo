@@ -23,15 +23,18 @@ const _sfc_main = {
   __name: "orderDetail",
   setup(__props) {
     const orderId = common_vendor.ref("");
+    const supplyId = common_vendor.ref("");
     common_vendor.onLoad((options) => {
-      orderId.value = options.orderId;
+      orderId.value = (options == null ? void 0 : options.orderId) ?? "";
+      supplyId.value = (options == null ? void 0 : options.supplyId) ?? "";
       getInfo();
     });
     const info = common_vendor.ref({});
     async function getInfo() {
       try {
         const res = await api_index.GetOrderDetail({
-          orderId: orderId.value
+          orderId: orderId.value,
+          supplyId: supplyId.value
         });
         info.value = res;
       } catch {

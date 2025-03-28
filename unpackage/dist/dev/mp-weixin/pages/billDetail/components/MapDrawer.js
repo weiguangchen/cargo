@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../../common/vendor.js");
+const utils_index = require("../../../utils/index.js");
 if (!Array) {
   const _easycom_uv_line2 = common_vendor.resolveComponent("uv-line");
   const _easycom_uv_image2 = common_vendor.resolveComponent("uv-image");
@@ -23,66 +24,60 @@ const _sfc_main = {
     common_vendor.onMounted(() => {
       mapContext.value = common_vendor.index.createMapContext("map", ctx);
     });
-    function openApp() {
-      const { latitude, longitude, address } = location.value;
-      mapContext.value.openMapApp({
-        longitude,
-        latitude,
-        destination: address
-      });
-    }
-    const location = common_vendor.ref({
-      name: "",
-      address: "",
-      username: "",
-      phone: "",
-      type: "装货地",
-      longitude: "",
-      latitude: ""
-    });
-    function open(data) {
-      location.value = data;
-      drawer.value.popup.open();
-    }
-    const isOpen = common_vendor.ref(false);
-    function drawerChange(event) {
-      isOpen.value = event.show;
-      if (event.show) {
-        setTimeout(() => {
-          const marker = {
-            id: 1,
-            longitude: location.value.longitude,
-            latitude: location.value.latitude,
-            iconPath: "/static/images/map-marker.png",
-            width: "20rpx",
-            height: "28rpx",
-            customCallout: {
-              display: "ALWAYS",
-              anchorX: 0,
-              anchorY: -16
-            }
-          };
-          mapContext.value.addMarkers({
-            markers: [marker],
-            clear: true
-          });
-          mapContext.value.moveToLocation({
-            longitude: location.value.longitude,
-            latitude: location.value.latitude
-          });
-        }, 300);
-      }
-    }
-    function takePhone() {
-      if (!location.value.phone) {
-        common_vendor.index.showToast({
-          icon: "none",
-          title: "暂无司机手机号"
-        });
+    function makePhone() {
+      if (!info.phone) {
         return;
       }
       common_vendor.index.makePhoneCall({
-        phoneNumber: location.value.phone
+        phoneNumber: info.phone
+      });
+    }
+    function openApp() {
+      common_vendor.index.openLocation({
+        longitude: info.longitude,
+        latitude: info.latitude,
+        name: info.name,
+        address: info.address
+      });
+    }
+    const info = common_vendor.reactive({
+      type: "",
+      name: "",
+      address: "",
+      user: "",
+      phone: ""
+    });
+    async function open(data) {
+      console.log("打开地图 data", data);
+      info.type = (data == null ? void 0 : data.type) ?? "";
+      info.name = (data == null ? void 0 : data.name) ?? "";
+      info.address = (data == null ? void 0 : data.address) ?? "";
+      info.user = (data == null ? void 0 : data.user) ?? "";
+      info.phone = (data == null ? void 0 : data.phone) ?? "";
+      info.longitude = (data == null ? void 0 : data.longitude) ?? "";
+      info.latitude = (data == null ? void 0 : data.latitude) ?? "";
+      drawer.value.popup.open();
+      await utils_index.sleep(300);
+      const marker = {
+        id: 123,
+        longitude: data.longitude,
+        latitude: data.latitude,
+        iconPath: "/static/images/map-marker.png",
+        width: "30rpx",
+        height: "42rpx",
+        customCallout: {
+          display: "ALWAYS",
+          anchorX: 0,
+          anchorY: -12
+        }
+      };
+      mapContext.value.addMarkers({
+        markers: [marker],
+        clear: true
+      });
+      mapContext.value.moveToLocation({
+        longitude: info.longitude,
+        latitude: info.latitude
       });
     }
     __expose({
@@ -90,27 +85,27 @@ const _sfc_main = {
     });
     return (_ctx, _cache) => {
       return common_vendor.e({
-        a: isOpen.value
-      }, isOpen.value ? {} : {}, {
-        b: common_vendor.t(location.value.type),
-        c: location.value.type === "卸货地" ? 1 : "",
-        d: location.value.type === "装货地" ? 1 : "",
-        e: common_vendor.t(location.value.name),
-        f: common_vendor.t(location.value.address),
+        a: common_vendor.t(info.type === 1 ? "装货地" : "卸货地"),
+        b: info.type === 1 ? 1 : "",
+        c: info.type === 2 ? 1 : "",
+        d: common_vendor.t(info.name),
+        e: common_vendor.t(info.address),
+        f: info.user || info.phone
+      }, info.user || info.phone ? common_vendor.e({
         g: common_vendor.p({
           color: "#E3E9EF",
           margin: "28rpx 0 32rpx"
         }),
-        h: location.value.username || location.value.phone
-      }, location.value.username || location.value.phone ? common_vendor.e({
-        i: location.value.username
-      }, location.value.username ? {
-        j: common_vendor.t(location.value.username)
+        h: info.user || info.phone
+      }, info.user || info.phone ? common_vendor.e({
+        i: info.user
+      }, info.user ? {
+        j: common_vendor.t(info.user)
       } : {}, {
-        k: location.value.phone
-      }, location.value.phone ? {
-        l: common_vendor.t(location.value.phone)
-      } : {}) : {}, {
+        k: info.phone
+      }, info.phone ? {
+        l: common_vendor.t(info.phone)
+      } : {}) : {}) : {}, {
         m: common_vendor.p({
           src: "/static/images/phone.png",
           width: "40rpx",
@@ -120,7 +115,7 @@ const _sfc_main = {
             marginRight: "4rpx"
           }
         }),
-        n: common_vendor.o(takePhone),
+        n: common_vendor.o(makePhone),
         o: common_vendor.p({
           color: "#E7F9E9",
           ["custom-style"]: {
@@ -150,8 +145,7 @@ const _sfc_main = {
         s: common_vendor.sr(drawer, "a251a19b-0", {
           "k": "drawer"
         }),
-        t: common_vendor.o(drawerChange),
-        v: common_vendor.p({
+        t: common_vendor.p({
           showTitle: false,
           bgColor: "#FFFFFF",
           round: "12px"

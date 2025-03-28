@@ -125,10 +125,10 @@
 		label: '全部装货厂家',
 		value: 'all'
 	}, {
-		label: '河南洛阳腾圃代理有限公司',
+		label: '选项',
 		value: '1'
 	}, {
-		label: '河南洛阳腾圃代理有限公司',
+		label: '选项',
 		value: '2'
 	}])
 	const mfrs = ref('all')
@@ -137,10 +137,10 @@
 		label: '全部物料',
 		value: 'all'
 	}, {
-		label: '河南洛阳腾圃代理有限公司',
+		label: '选项',
 		value: '1'
 	}, {
-		label: '河南洛阳腾圃代理有限公司',
+		label: '选项',
 		value: '2'
 	}])
 	const material = ref('all')
@@ -149,10 +149,10 @@
 		label: '全部卸货地',
 		value: 'all'
 	}, {
-		label: '河南洛阳腾圃代理有限公司',
+		label: '选项',
 		value: '1'
 	}, {
-		label: '河南洛阳腾圃代理有限公司',
+		label: '选项',
 		value: '2'
 	}])
 	const discharge = ref('all')
@@ -161,10 +161,10 @@
 		label: '全部货主',
 		value: 'all'
 	}, {
-		label: '河南洛阳腾圃代理有限公司',
+		label: '选项',
 		value: '1'
 	}, {
-		label: '河南洛阳腾圃代理有限公司',
+		label: '选项',
 		value: '2'
 	}])
 	const cargo = ref('all')

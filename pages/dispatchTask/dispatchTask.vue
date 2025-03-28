@@ -326,7 +326,8 @@
 			...m,
 			MaterialsList: m.MaterialsList?.map(n => ({
 				...n,
-				Limittype: '0'
+				Limittype: '0',
+				EstimiteWeight: n.minWgtLeft,
 			})) ?? []
 		}));
 		orderList.value = temp;
@@ -352,11 +353,11 @@
 		if(!order.value) return price;
 		if(!order.value.MaterialsList || (order.value.MaterialsList && order.value.MaterialsList.length === 0)) return price;
 		const total = order.value.MaterialsList.map(m => {
-			const { TaxPrice, Limittype, EstimateWeight, EstimateTimes } = m;
+			const { TaxPrice, Limittype, EstimiteWeight, EstimiteTimes } = m;
 			const SingleWeight = order.value.SingleWeight;
 			if(Limittype === '0') price = Big(0).toFixed(2);
-			if(Limittype === '1') price = Big(EstimateWeight || 0).times(TaxPrice || 0).toFixed(2);
-			if(Limittype === '2') price = Big(EstimateTimes || 0).times(SingleWeight || 0).times(TaxPrice || 0).toFixed(2);
+			if(Limittype === '1') price = Big(EstimiteWeight || 0).times(TaxPrice || 0).toFixed(2);
+			if(Limittype === '2') price = Big(EstimiteTimes || 0).times(SingleWeight || 0).times(TaxPrice || 0).toFixed(2);
 			console.log('price',price)
 			return price;
 		}).reduce((p,n) => Big(p).plus(n).toFixed(2),0)
@@ -408,8 +409,8 @@
 			UnloadPlaceId: unload.value.Id, // 卸货地址主键
 			Orderid: order.value.SSOrderId, //订单主键
 			Orderno: order.value.SSOrderNo, // 订单编码
-			StartTime: startTime.value ? dayjs(startTime.value).format('YYYY-MM-DD HH:mm:ss') : '', //开始进厂时间
-			EndTime: endTime.value ? dayjs(endTime.value).format('YYYY-MM-DD HH:mm:ss') : '', // 截止接单时间
+			StartTime: startTime.value ? dayjs(startTime.value).format('YYYY-MM-DD HH:mm') : '', //开始进厂时间
+			EndTime: endTime.value ? dayjs(endTime.value).format('YYYY-MM-DD HH:mm') : '', // 截止接单时间
 			Carno: model.Carno.join(','), // 限制车牌，多个‘,’分隔
 			CarType : model.CarType.join(','),
 			MatList: order.value.MaterialsList.map(m => {
@@ -420,15 +421,14 @@
 					LeftWeight: m.WeightLeft,
 					EstimatePrice: m.TaxPrice
 				}
-				if(m.Limittype === '1') item.EstimateWeight = m.EstimateWeight;
-				if(m.Limittype === '2') item.EstimateTimes = m.EstimateTimes;
+				if(m.Limittype === '1') item.EstimiteWeight = m.EstimiteWeight;
+				if(m.Limittype === '2') item.EstimiteTimes = m.EstimiteTimes;
 				return item;
 			}),
 			Memo: model.Memo,
 			OwnerUserId: getToken()?.userInfo?.Id ?? '',
 		}
 		console.log('params',params)
-		
 		try {
 			submiting.value = true;
 			await SetAssignTicket(params)
@@ -437,8 +437,11 @@
 				icon: 'none'
 			})
 			uni.navigateBack()
-		}catch {
-			
+		}catch (err){
+			uni.showToast({
+				title: err.data,
+				icon: 'none'
+			})
 		}
 		finally {
 			submiting.value = false;

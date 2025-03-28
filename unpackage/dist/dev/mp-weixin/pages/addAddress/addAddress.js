@@ -36,6 +36,7 @@ const _sfc_main = {
             province: res.Province,
             city: res.City,
             district: res.Distinct,
+            districtCode: res.DistrictCode,
             latitude: res.Latitude,
             longitude: res.Logitude
           };
@@ -108,12 +109,14 @@ const _sfc_main = {
             province,
             city,
             distinct,
-            address
+            address,
+            districtCode
           } = response;
           let area = {
             province,
             city,
             district: distinct,
+            districtCode,
             address,
             latitude,
             longitude
@@ -134,6 +137,7 @@ const _sfc_main = {
             city,
             province,
             district,
+            districtCode,
             longitude,
             latitude
           },
@@ -148,6 +152,7 @@ const _sfc_main = {
           City: city,
           Province: province,
           Distinct: district,
+          DistrictCode: districtCode,
           Placename,
           Logitude: longitude,
           Latitude: latitude,

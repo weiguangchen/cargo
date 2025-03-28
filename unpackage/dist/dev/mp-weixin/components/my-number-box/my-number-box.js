@@ -1,15 +1,27 @@
 "use strict";
+const common_vendor = require("../../common/vendor.js");
 const uni_modules_uvUiTools_libs_mixin_mpMixin = require("../../uni_modules/uv-ui-tools/libs/mixin/mpMixin.js");
 const uni_modules_uvUiTools_libs_mixin_mixin = require("../../uni_modules/uv-ui-tools/libs/mixin/mixin.js");
 const uni_modules_uvNumberBox_components_uvNumberBox_props = require("../../uni_modules/uv-number-box/components/uv-number-box/props.js");
-const common_vendor = require("../../common/vendor.js");
 const _sfc_main = {
   name: "uv-number-box",
   mixins: [uni_modules_uvUiTools_libs_mixin_mpMixin.mpMixin, uni_modules_uvUiTools_libs_mixin_mixin.mixin, uni_modules_uvNumberBox_components_uvNumberBox_props.props],
   props: {
+    min: {
+      default: 0,
+      type: Number
+    },
     unit: {
       default: "吨",
       type: String
+    },
+    minLimitMsg: {
+      default: null,
+      type: Function
+    },
+    maxLimitMsg: {
+      default: null,
+      type: Function
     }
   },
   data() {
@@ -31,9 +43,7 @@ const _sfc_main = {
       }
     },
     modelValue(newVal) {
-      if (newVal !== this.currentValue) {
-        this.currentValue = this.format(this.modelValue);
-      }
+      this.currentValue = this.formatter(this.format(this.modelValue));
     }
   },
   computed: {
@@ -70,10 +80,12 @@ const _sfc_main = {
     },
     isDisabled() {
       return (type) => {
+        const value = this.filter(this.currentValue);
+        const newVal = value === "" ? 0 : +value;
         if (type === "plus") {
-          return this.disabled || this.disablePlus || this.currentValue >= this.max;
+          return this.disabled || this.disablePlus || newVal >= this.max;
         }
-        return this.disabled || this.disableMinus || this.currentValue <= this.min;
+        return this.disabled || this.disableMinus || newVal <= this.min;
       };
     }
   },
@@ -83,16 +95,41 @@ const _sfc_main = {
   methods: {
     init() {
       const value = this.value || this.modelValue;
-      this.currentValue = this.format(value);
+      let val = this.format(value);
+      this.currentValue = this.formatter(val);
     },
     // 格式化整理数据，限制范围
     format(value) {
       value = this.filter(value);
       value = value === "" ? 0 : +value;
+      console.log("max", this.max, "min", this.min, "value", value);
+      if (common_vendor.Big(value || 0).gt(this.max || 0)) {
+        let maxMsg = `最大值为${this.max}`;
+        if (this.maxLimitMsg && typeof this.maxLimitMsg === "function") {
+          maxMsg = this.maxLimitMsg(this.max);
+        }
+        common_vendor.index.showToast({
+          title: maxMsg,
+          icon: "none"
+        });
+      }
+      if (common_vendor.Big(value || 0).lt(this.min || 0)) {
+        let minMsg = `最小值为${this.min}`;
+        if (this.minLimitMsg && typeof this.minLimitMsg === "function") {
+          minMsg = this.minLimitMsg(this.min);
+        }
+        common_vendor.index.showToast({
+          title: minMsg,
+          icon: "none"
+        });
+      }
       value = Math.max(Math.min(this.max, value), this.min);
       if (this.decimalLength !== null) {
         value = value.toFixed(this.decimalLength);
       }
+      return value;
+    },
+    formatter(value) {
       return value;
     },
     // 过滤非法的字符
@@ -118,7 +155,16 @@ const _sfc_main = {
     },
     // 输入框失去焦点
     onBlur(event) {
-      this.format(event.detail.value);
+      let value = this.format(event.detail.value);
+      if (!this.asyncChange) {
+        console.log("onBlur", value);
+        this.$nextTick(() => {
+          this.$emit("input", value);
+          this.$emit("update:modelValue", value);
+          this.currentValue = this.formatter(value);
+          this.$forceUpdate();
+        });
+      }
       this.$emit(
         "blur",
         {
@@ -132,15 +178,7 @@ const _sfc_main = {
       const {
         value = ""
       } = e.detail || {};
-      if (value === "")
-        return;
-      let formatted = this.filter(value);
-      if (this.decimalLength !== null && formatted.indexOf(".") !== -1) {
-        const pair = formatted.split(".");
-        formatted = `${pair[0]}.${pair[1].slice(0, this.decimalLength)}`;
-      }
-      formatted = this.format(formatted);
-      this.emitChange(formatted);
+      this.filter(value);
     },
     // 发出change事件
     emitChange(value) {
@@ -148,7 +186,7 @@ const _sfc_main = {
         this.$nextTick(() => {
           this.$emit("input", value);
           this.$emit("update:modelValue", value);
-          this.currentValue = value;
+          this.currentValue = this.formatter(value);
           this.$forceUpdate();
         });
       }
@@ -165,7 +203,8 @@ const _sfc_main = {
         return this.$emit("overlimit", type);
       }
       const diff = type === "minus" ? -this.step : +this.step;
-      const value = this.format(this.add(+this.currentValue, diff));
+      const inputValue = this.filter(this.currentValue);
+      let value = this.format(this.add(+inputValue, diff));
       this.emitChange(value);
       this.$emit(type);
     },
@@ -206,6 +245,9 @@ const _sfc_main = {
     clearTimeout() {
       clearTimeout(this.longPressTimer);
       this.longPressTimer = null;
+    },
+    clickUnit() {
+      console.log(this.$refs["inputRef"]);
     }
   }
 };

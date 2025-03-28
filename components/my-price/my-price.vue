@@ -54,7 +54,9 @@
 		font-weight: bold;
 		color: var(--title-color);
 	}
-
+	.symbol {
+		margin-right: 2rpx;
+	}
 	.symbol,
 	.unit {
 		font-size: 24rpx;

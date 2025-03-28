@@ -79,13 +79,16 @@
 	}
 	
 	onLoad(async() => {
-		// 定位授权
-		getLocationInfo();
-		
 		if(!getToken()) {
 			return;
 		}
-		getList()
+		
+		try {
+			// 定位授权
+			await getLocationInfo();
+		}finally {
+			getList()
+		}
 	})
 
 	// 导航条

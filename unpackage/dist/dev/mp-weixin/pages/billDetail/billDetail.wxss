@@ -127,8 +127,15 @@ page {
   color: var(--sub-color);
   font-size: 26rpx;
 }
-.material-wrapper .material .my-price.unit {
-  color: var(--content-color) !important;
+.material-wrapper .material .my-price .number {
+  font-size: 36rpx !important;
+}
+.material-wrapper .material .value {
+  text-align: center;
+}
+.material-wrapper .material .value .title {
+  font-size: 26rpx;
+  color: #73838E;
 }
 .bangdan,
 .bill-car,
@@ -230,4 +237,7 @@ page {
 .info-wrapper .item.my-border-bottom {
   padding: 0 4rpx 32rpx;
   margin-bottom: 32rpx;
+}
+.info-wrapper .item.my-border-top {
+  padding: 32rpx 4rpx 0;
 }

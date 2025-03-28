@@ -5,6 +5,7 @@
     "uv-search": "../../uni_modules/uv-search/components/uv-search/uv-search",
     "uv-navbar": "../../uni_modules/uv-navbar/components/uv-navbar/uv-navbar",
     "uv-tabs": "../../uni_modules/uv-tabs/components/uv-tabs/uv-tabs",
+    "uv-image": "../../uni_modules/uv-image/components/uv-image/uv-image",
     "my-empty": "../../components/my-empty/my-empty",
     "uv-load-more": "../../uni_modules/uv-load-more/components/uv-load-more/uv-load-more",
     "my-login-drawer": "../../components/my-login-drawer/my-login-drawer",

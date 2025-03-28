@@ -1,5 +1,6 @@
 "use strict";
 const common_vendor = require("../../../common/vendor.js");
+const utils_index = require("../../../utils/index.js");
 if (!Array) {
   const _easycom_uv_image2 = common_vendor.resolveComponent("uv-image");
   const _easycom_uv_form_item2 = common_vendor.resolveComponent("uv-form-item");
@@ -41,32 +42,45 @@ const _sfc_main = {
     const emits = __emit;
     const model = common_vendor.ref({
       Limittype: "0",
-      EstimateWeight: 1,
-      EstimateTimes: 1
+      EstimiteWeight: 1,
+      EstimiteTimes: 1
     });
     const rules = common_vendor.ref();
     common_vendor.watchEffect(() => {
+      var _a, _b;
       model.value = {
         ...model.value,
-        ...props.modelValue
+        ...props.modelValue,
+        EstimiteWeight: ((_a = props.modelValue) == null ? void 0 : _a.EstimiteWeight) ?? 1,
+        EstimiteTimes: ((_b = props.modelValue) == null ? void 0 : _b.EstimiteTimes) ?? 1
       };
     });
     const maxCarNumber = common_vendor.computed(() => {
       if (!props.modelValue.LeftWeight || !props.order.SingleWeight)
-        return null;
+        return void 0;
       const no = common_vendor.Big(props.modelValue.LeftWeight).div(props.order.SingleWeight).toFixed(0);
       console.log("maxCarNumber", no);
-      return no;
+      return +no;
     });
     const drawer = common_vendor.ref();
     function openDrawer() {
+      var _a, _b;
+      model.value = {
+        ...model.value,
+        ...props.modelValue,
+        EstimiteWeight: ((_a = props.modelValue) == null ? void 0 : _a.EstimiteWeight) ?? 1,
+        EstimiteTimes: ((_b = props.modelValue) == null ? void 0 : _b.EstimiteTimes) ?? 1
+      };
       drawer.value.popup.open();
     }
     async function typeChange() {
       await common_vendor.nextTick$1();
       drawer.value.resize();
     }
-    function confirm() {
+    async function confirm() {
+      await common_vendor.index.hideKeyboard();
+      await utils_index.sleep(200);
+      console.log("confirm");
       console.log("model", model.value);
       emits("update:modelValue", model.value);
     }
@@ -77,11 +91,11 @@ const _sfc_main = {
       }, __props.modelValue.Limittype === "0" ? {} : {}, {
         c: __props.modelValue.Limittype === "1"
       }, __props.modelValue.Limittype === "1" ? {
-        d: common_vendor.t(__props.modelValue.EstimateWeight)
+        d: common_vendor.t(__props.modelValue.EstimiteWeight)
       } : {}, {
         e: __props.modelValue.Limittype === "2"
       }, __props.modelValue.Limittype === "2" ? {
-        f: common_vendor.t(__props.modelValue.EstimateTimes)
+        f: common_vendor.t(__props.modelValue.EstimiteTimes)
       } : {}, {
         g: common_vendor.p({
           src: "/static/images/arrow.png",
@@ -102,6 +116,7 @@ const _sfc_main = {
         m: common_vendor.o(typeChange),
         n: common_vendor.o(($event) => model.value.Limittype = $event),
         o: common_vendor.p({
+          record: model.value,
           modelValue: model.value.Limittype
         }),
         p: common_vendor.p({
@@ -113,27 +128,38 @@ const _sfc_main = {
         }),
         q: model.value.Limittype === "1"
       }, model.value.Limittype === "1" ? {
-        r: common_vendor.o(($event) => model.value.EstimateWeight = $event),
+        r: common_vendor.o(($event) => model.value.EstimiteWeight = $event),
         s: common_vendor.p({
-          max: model.value.LeftWeight,
-          modelValue: model.value.EstimateWeight
+          ["decimal-length"]: "2",
+          max: model.value.LeftWeight !== null ? model.value.LeftWeight : void 0,
+          ["max-limit-msg"]: (max) => `重量最多为${max}吨`,
+          min: model.value.minWgtLeft,
+          ["min-limit-msg"]: (min) => `重量最少为${min}吨`,
+          step: 10,
+          modelValue: model.value.EstimiteWeight
         }),
         t: common_vendor.p({
+          labelPosition: "top",
           label: "最大装运重量",
-          prop: "EstimateWeight"
+          prop: "EstimiteWeight"
         })
       } : {}, {
         v: model.value.Limittype === "2"
       }, model.value.Limittype === "2" ? {
-        w: common_vendor.o(($event) => model.value.EstimateTimes = $event),
+        w: common_vendor.o(($event) => model.value.EstimiteTimes = $event),
         x: common_vendor.p({
+          ["decimal-length"]: "0",
           max: maxCarNumber.value,
+          ["max-limit-msg"]: (max) => `车次最多为${max}`,
+          min: 1,
+          ["min-limit-msg"]: (min) => `车次最少为${min}`,
           unit: "车次",
-          modelValue: model.value.EstimateTimes
+          modelValue: model.value.EstimiteTimes
         }),
         y: common_vendor.p({
+          labelPosition: "top",
           label: "最大装运车次",
-          prop: "EstimateTimes"
+          prop: "EstimiteTimes"
         })
       } : {}, {
         z: common_vendor.sr("form", "6a1fe5cc-2,6a1fe5cc-1"),

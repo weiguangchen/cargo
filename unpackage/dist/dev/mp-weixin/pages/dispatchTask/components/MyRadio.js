@@ -10,10 +10,16 @@ const _sfc_main = /* @__PURE__ */ Object.assign(__default__, {
   props: {
     modelValue: {
       default: ""
+    },
+    record: {
+      default: () => {
+      },
+      type: Object
     }
   },
   emits: ["update:modelValue", "change"],
   setup(__props, { emit: __emit }) {
+    const props = __props;
     const emits = __emit;
     const options = common_vendor.ref([
       {
@@ -30,8 +36,21 @@ const _sfc_main = /* @__PURE__ */ Object.assign(__default__, {
       }
     ]);
     function select(item) {
-      emits("update:modelValue", item.value);
-      emits("change", item.value);
+      console.log("select", item, props.record);
+      if (item.value === "0") {
+        emits("update:modelValue", item.value);
+        emits("change", item.value);
+        return;
+      }
+      if (props.record.LeftStatus === "0") {
+        common_vendor.index.showToast({
+          title: "订单剩余量过低，不满足装运条件",
+          icon: "none"
+        });
+      } else if (props.record.LeftStatus === "1") {
+        emits("update:modelValue", item.value);
+        emits("change", item.value);
+      }
     }
     return (_ctx, _cache) => {
       return {

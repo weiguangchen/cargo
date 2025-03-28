@@ -3,10 +3,13 @@
   "navigationStyle": "custom",
   "usingComponents": {
     "uv-navbar": "../../uni_modules/uv-navbar/components/uv-navbar/uv-navbar",
-    "uv-icon": "../../uni_modules/uv-icon/components/uv-icon/uv-icon",
     "uv-image": "../../uni_modules/uv-image/components/uv-image/uv-image",
     "uv-line": "../../uni_modules/uv-line/components/uv-line/uv-line",
     "my-price": "../../components/my-price/my-price",
-    "uv-button": "../../uni_modules/uv-button/components/uv-button/uv-button"
+    "uv-button": "../../uni_modules/uv-button/components/uv-button/uv-button",
+    "my-confirm": "../../components/my-confirm/my-confirm",
+    "remark-drawer": "../billDetail/components/RemarkDrawer",
+    "map-drawer": "../billDetail/components/MapDrawer",
+    "carno-drawer": "./components/CarnoDrawer"
   }
 }

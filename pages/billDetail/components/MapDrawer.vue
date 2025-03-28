@@ -1,25 +1,20 @@
 <template>
-	<my-drawer ref="drawer" :showTitle="false" bgColor="#FFFFFF" round="12px" @change="drawerChange">
+	<my-drawer ref="drawer" :showTitle="false" bgColor="#FFFFFF" round="12px">
 		<view class="map-wrapper">
-			<map id="map" style="width: 100%;height: 100%;" show-location v-if="isOpen">
-				<cover-view slot="callout">
-					<cover-view :marker-id="1" class="marker">在这里装货</cover-view>
-				</cover-view>
-			</map>
+			<map id="map" style="width: 100%;height: 480rpx;"/>
 		</view>
 		<view class="info-wrapper">
 			<view class="map-location-wrapper">
-				<view class="tag" :class="{ 'xie': location.type === '卸货地', 'zhuang': location.type === '装货地' }">{{ location.type }}</view>
-				<view class="name">{{ location.name }}</view>
-				<view class="address">{{ location.address }}</view>
-				<uv-line color="#E3E9EF" margin="28rpx 0 32rpx" />
-				<view class="person">
-					<template v-if="location.username || location.phone">
-						<text style="margin-right: 24rpx;" v-if="location.username">{{ location.username }}</text>
-						<text v-if="location.phone">{{ location.phone }}</text>
-					</template>
-					<template v-else>暂无联系人信息</template>
-				</view>
+				<view class="tag" :class="{ 'zhuang': info.type === 1, 'xie': info.type === 2 }">{{ info.type === 1 ? '装货地' : '卸货地' }}</view>
+				<view class="name">{{ info.name }}</view>
+				<view class="address">{{ info.address }}</view>
+				<template v-if="info.user || info.phone">
+					<uv-line color="#E3E9EF" margin="28rpx 0 32rpx"/>
+					<view class="person" v-if="info.user || info.phone">
+						<text style="margin-right: 24rpx;" v-if="info.user">{{ info.user }}</text>
+						<text v-if="info.phone">{{ info.phone }}</text>
+					</view>
+				</template>
 			</view>
 		</view>
 
@@ -27,7 +22,7 @@
 			<view class="map-footer">
 				<view class="btn" style="margin-right: 22rpx;">
 					<uv-button color="#E7F9E9"
-						:custom-style="{ height: '96rpx', border: '1px solid var(--main-color)', borderRadius: '16rpx', color: 'var(--main-color)' }" @click="takePhone">
+						:custom-style="{ height: '96rpx', border: '1px solid var(--main-color)', borderRadius: '16rpx', color: 'var(--main-color)' }" @click="makePhone">
 						<uv-image src="/static/images/phone.png" width="40rpx" height="40rpx" :duration="0"
 							:custom-style="{ marginRight: '4rpx' }" />
 						呼叫
@@ -49,8 +44,11 @@
 	import {
 		ref,
 		onMounted,
-		getCurrentInstance
+		getCurrentInstance,
+		reactive
 	} from 'vue';
+	import { sleep } from '@/utils/index.js';
+	
 	const { ctx } = getCurrentInstance();
 	const drawer = ref();
 	
@@ -59,70 +57,66 @@
 		mapContext.value = uni.createMapContext("map", ctx);
 	})
 	
-	function openApp() {
-		const { latitude, longitude, address } = location.value
-		mapContext.value.openMapApp({
-			longitude,
-			latitude,
-			destination: address
-		});
-	}
-	
-	const location = ref({
-		name: '',
-		address: '',
-		username: '',
-		phone: '',
-		type: '装货地',
-		longitude: '',
-		latitude: ''
-	});
-	function open(data) {
-		location.value = data;
-		drawer.value.popup.open();
-	}
-	const isOpen = ref(false);
-	function drawerChange(event) {
-		isOpen.value = event.show;
-		if(event.show) {
-			setTimeout(() => {
-				const marker = {
-					id: 1,
-					longitude: location.value.longitude,
-					latitude: location.value.latitude,
-					iconPath: '/static/images/map-marker.png',
-					width: '20rpx',
-					height: '28rpx',
-					customCallout: {
-						display: 'ALWAYS',
-						anchorX: 0,
-						anchorY: -16
-					}
-				}
-				mapContext.value.addMarkers({
-					markers: [marker],
-					clear: true
-				})
-				mapContext.value.moveToLocation({
-					longitude: location.value.longitude,
-					latitude: location.value.latitude,
-				});
-			},300)
-		}
-	}
-	
-	function takePhone() {
-		if(!location.value.phone) {
-			uni.showToast({
-				icon: 'none',
-				title: '暂无司机手机号'
-			})
+	function makePhone() {
+		if(!info.phone) {
 			return;
 		}
+		
 		uni.makePhoneCall({
-			phoneNumber: location.value.phone
+			phoneNumber: info.phone
 		})
 	}
+	function openApp() {
+		uni.openLocation({
+			longitude: info.longitude,
+			latitude: info.latitude,
+			name: info.name,
+			address: info.address
+		})
+	}
+	
+	const info = reactive({
+		type: '',
+		name: '',
+		address: '',
+		user: '',
+		phone: ''
+	})
+	async function open(data) {
+		console.log('打开地图 data', data)
+		info.type = data?.type ?? '';
+		info.name = data?.name ?? '';
+		info.address = data?.address ?? '';
+		info.user = data?.user ?? '';
+		info.phone = data?.phone ?? '';
+		info.longitude = data?.longitude ?? '';
+		info.latitude = data?.latitude ?? '';
+		drawer.value.popup.open();
+		
+		await sleep(300);
+		const marker = {
+			id: 123,
+			longitude: data.longitude,
+			latitude: data.latitude,
+			iconPath: '/static/images/map-marker.png',
+			width: '30rpx',
+			height: '42rpx',
+			customCallout: {
+				display: 'ALWAYS',
+				anchorX: 0,
+				anchorY: -12
+			}
+		}
+		mapContext.value.addMarkers({
+			markers: [marker],
+			clear: true
+		})
+		mapContext.value.moveToLocation({
+			longitude: info.longitude,
+			latitude: info.latitude,
+		})
+	}
+
 
 	defineExpose({
 		open
@@ -131,23 +125,10 @@
 
 <style lang="scss" scoped>
 	.map-wrapper {
-		height: 480rpx;
 		border-radius: 12px;
 		overflow: hidden;
 		transform: translateY(0)
 	}
-	
-	.marker {
-		padding: 10rpx 20rpx;
-		background-color: #fff;
-		font-weight: 500;
-		font-size: 26rpx;
-		color: var(--title-color);
-		line-height: 36rpx;
-		box-shadow: 0rpx 4rpx 4rpx 0rpx rgba(0,0,0,0.25);
-		border-radius: 28rpx;
-	}
-	
 	.info-wrapper {
 		padding: 24rpx;
 		background-color: var(--page-bg);
@@ -172,11 +153,12 @@
 			font-size: 26rpx;
 			color: #FFFFFF;
 			margin-bottom: 20rpx;
-			&.zhuang {
-				background-color: var(--main-color);
-			}
+
 			&.xie {
 				background-color: #FC7E2C;
+			}
+			&.zhuang {
+				background-color: var(--main-color);
 			}
 		}
 

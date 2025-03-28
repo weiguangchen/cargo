@@ -1,15 +1,13 @@
-<script>
-	export default {
-		onLaunch: function() {
-			console.log('App Launch')
-		},
-		onShow: function() {
-			console.log('App Show')
-		},
-		onHide: function() {
-			console.log('App Hide')
-		}
-	}
+<script setup>
+	import { getToken } from '@/utils/token.js';
+	import { useUserStore } from '@/stores/user.js';
+	import { onLaunch } from '@dcloudio/uni-app';
+	
+	const userStore = useUserStore();
+	onLaunch(async () => {
+		console.log('App Launch')
+		userStore.setUserInfo(getToken() ? getToken()?.userInfo : {});
+	})
 </script>
 
 <style lang="scss">

@@ -66,6 +66,7 @@
 					province: res.Province,
 					city: res.City,
 					district: res.Distinct,
+					districtCode: res.DistrictCode,
 					latitude: res.Latitude,
 					longitude: res.Logitude
 				}
@@ -144,12 +145,14 @@
 					province,
 					city,
 					distinct,
-					address
+					address,
+					districtCode
 				} = response;
 				let area = {
 					province,
 					city,
 					district: distinct,
+					districtCode: districtCode,
 					address,
 					latitude,
 					longitude
@@ -172,6 +175,7 @@
 					city,
 					province,
 					district,
+					districtCode,
 					longitude,
 					latitude
 				},
@@ -186,6 +190,7 @@
 				City: city,
 				Province: province,
 				Distinct: district,
+				DistrictCode: districtCode,
 				Placename,
 				Logitude: longitude,
 				Latitude: latitude,

@@ -1,5 +1,5 @@
 <template>
-	<uv-navbar placeholder bgColor="rgba(255,255,255,0)" @leftClick="leftClick"></uv-navbar>
+	<uv-navbar placeholder bgColor="var(--page-bg)" @leftClick="leftClick"></uv-navbar>
 	<!-- 状态 -->
 	<view class="status-wrapper">
 		<view class="status-text">
@@ -8,8 +8,8 @@
 			<template v-if="info.Status === '3'">货单已暂停</template>
 			<template v-if="info.Status === '4'">等待货单完结</template>
 			<template v-if="info.Status === '5'">货单已完结</template>
-			 <uv-icon name="arrow-right" size="28rpx" color="var(--title-color)"
-				:custom-style="{ marginLeft: '4rpx' }" bold />
+			<!-- <uv-icon name="arrow-right" size="28rpx" color="var(--title-color)"
+				:custom-style="{ marginLeft: '4rpx' }" bold /> -->
 		</view>
 		<view class="tip" v-if="['2','3','4'].includes(info.Status)">
 			<template v-if="info.Status === '2'">已停止派单，等待进行中运单任务的结束</template>
@@ -20,7 +20,7 @@
 	<!-- end -->
 	<!-- 地址 -->
 	<view class="location-wrapper">
-		<view class="from-wrapper" @click="openMapModal" v-if="info.SupEnt">
+		<view class="from-wrapper" @click="openMapModal(1)" v-if="info.SupEnt">
 			<view class="icon">装</view>
 			<view class="content-box my-border-bottom">
 				<view class="info" @click="selectAddress">
@@ -32,7 +32,7 @@
 				<uv-image src="/static/images/arrow.png" :duration="0" width="24rpx" height="24rpx" />
 			</view>
 		</view>
-		<view class="to-wrapper" @click="openMapModal" v-if="info.UnloadEnt">
+		<view class="to-wrapper" @click="openMapModal(2)" v-if="info.UnloadEnt">
 			<view class="icon">卸</view>
 			<view class="content-box">
 				<view class="info" @click="selectAddress">
@@ -64,7 +64,7 @@
 						</template>
 					</view>
 					<uv-line direction="col" color="#B0BECC" length="24rpx" margin="0 24rpx" />
-					<view class="payed">已支付 ¥ {{ mat.Realamount }}</view>
+					<view class="payed">已支付 ¥ {{ mat.Realamount || 0 }}</view>
 				</view>
 			</view>
 		</view>
@@ -99,10 +99,6 @@
 			<view class="label">创建时间</view>
 			<view class="value">{{ info.CreatorTime ? dayjs(info.CreatorTime).format('YYYY-MM-DD HH:mm:ss') : '' }}</view>
 		</view>
-		<view class="item my-border-bottom">
-			<view class="label">创建人</view>
-			<view class="value">张三 18566669999</view>
-		</view>
 		<view class="item" :class="{'my-border-bottom': !info.EndTime }" v-if="info.StartTime">
 			<view class="label">车辆入场时间</view>
 			<view class="value">{{ info.StartTime }}</view>
@@ -113,24 +109,26 @@
 		</view>
 		<view class="item">
 			<view class="label">车辆类型限制</view>
-			<view class="value">{{ info.CarType }}</view>
+			<view class="value">{{ carTypeText }}</view>
 		</view>
-		<view class="item my-border-bottom">
+		<view class="item my-border-bottom"  v-if="info.Carno">
 			<view class="label">车牌限制</view>
-			<view class="value">
-				京YU987W 等 6 车 <uv-image src="/static/images/arrow.png" width="18rpx" height="18rpx" :duration="0":customStyle="{ marginLeft: '2rpx' }"/>
+			<view class="value" @click="showAllCarno">
+				{{ carLimitText }}
+				<uv-image v-if="carnoList.length > 1" src="/static/images/arrow.png" width="18rpx" height="18rpx" :duration="0":customStyle="{ marginLeft: '2rpx' }"/>
 			</view>
 		</view>
 		<view class="item" v-if="!!info.Memo">
 			<view class="label">派单备注</view>
-			<view class="value">
+			<view class="value" @click="openMemo">
 				查看 <uv-image src="/static/images/arrow.png" width="18rpx" height="18rpx" :duration="0":customStyle="{ marginLeft: '2rpx' }"/>
 			</view>
 		</view>
-		<view class="item" v-if="info.OrderId">
+		<view class="item" v-if="info.Orderno">
 			<view class="label">所属订单</view>
 			<view class="value">
-				查看 <uv-image src="/static/images/arrow.png" width="18rpx" height="18rpx" :duration="0":customStyle="{ marginLeft: '2rpx' }"/>
+				{{ info.Orderno }} 
+				<!-- <uv-image src="/static/images/arrow.png" width="18rpx" height="18rpx" :duration="0":customStyle="{ marginLeft: '2rpx' }"/> -->
 			</view>
 		</view>
 		<view class="item" style="margin-bottom: 0;" v-if="!!info.RelOnwayCount">
@@ -141,31 +139,52 @@
 		</view>
 	</view>
 	
-	<view class="page-footer">
-		<view class="btns">
+	<view class="page-footer" v-if="['1','2','3','4'].includes(info.Status)">
+		<view class="btns" v-if="['1'].includes(info.Status)">
 			<view class="left">
-				<uv-button text="完结货单" color="var(--page-bg)" :custom-style="{ height: '96rpx', borderRadius: '16rpx', fontSize: '30rpx', color: 'var(--sub-color)', fontWeight: 'bold' }" />
+				<uv-button text="完结货单" color="var(--page-bg)" :custom-style="{ height: '96rpx', borderRadius: '16rpx', fontSize: '30rpx', color: 'var(--sub-color)' }" @click="finishHandle"/>
 			</view>
 			<view class="right">
-				<uv-button text="继续派单" color="linear-gradient( 270deg, #31CE57 0%, #07B130 100%)" :custom-style="{ height: '96rpx', borderRadius: '16rpx', fontSize: '30rpx', fontWeight: 'bold' }" />
+				<uv-button text="暂停货单" color="var(--page-bg)" :custom-style="{ height: '96rpx', borderRadius: '16rpx', fontSize: '30rpx', color: 'var(--sub-color)' }" @click="pauseHandle"/>
 			</view>
 		</view>
+		<view class="btns" v-if="['2','3'].includes(info.Status)">
+			<view class="left">
+				<uv-button text="完结货单" color="var(--page-bg)" :custom-style="{ height: '96rpx', borderRadius: '16rpx', fontSize: '30rpx', color: 'var(--sub-color)' }" @click="finishHandle"/>
+			</view>
+			<view class="right">
+				<uv-button text="继续派单" color="linear-gradient( 270deg, #31CE57 0%, #07B130 100%)" :custom-style="{ height: '96rpx', borderRadius: '16rpx', fontSize: '30rpx' }" @click="goOnHandle"/>
+			</view>
+		</view>
+		<view class="btns" v-if="['5'].includes(info.Status)">
+			<uv-button text="继续派单" color="linear-gradient( 270deg, #31CE57 0%, #07B130 100%)" :custom-style="{ height: '96rpx', width: '100%', borderRadius: '16rpx', fontSize: '30rpx' }" @click="goOnHandle"/>
+		</view>
 	</view>
+	<!-- 地图 -->
+	<MapDrawer ref="mapModal" />
+	<RemarkDrawer ref="remarkModal"/>
+	<my-confirm ref="confirm"/>
+	<CarnoDrawer ref="carnoModal"/>
 </template>
 
 <script setup>
-	import { ref } from 'vue'
+	import { computed, ref } from 'vue'
 	import { onLoad } from '@dcloudio/uni-app';
-	import { GetAssignDetail } from '@/api/index.js'
+	import { GetAssignDetail, SetAssignStatusChg, ResetAssignStatusChg } from '@/api/index.js'
 	import dayjs from 'dayjs'
+	import RemarkDrawer from '@/pages/billDetail/components/RemarkDrawer.vue';
+	import MapDrawer from '@/pages/billDetail/components/MapDrawer.vue';
+	import CarnoDrawer from './components/CarnoDrawer.vue';
 	
 	function leftClick() {
 		uni.navigateBack()
 	}
 	
 	const assignId = ref();
+	const supplyId = ref();
 	onLoad((options) => {
-		assignId.value = options.assignId;
+		assignId.value = options?.assignId ?? '';
+		supplyId.value = options?.supplyId ?? '';
 		getDetail();
 	})
 	
@@ -173,13 +192,154 @@
 	async function getDetail() {
 		try {
 			const res = await GetAssignDetail({
-				assignId: assignId.value
+				assignId: assignId.value,
+				supplyId: supplyId.value
 			})
 			info.value = res || {};
 		}catch {
 		}
 	}
 	
+	// 车辆类型
+	const carTypeText = computed(() => {
+		if(!info.value.CarType) return '';
+		const arr = info.value?.CarType?.split(',') ?? [];
+		return arr.join(' + ');
+	})
+	// 车牌限制
+	const carnoList = computed(() => {
+		if(!info.value.Carno) return [];
+		return info.value?.Carno?.split(',') ?? []
+	});
+	const carLimitText = computed(() => {
+		if(carnoList.value.length === 0) return '';
+		if(carnoList.value.length === 1) return carnoList.value[0];
+		if(carnoList.value.length > 1) {
+			return `${carnoList.value[0]} 等 ${carnoList.value.length} 车`
+		}
+	})
+	const carnoModal = ref();
+	function showAllCarno() {
+		if(carnoList.value.length <= 1) return;
+		carnoModal.value.open(carnoList.value);
+	}
+	
+	// 地图
+	const mapModal = ref();
+	function openMapModal(type) {
+		const data = {
+			type,
+			name: type === 1 ? info.value?.SupEnt?.SupplierName ?? '' : info.value?.UnloadEnt?.PlaceName ?? '',
+			address: type === 1 ? `${info.value?.SupEnt?.Province ?? ''}${info.value?.SupEnt?.City ?? ''}${info.value?.SupEnt?.District ?? ''}${info.value?.SupEnt?.Address ?? ''}` : `${info.value?.UnloadEnt?.Province ?? ''}${info.value?.UnloadEnt?.City ?? ''}${info.value?.UnloadEnt?.District ?? ''}${info.value?.UnloadEnt?.Address ?? ''}`,
+			user: type === 1 ? info.value?.SupEnt?.Linker ?? '' : info.value?.UnloadEnt?.NickName ?? '',
+			phone: type === 1 ? info.value?.SupEnt?.LinkerMobile ?? '' : info.value?.UnloadEnt?.Mobile ?? '',
+			longitude: type === 1 ? info.value?.SupEnt?.Logitude : info.value?.UnloadEnt?.Logitude,
+			latitude: type === 1 ? info.value?.SupEnt?.Latitude : info.value?.UnloadEnt?.Latitude
+		}
+		mapModal.value.open(data);
+	}
+	
+	
+	const remarkModal = ref();
+	function openMemo() {
+		remarkModal.value.open({
+			title: '派单备注',
+			memo: info.value.Memo
+		})
+	}
+	
+	const confirm = ref();
+	function finishHandle() {
+		confirm.value.confirm({
+			title: '确定完结货单？',
+			content: '完结后将不再派发新的运单任务，当前进行中的运单任务不受影响',
+			cancelText: '再想想',
+			confirmText: '完结货单',
+			asyncClose: true,
+			async confirm() {
+				try {
+					await SetAssignStatusChg({
+						optType: 'end',
+						assignId: assignId.value,
+						supplyId: supplyId.value
+					})
+					uni.showToast({
+						title: '操作成功',
+						icon: 'none'
+					})
+					confirm.value.close();
+					getDetail();
+				} catch(err) {
+					uni.showToast({
+						icon: 'none',
+						title: err.data
+					})
+					confirm.value.closeLoading();
+				}
+			}
+		})
+	}
+	function pauseHandle() {
+		confirm.value.confirm({
+			title: '确定暂停货单？',
+			content: '暂停后将不再派发新的运单任务，后续可随时继续派单，当前进行中的运单任务不受影响',
+			cancelText: '再想想',
+			confirmText: '暂停货单',
+			confirmBgColor: 'var(--main-color)',
+			asyncClose: true,
+			async confirm() {
+				try {
+					await SetAssignStatusChg({
+						optType: 'pause',
+						assignId: assignId.value,
+						supplyId: supplyId.value
+					})
+					uni.showToast({
+						title: '操作成功',
+						icon: 'none'
+					})
+					confirm.value.close();
+					getDetail();
+				} catch(err) {
+					uni.showToast({
+						icon: 'none',
+						title: err.data
+					})
+					confirm.value.closeLoading();
+				}
+			}
+		})
+	}
+	function goOnHandle() {
+		confirm.value.confirm({
+			title: '确定继续派单？',
+			content: '将继续派发运单任务',
+			cancelText: '再想想',
+			confirmText: '继续派单',
+			confirmBgColor: 'var(--main-color)',
+			asyncClose: true,
+			async confirm() {
+				try {
+					await ResetAssignStatusChg({
+						assignId: assignId.value,
+						supplyId: supplyId.value
+					})
+					uni.showToast({
+						title: '操作成功',
+						icon: 'none'
+					})
+					confirm.value.close();
+					getDetail();
+				} catch(err) {
+					uni.showToast({
+						icon: 'none',
+						title: err.data
+					})
+					confirm.value.closeLoading();
+				}
+			}
+		})
+	}
 </script>
 
 <style lang="scss">

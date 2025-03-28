@@ -4,6 +4,7 @@ const utils_authorize = require("../../utils/authorize.js");
 const stores_app = require("../../stores/app.js");
 const utils_token = require("../../utils/token.js");
 const api_index = require("../../api/index.js");
+const utils_index = require("../../utils/index.js");
 if (!Array) {
   const _easycom_uv_status_bar2 = common_vendor.resolveComponent("uv-status-bar");
   const _easycom_uv_image2 = common_vendor.resolveComponent("uv-image");
@@ -29,11 +30,14 @@ const _sfc_main = {
       appStore.switchTab(0);
     });
     common_vendor.onLoad(async () => {
-      utils_authorize.getLocationInfo();
       if (!utils_token.getToken()) {
         return;
       }
-      getCount();
+      try {
+        await utils_authorize.getLocationInfo();
+      } finally {
+        getCount();
+      }
     });
     const loginDrawer = common_vendor.ref();
     function openLoginDrawer() {
@@ -65,12 +69,16 @@ const _sfc_main = {
           });
         },
         events: {
-          confirm(res) {
+          async confirm(res) {
             console.log("confirm", res);
             if (res.type === 1)
               supply.value = res.data;
             if (res.type === 2)
               unload.value = res.data;
+            await utils_index.sleep(500);
+            if (supply.value && unload.value) {
+              dispatch();
+            }
           }
         }
       });
@@ -93,14 +101,15 @@ const _sfc_main = {
       });
     }
     function toGuide() {
-      common_vendor.index.navigateTo({
-        url: "/pages/guide/guide"
+      const src = "https://mp.weixin.qq.com/s/giY3v4K_9eQWPaeKfiqgJw";
+      common_vendor.index.openOfficialAccountArticle({
+        url: src
       });
     }
     function follow() {
       const src = "https://mp.weixin.qq.com/s?__biz=MzkxOTcyODM5OA==&mid=2247483675&idx=1&sn=3f1378b5f85fe5ed6144eb9446f63a32&chksm=c19cf97af6eb706cee30883335ba2e11ab4ebd79c23dac68af13106c2b56e20eee02ddfe656c#rd";
-      common_vendor.index.navigateTo({
-        url: `/pages/webview/webview?src=${encodeURIComponent(src)}`
+      common_vendor.index.openOfficialAccountArticle({
+        url: src
       });
     }
     function navigate(type) {
@@ -110,14 +119,15 @@ const _sfc_main = {
       }
       switch (type) {
         case "数据统计":
-          common_vendor.index.navigateTo({
-            url: "/pages/statistics/statistics"
+          common_vendor.index.showToast({
+            title: "敬请期待",
+            icon: "none"
           });
-          break;
+          return;
         case "问题反馈":
-          common_vendor.index.navigateTo({
-            url: "/pages/feedback/feedback"
-          });
+          return;
+        case "扫码助手":
+          common_vendor.index.scanCode({});
           break;
       }
     }
@@ -198,7 +208,8 @@ const _sfc_main = {
             marginBottom: "14rpx"
           }
         }),
-        v: common_vendor.p({
+        v: common_vendor.o(($event) => navigate("扫码助手")),
+        w: common_vendor.p({
           src: "/static/images/home/statistics.png",
           width: "80rpx",
           height: "80rpx",
@@ -207,8 +218,8 @@ const _sfc_main = {
             marginBottom: "14rpx"
           }
         }),
-        w: common_vendor.o(($event) => navigate("数据统计")),
-        x: common_vendor.p({
+        x: common_vendor.o(($event) => navigate("数据统计")),
+        y: common_vendor.p({
           src: "/static/images/home/guide.png",
           width: "80rpx",
           height: "80rpx",
@@ -217,8 +228,8 @@ const _sfc_main = {
             marginBottom: "14rpx"
           }
         }),
-        y: common_vendor.o(toGuide),
-        z: common_vendor.p({
+        z: common_vendor.o(toGuide),
+        A: common_vendor.p({
           src: "/static/images/home/feedback.png",
           width: "80rpx",
           height: "80rpx",
@@ -227,18 +238,18 @@ const _sfc_main = {
             marginBottom: "14rpx"
           }
         }),
-        A: common_vendor.o(($event) => navigate("问题反馈")),
-        B: common_vendor.p({
+        B: common_vendor.o(($event) => navigate("问题反馈")),
+        C: common_vendor.p({
           width: "100%",
           height: "100%",
           duration: 0,
           src: "/static/images/home/banner.png"
         }),
-        C: common_vendor.o(follow),
-        D: common_vendor.sr(loginDrawer, "5be606db-13", {
+        D: common_vendor.o(follow),
+        E: common_vendor.sr(loginDrawer, "5be606db-13", {
           "k": "loginDrawer"
         }),
-        E: common_vendor.o(loginSuccess)
+        F: common_vendor.o(loginSuccess)
       });
     };
   }

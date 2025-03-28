@@ -7,21 +7,23 @@ if (!Array) {
   const _easycom_uv_search2 = common_vendor.resolveComponent("uv-search");
   const _easycom_uv_navbar2 = common_vendor.resolveComponent("uv-navbar");
   const _easycom_uv_tabs2 = common_vendor.resolveComponent("uv-tabs");
+  const _easycom_uv_image2 = common_vendor.resolveComponent("uv-image");
   const _easycom_my_empty2 = common_vendor.resolveComponent("my-empty");
   const _easycom_uv_load_more2 = common_vendor.resolveComponent("uv-load-more");
   const _easycom_my_login_drawer2 = common_vendor.resolveComponent("my-login-drawer");
   const _easycom_my_tabbar2 = common_vendor.resolveComponent("my-tabbar");
-  (_easycom_uv_search2 + _easycom_uv_navbar2 + _easycom_uv_tabs2 + _easycom_my_empty2 + _easycom_uv_load_more2 + _easycom_my_login_drawer2 + _easycom_my_tabbar2)();
+  (_easycom_uv_search2 + _easycom_uv_navbar2 + _easycom_uv_tabs2 + _easycom_uv_image2 + _easycom_my_empty2 + _easycom_uv_load_more2 + _easycom_my_login_drawer2 + _easycom_my_tabbar2)();
 }
 const _easycom_uv_search = () => "../../uni_modules/uv-search/components/uv-search/uv-search.js";
 const _easycom_uv_navbar = () => "../../uni_modules/uv-navbar/components/uv-navbar/uv-navbar.js";
 const _easycom_uv_tabs = () => "../../uni_modules/uv-tabs/components/uv-tabs/uv-tabs.js";
+const _easycom_uv_image = () => "../../uni_modules/uv-image/components/uv-image/uv-image.js";
 const _easycom_my_empty = () => "../../components/my-empty/my-empty.js";
 const _easycom_uv_load_more = () => "../../uni_modules/uv-load-more/components/uv-load-more/uv-load-more.js";
 const _easycom_my_login_drawer = () => "../../components/my-login-drawer/my-login-drawer.js";
 const _easycom_my_tabbar = () => "../../components/my-tabbar/my-tabbar.js";
 if (!Math) {
-  (_easycom_uv_search + _easycom_uv_navbar + _easycom_uv_tabs + _easycom_my_empty + ManifestItem + _easycom_uv_load_more + WaybillItem + _easycom_my_login_drawer + _easycom_my_tabbar)();
+  (_easycom_uv_search + _easycom_uv_navbar + _easycom_uv_tabs + _easycom_uv_image + _easycom_my_empty + ManifestItem + _easycom_uv_load_more + WaybillItem + _easycom_my_login_drawer + _easycom_my_tabbar)();
 }
 const ManifestItem = () => "../manifestList/components/item.js";
 const WaybillItem = () => "../waybill/components/item.js";
@@ -61,53 +63,119 @@ const _sfc_main = {
       triggered.value = false;
       current.value = index;
       console.log(index, name);
+      if (index === 0) {
+        getList1();
+      }
+      if (index === 1) {
+        getList2();
+      }
     }
-    function toDetail(record) {
+    const isFiltering = common_vendor.ref(false);
+    const keyWord = common_vendor.ref("");
+    const isKeyWord = common_vendor.ref(false);
+    function handleSearch() {
+      isFiltering.value = true;
+      isKeyWord.value = !!keyWord.value;
       if (current.value === 0) {
-        common_vendor.index.navigateTo({
-          url: `/pages/manifestDetail/manifestDetail?assignId=${record.Id}`
-        });
+        getList1();
       }
       if (current.value === 1) {
-        common_vendor.index.navigateTo({
-          url: "/pages/billDetail/billDetail"
-        });
+        getList2();
       }
     }
+    function reset() {
+      keyWord.value = "";
+      isKeyWord.value = false;
+      if (current.value === 0) {
+        getList1();
+      }
+      if (current.value === 1) {
+        getList2();
+      }
+    }
+    const total = common_vendor.ref(0);
     const list1 = common_vendor.ref([]);
+    const inInit1 = common_vendor.ref(false);
     async function getList1() {
-      const res = await api_index.GetAssignCarList();
-      list1.value = res;
+      try {
+        common_vendor.index.showLoading();
+        const res = await api_index.GetAssignCarListWithCount({
+          status: 10,
+          keyWord: keyWord.value
+        });
+        list1.value = res.list;
+        total.value = res.cnt;
+        common_vendor.index.hideLoading();
+      } catch (err) {
+        console.log("err", err);
+        common_vendor.index.hideLoading();
+        common_vendor.index.showToast({
+          title: err.data,
+          icon: "none"
+        });
+      } finally {
+        isFiltering.value = false;
+      }
     }
     const list2 = common_vendor.ref([]);
+    const inInit2 = common_vendor.ref(false);
     async function getList2() {
-      const res = await api_index.GetOwnerOnwayList();
-      list2.value = res;
+      try {
+        common_vendor.index.showLoading();
+        const res = await api_index.GetOnwayOwnerWithCount({
+          status: 10,
+          keyWord: keyWord.value
+        });
+        list2.value = res.list;
+        total.value = res.cnt;
+        common_vendor.index.hideLoading();
+      } catch (err) {
+        console.log("err", err);
+        common_vendor.index.hideLoading();
+        common_vendor.index.showToast({
+          title: err.data,
+          icon: "none"
+        });
+      } finally {
+        isFiltering.value = false;
+      }
     }
-    common_vendor.onLoad(() => {
+    common_vendor.onShow(() => {
       if (!utils_token.getToken()) {
         return;
       }
-      getList1();
-      getList2();
+      if (current.value === 0) {
+        if (inInit1.value)
+          return;
+        inInit1.value = true;
+        getList1();
+      }
+      if (current.value === 1) {
+        if (inInit2.value)
+          return;
+        inInit2.value = true;
+        getList2();
+      }
     });
     const triggered = common_vendor.ref(false);
     return (_ctx, _cache) => {
       return common_vendor.e({
         a: "overflow:" + (show.value ? "hidden" : "visible"),
-        b: common_vendor.o(($event) => _ctx.keyword = $event),
-        c: common_vendor.p({
-          placeholder: "搜索单号",
-          showAction: false,
-          modelValue: _ctx.keyword
-        }),
-        d: `${navbarPad.value}px`,
+        b: common_vendor.o(handleSearch),
+        c: common_vendor.o(handleSearch),
+        d: common_vendor.o(($event) => keyWord.value = $event),
         e: common_vendor.p({
+          placeholder: "搜索单号、车牌号",
+          showAction: false,
+          modelValue: keyWord.value
+        }),
+        f: `${navbarPad.value}px`,
+        g: common_vendor.p({
           placeholder: true,
           ["left-icon"]: ""
         }),
-        f: common_vendor.o(changeTabs),
-        g: common_vendor.p({
+        h: common_vendor.o(changeTabs),
+        i: common_vendor.p({
           activeStyle: {
             fontWeight: "bold",
             color: "var(--title-color)"
@@ -125,70 +193,84 @@ const _sfc_main = {
           },
           current: current.value
         }),
-        h: !common_vendor.unref(utils_token.getToken)()
+        j: isKeyWord.value && !isFiltering.value
+      }, isKeyWord.value && !isFiltering.value ? {
+        k: common_vendor.t(total.value),
+        l: common_vendor.p({
+          duration: 0,
+          src: "/static/images/filter/redo.png",
+          width: "28rpx",
+          height: "28rpx",
+          ["custom-style"]: {
+            marginRight: "4rpx"
+          }
+        }),
+        m: common_vendor.o(reset)
+      } : {}, {
+        n: !common_vendor.unref(utils_token.getToken)()
       }, !common_vendor.unref(utils_token.getToken)() ? {
-        i: common_vendor.o(openLoginDrawer),
-        j: common_vendor.p({
+        o: common_vendor.o(openLoginDrawer),
+        p: common_vendor.p({
           height: "100%",
           showButton: true,
           text: current.value === 0 ? "暂无进行中的货单" : "暂无进行中的运单"
         })
       } : common_vendor.e({
-        k: current.value === 0
+        q: current.value === 0
       }, current.value === 0 ? common_vendor.e({
-        l: list1.value.length === 0
+        r: list1.value.length === 0
       }, list1.value.length === 0 ? {
-        m: common_vendor.p({
+        s: common_vendor.p({
           height: "100%",
           text: "暂无进行中的货单"
         })
       } : {
-        n: common_vendor.f(list1.value, (item, k0, i0) => {
+        t: common_vendor.f(list1.value, (item, k0, i0) => {
           return {
             a: item.Id,
-            b: common_vendor.o(toDetail, item.Id),
-            c: "5cd3f056-5-" + i0,
+            b: common_vendor.o(getList1, item.Id),
+            c: "5cd3f056-6-" + i0,
             d: common_vendor.p({
               record: item
             })
           };
         }),
-        o: common_vendor.p({
+        v: common_vendor.p({
           status: "nomore",
           color: "#B0BECC"
         })
       }) : {}, {
-        p: current.value === 1
+        w: current.value === 1
       }, current.value === 1 ? common_vendor.e({
-        q: list2.value.length === 0
+        x: list2.value.length === 0
       }, list2.value.length === 0 ? {
-        r: common_vendor.p({
+        y: common_vendor.p({
           height: "100%",
           text: "暂无进行中的运单"
         })
       } : {
-        s: common_vendor.f(list2.value, (item, k0, i0) => {
+        z: common_vendor.f(list2.value, (item, k0, i0) => {
           return {
             a: item.OnwayId,
-            b: "5cd3f056-8-" + i0,
-            c: common_vendor.p({
+            b: common_vendor.o(getList2, item.OnwayId),
+            c: "5cd3f056-9-" + i0,
+            d: common_vendor.p({
               record: item
             })
           };
         }),
-        t: common_vendor.p({
-          status: _ctx.noMore2 ? "nomore" : _ctx.loading2 ? "loading" : "loadmore",
+        A: common_vendor.p({
+          status: "nomore",
           color: "#B0BECC"
         })
       }) : {}), {
-        v: common_vendor.unref(utils_token.getToken)(),
-        w: triggered.value,
-        x: common_vendor.o((...args) => _ctx.onRefresh && _ctx.onRefresh(...args)),
-        y: common_vendor.o((...args) => _ctx.onPulling && _ctx.onPulling(...args)),
-        z: common_vendor.sr(loginDrawer, "5cd3f056-10", {
+        B: triggered.value,
+        C: common_vendor.o((...args) => _ctx.onRefresh && _ctx.onRefresh(...args)),
+        D: common_vendor.o((...args) => _ctx.onPulling && _ctx.onPulling(...args)),
+        E: common_vendor.sr(loginDrawer, "5cd3f056-11", {
           "k": "loginDrawer"
         }),
-        A: common_vendor.o(loginSuccess)
+        F: common_vendor.o(loginSuccess)
       });
     };
   }

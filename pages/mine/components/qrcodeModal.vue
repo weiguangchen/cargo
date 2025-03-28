@@ -3,9 +3,9 @@
 		<view class="qrcode-modal">
 			<view class="person">
 				<uv-image src="/static/images/mine/avatar.png" width="120rpx" height="120rpx" :duration="0" :custom-style="{ marginRight: '24rpx' }"/>
-				<view class="user">
-					<view class="name">{{ getToken() ? getToken().userInfo.Nickname : '暂无昵称' }}</view>
-					<view class="phone">{{ getToken() ? getToken().userInfo.Mobile : '' }}</view>
+				<view class="user" v-if="getToken()">
+					<view class="name">{{ userInfo.Nickname || '暂无昵称' }}</view>
+					<view class="phone">{{ userInfo.Mobile || '' }}</view>
 				</view>
 			</view>
 			<view class="qrcode-wrapper">
@@ -18,6 +18,10 @@
 <script setup>
 	import { getToken } from '@/utils/token.js'
 	import { ref } from 'vue'
+	import { storeToRefs } from 'pinia'
+	import { useUserStore } from '@/stores/user.js'
+	const userStore = useUserStore();
+	const { userInfo } = storeToRefs(userStore);
 	const popup = ref();
 	const qrcode = ref();
 	function open() {

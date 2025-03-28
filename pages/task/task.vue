@@ -1,41 +1,50 @@
 <template>
 	<page-meta :page-style="'overflow:'+(show?'hidden':'visible')"></page-meta>
-	<!-- 导航 -->
-	<uv-navbar placeholder left-icon="">
-		<template v-slot:center>
-			<view class="navbar-content" :style="{ paddingRight: `${navbarPad}px` }">
-				<uv-search placeholder="搜索单号" v-model="keyword":showAction="false"></uv-search>
+	<view catchtouchmove="true" style="height: 100vh;display: flex;flex-direction: column;">
+		<!-- 导航 -->
+		<uv-navbar placeholder left-icon="">
+			<template v-slot:center>
+				<view class="navbar-content" :style="{ paddingRight: `${navbarPad}px` }">
+					<uv-search placeholder="搜索单号、车牌号" v-model="keyWord":showAction="false" @search="handleSearch" @clear="handleSearch"></uv-search>
+				</view>
+			</template>
+		</uv-navbar>
+		<!-- end -->
+		<!-- tab -->
+		<uv-tabs :activeStyle="{ fontWeight: 'bold', color: 'var(--title-color)' }" :inactiveStyle="{ color: 'var(--sub-color)' }" lineWidth="32rpx" lineHeight="8rpx" :list="tabs" @change="changeTabs" :scrollable="false" lineColor="var(--main-color)" :customStyle="{ background: '#ffffff' }" :current="current"/>
+		<view class="has-filter" v-if="isKeyWord && !isFiltering">
+			已按条件筛选出 {{ total }} 条数据
+			<view class="redo" @click="reset">
+				<uv-image :duration="0" src="/static/images/filter/redo.png" width="28rpx" height="28rpx" :custom-style="{ marginRight: '4rpx' }"/>重置
 			</view>
-		</template>
-	</uv-navbar>
-	<!-- end -->
-	<!-- tab -->
-	<uv-tabs :activeStyle="{ fontWeight: 'bold', color: 'var(--title-color)' }" :inactiveStyle="{ color: 'var(--sub-color)' }" lineWidth="32rpx" lineHeight="8rpx" :list="tabs" @change="changeTabs" :scrollable="false" lineColor="var(--main-color)" :customStyle="{ background: '#ffffff' }" :current="current"/>
-	<!-- end -->
-	<!-- 列表 -->
-	<scroll-view scroll-y class="scroll-view" :refresher-enabled="getToken()" :refresher-triggered="triggered" @refresherrefresh="onRefresh"  @scrolltolower="onPulling">
-		<!-- 未登录 -->
-		<my-empty height="100%" v-if="!getToken()" showButton 
-			:text="current === 0 ? '暂无进行中的货单' : '暂无进行中的运单'" @confirm="openLoginDrawer"/>
-		<!-- 已登录 -->
-		<template v-else>
-			<template v-if="current === 0">
-				<my-empty v-if="list1.length === 0" height="100%" text="暂无进行中的货单"/>
-				<view class="task-list" v-else>
-					<ManifestItem v-for="item in list1" :key="item.Id" :record="item" @toDetail="toDetail"/>
-					<uv-load-more status="nomore" color="#B0BECC"/>
-				</view>
+		</view>
+		<!-- end -->
+		<!-- 列表 -->
+		<scroll-view scroll-y class="scroll-view" :refresher-enabled="false" :refresher-triggered="triggered" @refresherrefresh="onRefresh"  @scrolltolower="onPulling">
+			<!-- 未登录 -->
+			<my-empty height="100%" v-if="!getToken()" showButton 
+				:text="current === 0 ? '暂无进行中的货单' : '暂无进行中的运单'" @confirm="openLoginDrawer"/>
+			<!-- 已登录 -->
+			<template v-else>
+				<template v-if="current === 0">
+					<my-empty v-if="list1.length === 0" height="100%" text="暂无进行中的货单"/>
+					<view class="task-list" v-else>
+						<ManifestItem v-for="item in list1" :key="item.Id" :record="item" @success="getList1"/>
+						<uv-load-more status="nomore" color="#B0BECC"/>
+					</view>
+				</template>
+				<template v-if="current === 1">
+					<my-empty v-if="list2.length === 0" height="100%" text="暂无进行中的运单"/>
+					<view class="task-list" v-else>
+						<WaybillItem v-for="item in list2" :record="item" :key="item.OnwayId" @success="getList2"/>
+						<uv-load-more status="nomore" color="#B0BECC"/>
+						<!-- <uv-load-more :status="noMore2 ? 'nomore' : loading2 ? 'loading' : 'loadmore'" color="#B0BECC"/> -->
+					</view>
+				</template>
 			</template>
-			<template v-if="current === 1">
-				<my-empty v-if="list2.length === 0" height="100%" text="暂无进行中的运单"/>
-				<view class="task-list" v-else>
-					<WaybillItem v-for="item in list2" :record="item" :key="item.OnwayId"/>
-					<uv-load-more :status="noMore2 ? 'nomore' : loading2 ? 'loading' : 'loadmore'" color="#B0BECC"/>
-				</view>
-			</template>
-		</template>
-	</scroll-view>
-	<!-- end -->
+		</scroll-view>
+		<!-- end -->
+	</view>
 	<!-- 登录弹窗 -->
 	<my-login-drawer ref="loginDrawer" @success="loginSuccess"/>
 	<!-- tabbar -->
@@ -45,10 +54,12 @@
 <script setup>
 	import {
 		ref,
-		onMounted
+		onMounted,
+		nextTick
 	} from 'vue'
 	import {
-		onLoad
+		onLoad,
+		onShow
 	} from '@dcloudio/uni-app'
 	import { getToken } from'@/utils/token.js'
 	import ManifestItem from '@/pages/manifestList/components/item.vue';
@@ -56,8 +67,7 @@
 	import {
 		useAppStore
 	} from '@/stores/app.js'
-	import { sleep } from '@/utils/index.js'
-	import { GetAssignCarList, GetOwnerOnwayList } from '@/api/index.js'
+	import { GetAssignCarListWithCount, GetOnwayOwnerWithCount } from '@/api/index.js'
 	import useList from '@/hooks/useList.js'
 	
 	const appStore = useAppStore();
@@ -76,10 +86,6 @@
 	}
 	// hack滚动穿透
 	const show = ref(false);
-	// 自定义导航条
-	function leftClick() {
-		uni.navigateBack()
-	}
 	const navbarPad = ref(0);
 	onMounted(() => {
 		let menuButtonInfo = uni.getMenuButtonBoundingClientRect();
@@ -100,32 +106,85 @@
 		triggered.value = false;
 		current.value = index;
 		console.log(index, name)
+		if(index === 0) {
+			getList1();
+		}
+		if(index === 1) {
+			getList2();
+		}
 	}
-	// 运单相关
-	function toDetail(record) {
+	// 搜索
+	const isFiltering = ref(false);	
+	const keyWord = ref('');
+	const isKeyWord = ref(false);
+	function handleSearch() {
+		isFiltering.value = true;
+		isKeyWord.value = !!keyWord.value;
 		if(current.value === 0) {
-			uni.navigateTo({
-				url: `/pages/manifestDetail/manifestDetail?assignId=${record.Id}`
-			})
+			getList1();
 		}
 		if(current.value === 1) {
-			uni.navigateTo({
-				url: '/pages/billDetail/billDetail'
-			})
+			getList2();
 		}
 	}
-		
+	function reset() {
+		keyWord.value = '';
+		isKeyWord.value = false;
+		if(current.value === 0) {
+			getList1();
+		}
+		if(current.value === 1) {
+			getList2();
+		}
+	}
+	const total = ref(0);
 	// 货单
 	const list1 = ref([]);
+	const inInit1 = ref(false);
 	async function getList1() {
-		const res = await GetAssignCarList();
-		list1.value = res;
+		try {
+			uni.showLoading();
+			const res = await GetAssignCarListWithCount({
+				status: 10,
+				keyWord: keyWord.value,
+			});
+			list1.value = res.list;
+			total.value = res.cnt;
+			uni.hideLoading();
+		} catch(err) {
+			console.log('err',err)
+			uni.hideLoading();
+			uni.showToast({
+				title: err.data,
+				icon: 'none'
+			})
+		} finally {
+			isFiltering.value = false;
+		}
 	}
 	// 运单列表
-	const list2 = ref([])
+	const list2 = ref([]);
+	const inInit2 = ref(false);
 	async function getList2() {
-		const res = await GetOwnerOnwayList();
-		list2.value = res;
+		try {
+			uni.showLoading();
+			const res = await GetOnwayOwnerWithCount({
+				status: 10,
+				keyWord: keyWord.value,
+			});
+			list2.value = res.list;
+			total.value = res.cnt;
+			uni.hideLoading();
+		} catch(err) {
+			console.log('err',err)
+			uni.hideLoading();
+			uni.showToast({
+				title: err.data,
+				icon: 'none'
+			})
+		} finally {
+			isFiltering.value = false;
+		}
 	}
 	// const { list: list2, fetchData: fetchData2, noMore: noMore2, loading: loading2 } = useList({
 	// 	immediate: false,
@@ -134,12 +193,20 @@
 	// 	// 	userMobile: getToken()?.userInfo?.Mobile ?? ''
 	// 	// }
 	// });
-	onLoad(() => {
+	onShow(() => {
 		if(!getToken()) {
 			return;
 		}
-		getList1()
-		getList2();
+		if(current.value === 0) {
+			if(inInit1.value) return;
+			inInit1.value = true;
+			getList1();
+		}
+		if(current.value === 1) {
+			if(inInit2.value) return;
+			inInit2.value = true;
+			getList2();
+		}
 		// fetchData2();
 	})
 	const triggered = ref(false)
@@ -176,7 +243,28 @@
 		display: flex;
 		align-items: center;
 	}
-
+	.has-filter {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0 32rpx;
+		height: 72rpx;
+		background: #FFF1E8;
+		font-size: 24rpx;
+		color: #FC7E2C;
+		font-weight: bold;
+		.redo {
+			background-color: #FC7E2C;
+			height: 48rpx;
+			padding: 0 20rpx;
+			border-radius: 24rpx;
+			color: #fff;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 24rpx;
+		}
+	}
 	.task-list {
 		padding: 24rpx;
 	}

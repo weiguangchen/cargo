@@ -1,36 +1,36 @@
 <template>
 	<page-meta :page-style="'overflow:'+(show?'hidden':'visible')"></page-meta>
-	<!-- 导航 -->
-	<uv-navbar placeholder @leftClick="leftClick">
-		<template #center>
-			<view class="navbar-content" :style="{ paddingRight: `${navbarPad}px` }">
-				<uv-search placeholder="搜索货单" v-model="keyword" :showAction="false"></uv-search>
-				<my-filter-drawer ref="filter" @change="changeFilter" />
+	<view catchtouchmove="true" style="height: 100vh;display: flex;flex-direction: column;">
+		<!-- 导航 -->
+		<uv-navbar placeholder @leftClick="leftClick">
+			<template #center>
+				<view class="navbar-content" :style="{ paddingRight: `${navbarPad}px` }">
+					<uv-search placeholder="搜索货单号、车牌号" v-model="keyWord" :showAction="false" @search="handleSearch" @clear="handleSearch"></uv-search>
+					<FilterDrawer ref="filter" @change="changeFilter" />
+				</view>
+			</template>
+		</uv-navbar>
+		<!-- end -->
+		<!-- tab -->
+		<uv-tabs :activeStyle="{ fontWeight: 'bold', color: 'var(--title-color)' }" :inactiveStyle="{ color: 'var(--sub-color)' }" lineWidth="32rpx" lineHeight="8rpx" :list="tabs" @change="changeTabs" :scrollable="false" lineColor="var(--main-color)"
+			:customStyle="{ background: '#ffffff' }" />
+		<view class="has-filter" v-if="(isFilter && !isFiltering) || (isKeyWord && !isFiltering)">
+		已按条件筛选出 {{ total }} 条数据
+			<view class="redo" @click="reset">
+				<uv-image :duration="0" src="/static/images/filter/redo.png" width="28rpx" height="28rpx" :custom-style="{ marginRight: '4rpx' }"/>重置
 			</view>
-		</template>
-	</uv-navbar>
-	<!-- <view class="has-filter">
-		已按条件筛选出 99 条数据
-		<view class="redo">
-			<uv-button color="#FC7E2C" shape="circle" :custom-style="{ height: '48rpx', padding: '0 20rpx' }">
-				<uv-image :duration="0" src="/static/images/filter/redo.png" width="28rpx" height="28rpx" :custom-style="{ marginRight: '4rpx' }" :customTextStyle="{ fontSize: '24rpx' }"/>重置
-			</uv-button>
 		</view>
-	</view> -->
-	<!-- end -->
-	<!-- tab -->
-	<uv-tabs :activeStyle="{ fontWeight: 'bold', color: 'var(--title-color)' }" :inactiveStyle="{ color: 'var(--sub-color)' }" lineWidth="32rpx" lineHeight="8rpx" :list="tabs" @change="changeTabs" :scrollable="false" lineColor="var(--main-color)"
-		:customStyle="{ background: '#ffffff' }" />
-	<!-- end -->
-	<!-- 列表 -->
-	<scroll-view scroll-y class="scroll-view">
-		<view class="bill-list" v-if="list.length > 0">
-			<Item v-for="item in list" :key="item.Id" :record="item" @toDetail="toDetail" />
-			<uv-load-more status="nomore" color="#B0BECC"/>
-		</view>
-		<my-empty v-else/>
-	</scroll-view>
-	<!-- end -->
+		<!-- end -->
+		<!-- 列表 -->
+		<scroll-view scroll-y class="scroll-view">
+			<view class="bill-list" v-if="list.length > 0">
+				<Item v-for="item in list" :key="item.Id" :record="item" @success="getList"/>
+				<uv-load-more status="nomore" color="#B0BECC"/>
+			</view>
+			<my-empty v-else/>
+		</scroll-view>
+		<!-- end -->
+	</view>
 </template>
 
 <script setup>
@@ -39,10 +39,12 @@
 		onMounted
 	} from 'vue'
 	import {
-		onLoad
+		onLoad,
+		onShow
 	} from '@dcloudio/uni-app'
 	import Item from './components/item.vue';
-	import { GetAssignCarList } from '@/api/index.js'
+	import { GetAssignCarList, GetAssignCarListWithCount } from '@/api/index.js';
+	import FilterDrawer from './components/FilterDrawer.vue';
 	// hack滚动穿透
 	const show = ref(false);
 	
@@ -63,7 +65,7 @@
 		value: ''
 	}, {
 		name: '进行中',
-		value: 1
+		value: 10
 	}, {
 		name: '已暂停',
 		value: 3
@@ -81,30 +83,56 @@
 	}
 	// 筛选
 	const filter = ref();
-
-	function changeFilter(e) {
-		show.value = e.show;
+	const isFilter = ref(false);
+	const isFiltering = ref(false);	
+	function changeFilter(data) {
+		console.log('changeFilter',data)
+		isFiltering.value = true;
+		isFilter.value = data.isFilter;
+		params.value = data.params;
+		getList();
 	}
-	// 运单相关
-	function toDetail(record) {
-		uni.navigateTo({
-			url: `/pages/manifestDetail/manifestDetail?assignId=${record.Id}`
-		})
+	const keyWord = ref('');
+	const isKeyWord = ref(false);
+	function handleSearch() {
+		isFiltering.value = true;
+		isKeyWord.value = !!keyWord.value;
+		getList();
 	}
-	
+	// 列表
 	const list = ref([]);
+	const params = ref({});
+	const total = ref(0);
 	async function getList() {
 		try {
-			const res = await GetAssignCarList({
-				status: status.value
+			uni.showLoading();
+			const { dateMode, date, ...rest } = params.value;
+			const res = await GetAssignCarListWithCount({
+				status: status.value,
+				keyWord: keyWord.value,
+				...rest
 			});
-			list.value = res;
+			list.value = res.list;
+			total.value = res.cnt;
+			uni.hideLoading();
 		}
-		catch {
-			
+		catch(err) {
+			uni.hideLoading();
+			uni.showToast({
+				title: err.data,
+				icon: 'none'
+			})
+		}
+		finally {
+			isFiltering.value = false;
 		}
 	}
-	onLoad(() => {
+	function reset() {
+		keyWord.value = '';
+		isKeyWord.value = false;
+		filter.value.reset();
+	}
+	onShow(() => {
 		getList();
 	})
 </script>
@@ -129,10 +157,21 @@
 		justify-content: space-between;
 		padding: 0 32rpx;
 		height: 72rpx;
-		background: rgba(252, 126, 44, .18);
+		background: #FFF1E8;
 		font-size: 24rpx;
 		color: #FC7E2C;
 		font-weight: bold;
+		.redo {
+			background-color: #FC7E2C;
+			height: 48rpx;
+			padding: 0 20rpx;
+			border-radius: 24rpx;
+			color: #fff;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 24rpx;
+		}
 	}
 
 	.bill-list {

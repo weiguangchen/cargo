@@ -78,15 +78,18 @@
 	import { onLoad } from '@dcloudio/uni-app';
 	
 	const orderId = ref('');
+	const supplyId = ref('')
 	onLoad((options) => {
-		orderId.value = options.orderId;
+		orderId.value = options?.orderId ?? '';
+		supplyId.value = options?.supplyId ?? '';
 		getInfo();
 	})
 	const info = ref({})
 	async function getInfo() {
 		try {
 			const res = await GetOrderDetail({
-				orderId: orderId.value
+				orderId: orderId.value,
+				supplyId: supplyId.value
 			})
 			info.value = res;
 		}catch {

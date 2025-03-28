@@ -9,9 +9,9 @@
     "miniprogram": {
       "list": [
         {
-          "name": "pages/manifestDetail/manifestDetail",
-          "pathName": "pages/manifestDetail/manifestDetail",
-          "query": "assignId=610332611318906821",
+          "name": "pages/addressList/addressList",
+          "pathName": "pages/addressList/addressList",
+          "query": "",
           "launchMode": "default",
           "scene": null
         },
@@ -23,8 +23,8 @@
           "scene": null
         },
         {
-          "name": "pages/orderList/orderList",
-          "pathName": "pages/orderList/orderList",
+          "name": "pages/waybill/waybill",
+          "pathName": "pages/waybill/waybill",
           "query": "",
           "launchMode": "default",
           "scene": null
@@ -37,113 +37,29 @@
           "scene": null
         },
         {
-          "name": "pages/dispatchTask/dispatchTask",
-          "pathName": "pages/dispatchTask/dispatchTask",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "pages/carList/carList",
-          "pathName": "pages/carList/carList",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "pages/addressList/addressList",
-          "pathName": "pages/addressList/addressList",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "pages/addressList/addressList",
-          "pathName": "pages/addressList/addressList",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "mine/statistics/statistics",
-          "pathName": "mine/statistics/statistics",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "mine/statistics/statistics",
-          "pathName": "mine/statistics/statistics",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "pages/enterprise/enterprise",
-          "pathName": "pages/enterprise/enterprise",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "pages/enterpriseDetail/enterpriseDetail",
-          "pathName": "pages/enterpriseDetail/enterpriseDetail",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "pages/mine/mine",
-          "pathName": "pages/mine/mine",
-          "query": "",
+          "name": "pages/manifestDetail/manifestDetail",
+          "pathName": "pages/manifestDetail/manifestDetail",
+          "query": "assignId=645821125120491461",
           "launchMode": "default",
           "scene": null
         },
         {
           "name": "pages/billDetail/billDetail",
           "pathName": "pages/billDetail/billDetail",
-          "query": "onwayId=595170774239674309&supplyId=510316841227255749",
+          "query": "onwayId=644012313740836805&supplyId=510316841227255749",
           "launchMode": "default",
           "scene": null
         },
         {
-          "name": "pages/task/task",
-          "pathName": "pages/task/task",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "pages/enterprise/enterprise",
-          "pathName": "pages/enterprise/enterprise",
-          "query": "",
+          "name": "pages/manifestDetail/manifestDetail",
+          "pathName": "pages/manifestDetail/manifestDetail",
+          "query": "assignId=644030749573382085",
           "launchMode": "default",
           "scene": null
         },
         {
           "name": "mine/relateMember/relateMember",
           "pathName": "mine/relateMember/relateMember",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "mine/statistics/statistics",
-          "pathName": "mine/statistics/statistics",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "mine/statistics/statistics",
-          "pathName": "mine/statistics/statistics",
-          "query": "",
-          "launchMode": "default",
-          "scene": null
-        },
-        {
-          "name": "mine/member/member",
-          "pathName": "mine/member/member",
           "query": "",
           "launchMode": "default",
           "scene": null

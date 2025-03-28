@@ -1,7 +1,14 @@
 <template>
 	<view class="enterprise" @click="toDetail">
 		<view class="img">
-			<uv-image width="100%" height="100%" :duration="0" src="/static/images/mfrs/avatar.png" />
+			<uv-image width="100%" height="100%" :src="record.Photo" mode="aspectFill">
+				<template v-slot:loading>
+					<view style="background-color: #E3E9EF;" ></view>
+				</template>
+				<template v-slot:error>
+					<view style="background-color: #E3E9EF;" ></view>
+				</template>
+			</uv-image>
 		</view>
 		<view class="info">
 			<view class="">

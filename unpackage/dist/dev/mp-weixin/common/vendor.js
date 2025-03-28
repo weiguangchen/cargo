@@ -8387,6 +8387,8 @@ function storeToRefs(store) {
 const createHook = (lifecycle) => (hook, target = getCurrentInstance()) => {
   !isInSSRComponentSetup && injectHook(lifecycle, hook, target);
 };
+const onShow = /* @__PURE__ */ createHook(ON_SHOW);
+const onLaunch = /* @__PURE__ */ createHook(ON_LAUNCH);
 const onLoad = /* @__PURE__ */ createHook(ON_LOAD);
 const onReady = /* @__PURE__ */ createHook(ON_READY);
 const onUnload = /* @__PURE__ */ createHook(ON_UNLOAD);
@@ -9211,11 +9213,13 @@ exports.mapStores = mapStores;
 exports.n = n;
 exports.nextTick$1 = nextTick$1;
 exports.o = o;
+exports.onLaunch = onLaunch;
 exports.onLoad = onLoad;
 exports.onMounted = onMounted;
 exports.onPageScroll = onPageScroll;
 exports.onPullDownRefresh = onPullDownRefresh;
 exports.onReady = onReady;
+exports.onShow = onShow;
 exports.onUnload = onUnload;
 exports.p = p;
 exports.r = r;

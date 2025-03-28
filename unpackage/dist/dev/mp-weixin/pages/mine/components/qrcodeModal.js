@@ -1,6 +1,7 @@
 "use strict";
 const common_vendor = require("../../../common/vendor.js");
 const utils_token = require("../../../utils/token.js");
+const stores_user = require("../../../stores/user.js");
 if (!Array) {
   const _easycom_uv_image2 = common_vendor.resolveComponent("uv-image");
   const _easycom_uv_qrcode2 = common_vendor.resolveComponent("uv-qrcode");
@@ -16,6 +17,8 @@ if (!Math) {
 const _sfc_main = {
   __name: "qrcodeModal",
   setup(__props, { expose: __expose }) {
+    const userStore = stores_user.useUserStore();
+    const { userInfo } = common_vendor.storeToRefs(userStore);
     const popup = common_vendor.ref();
     const qrcode = common_vendor.ref();
     function open() {
@@ -35,7 +38,7 @@ const _sfc_main = {
       open
     });
     return (_ctx, _cache) => {
-      return {
+      return common_vendor.e({
         a: common_vendor.p({
           src: "/static/images/mine/avatar.png",
           width: "120rpx",
@@ -45,21 +48,24 @@ const _sfc_main = {
             marginRight: "24rpx"
           }
         }),
-        b: common_vendor.t(common_vendor.unref(utils_token.getToken)() ? common_vendor.unref(utils_token.getToken)().userInfo.Nickname : "暂无昵称"),
-        c: common_vendor.t(common_vendor.unref(utils_token.getToken)() ? common_vendor.unref(utils_token.getToken)().userInfo.Mobile : ""),
-        d: common_vendor.sr(qrcode, "811b4f34-2,811b4f34-0", {
+        b: common_vendor.unref(utils_token.getToken)()
+      }, common_vendor.unref(utils_token.getToken)() ? {
+        c: common_vendor.t(common_vendor.unref(userInfo).Nickname || "暂无昵称"),
+        d: common_vendor.t(common_vendor.unref(userInfo).Mobile || "")
+      } : {}, {
+        e: common_vendor.sr(qrcode, "811b4f34-2,811b4f34-0", {
           "k": "qrcode"
         }),
-        e: common_vendor.p({
+        f: common_vendor.p({
           start: false,
           size: "430rpx",
           value: "https://h5.uvui.cn"
         }),
-        f: common_vendor.sr(popup, "811b4f34-0", {
+        g: common_vendor.sr(popup, "811b4f34-0", {
           "k": "popup"
         }),
-        g: common_vendor.o(change),
-        h: common_vendor.p({
+        h: common_vendor.o(change),
+        i: common_vendor.p({
           mode: "center",
           ["custom-style"]: {
             minHeight: "300rpx"
@@ -67,7 +73,7 @@ const _sfc_main = {
           bgColor: "none",
           duration: 0
         })
-      };
+      });
     };
   }
 };

@@ -1,19 +1,22 @@
 "use strict";
 const common_vendor = require("../../../common/vendor.js");
 const utils_dict = require("../../../utils/dict.js");
+const api_index = require("../../../api/index.js");
 if (!Array) {
   const _easycom_uv_image2 = common_vendor.resolveComponent("uv-image");
   const _easycom_my_price2 = common_vendor.resolveComponent("my-price");
   const _easycom_uv_line2 = common_vendor.resolveComponent("uv-line");
   const _easycom_uv_button2 = common_vendor.resolveComponent("uv-button");
-  (_easycom_uv_image2 + _easycom_my_price2 + _easycom_uv_line2 + _easycom_uv_button2)();
+  const _easycom_my_confirm2 = common_vendor.resolveComponent("my-confirm");
+  (_easycom_uv_image2 + _easycom_my_price2 + _easycom_uv_line2 + _easycom_uv_button2 + _easycom_my_confirm2)();
 }
 const _easycom_uv_image = () => "../../../uni_modules/uv-image/components/uv-image/uv-image.js";
 const _easycom_my_price = () => "../../../components/my-price/my-price.js";
 const _easycom_uv_line = () => "../../../uni_modules/uv-line/components/uv-line/uv-line.js";
 const _easycom_uv_button = () => "../../../uni_modules/uv-button/components/uv-button/uv-button.js";
+const _easycom_my_confirm = () => "../../../components/my-confirm/my-confirm.js";
 if (!Math) {
-  (_easycom_uv_image + _easycom_my_price + _easycom_uv_line + _easycom_uv_button)();
+  (_easycom_uv_image + _easycom_my_price + _easycom_uv_line + _easycom_uv_button + _easycom_my_confirm)();
 }
 const _sfc_main = {
   __name: "item",
@@ -24,7 +27,7 @@ const _sfc_main = {
       type: Object
     }
   },
-  emits: ["toDetail"],
+  emits: ["toDetail", "success"],
   setup(__props, { emit: __emit }) {
     const emits = __emit;
     const props = __props;
@@ -40,7 +43,113 @@ const _sfc_main = {
       return ((_b = (_a = utils_dict.ManifestStatusOptions) == null ? void 0 : _a.find((m) => m.value == props.record.Status)) == null ? void 0 : _b.name) ?? "";
     });
     function toDetail() {
-      emits("toDetail", props.record);
+      common_vendor.index.navigateTo({
+        url: `/pages/manifestDetail/manifestDetail?assignId=${props.record.Id}&supplyId=${props.record.Supply}`
+      });
+    }
+    const confirm = common_vendor.ref();
+    async function finishHandle() {
+      confirm.value.confirm({
+        title: "确定完结货单？",
+        content: "完结后将不再派发新的运单任务，当前进行中的运单任务不受影响",
+        cancelText: "再想想",
+        confirmText: "完结货单",
+        asyncClose: true,
+        async confirm() {
+          try {
+            await api_index.SetAssignStatusChg({
+              optType: "end",
+              assignId: props.record.Id,
+              supplyId: props.record.Supply
+            });
+            common_vendor.index.showToast({
+              title: "操作成功",
+              icon: "none",
+              complete() {
+                setTimeout(() => {
+                  emits("success");
+                }, 1500);
+              }
+            });
+            confirm.value.close();
+          } catch (err) {
+            common_vendor.index.showToast({
+              icon: "none",
+              title: err.data
+            });
+            confirm.value.closeLoading();
+          }
+        }
+      });
+    }
+    function pauseHandle() {
+      confirm.value.confirm({
+        title: "确定暂停货单？",
+        content: "暂停后将不再派发新的运单任务，后续可随时继续派单，当前进行中的运单任务不受影响",
+        cancelText: "再想想",
+        confirmText: "暂停货单",
+        confirmBgColor: "var(--main-color)",
+        asyncClose: true,
+        async confirm() {
+          try {
+            await api_index.SetAssignStatusChg({
+              optType: "pause",
+              assignId: props.record.Id,
+              supplyId: props.record.Supply
+            });
+            common_vendor.index.showToast({
+              title: "操作成功",
+              icon: "none",
+              complete() {
+                setTimeout(() => {
+                  emits("success");
+                }, 1500);
+              }
+            });
+            confirm.value.close();
+          } catch (err) {
+            common_vendor.index.showToast({
+              icon: "none",
+              title: err.data
+            });
+            confirm.value.closeLoading();
+          }
+        }
+      });
+    }
+    function goOnHandle() {
+      confirm.value.confirm({
+        title: "确定继续派单？",
+        content: "将继续派发运单任务",
+        cancelText: "再想想",
+        confirmText: "继续派单",
+        confirmBgColor: "var(--main-color)",
+        asyncClose: true,
+        async confirm() {
+          try {
+            await api_index.ResetAssignStatusChg({
+              assignId: props.record.Id,
+              supplyId: props.record.Supply
+            });
+            await common_vendor.index.showToast({
+              title: "操作成功",
+              icon: "none",
+              complete() {
+                setTimeout(() => {
+                  emits("success");
+                }, 1500);
+              }
+            });
+            confirm.value.close();
+          } catch (err) {
+            common_vendor.index.showToast({
+              icon: "none",
+              title: err.data
+            });
+            confirm.value.closeLoading();
+          }
+        }
+      });
     }
     return (_ctx, _cache) => {
       return common_vendor.e({
@@ -109,13 +218,16 @@ const _sfc_main = {
         })
       } : {}, {
         D: common_vendor.t(__props.record.EstimateCarAmount || 0),
-        E: common_vendor.p({
+        E: ["1", "2", "3", "4"].includes(__props.record.Status)
+      }, ["1", "2", "3", "4"].includes(__props.record.Status) ? common_vendor.e({
+        F: common_vendor.p({
           color: "var(--divider)",
           margin: "24rpx 0"
         }),
-        F: __props.record.Status === "1"
+        G: __props.record.Status === "1"
       }, __props.record.Status === "1" ? {
-        G: common_vendor.p({
+        H: common_vendor.o(finishHandle),
+        I: common_vendor.p({
           shape: "circle",
           text: "完结货单",
           color: "var(--page-bg)",
@@ -127,9 +239,10 @@ const _sfc_main = {
             height: "32px"
           }
         }),
-        H: common_vendor.o(() => {
+        J: common_vendor.o(() => {
         }),
-        I: common_vendor.p({
+        K: common_vendor.o(pauseHandle),
+        L: common_vendor.p({
           shape: "circle",
           text: "暂停货单",
           color: "var(--page-bg)",
@@ -141,10 +254,11 @@ const _sfc_main = {
             height: "32px"
           }
         }),
-        J: common_vendor.o(() => {
+        M: common_vendor.o(() => {
         })
       } : ["2", "3"].includes(__props.record.Status) ? {
-        L: common_vendor.p({
+        O: common_vendor.o(finishHandle),
+        P: common_vendor.p({
           shape: "circle",
           text: "完结货单",
           color: "var(--page-bg)",
@@ -156,9 +270,10 @@ const _sfc_main = {
             height: "32px"
           }
         }),
-        M: common_vendor.o(() => {
+        Q: common_vendor.o(() => {
         }),
-        N: common_vendor.p({
+        R: common_vendor.o(goOnHandle),
+        S: common_vendor.p({
           shape: "circle",
           text: "继续派单",
           color: "linear-gradient( 270deg, #31CE57 0%, #07B130 100%);",
@@ -169,10 +284,11 @@ const _sfc_main = {
             height: "32px"
           }
         }),
-        O: common_vendor.o(() => {
+        T: common_vendor.o(() => {
         })
       } : ["4"].includes(__props.record.Status) ? {
-        Q: common_vendor.p({
+        V: common_vendor.o(goOnHandle),
+        W: common_vendor.p({
           shape: "circle",
           text: "继续派单",
           color: "linear-gradient( 270deg, #31CE57 0%, #07B130 100%);",
@@ -183,12 +299,16 @@ const _sfc_main = {
             height: "32px"
           }
         }),
-        R: common_vendor.o(() => {
+        X: common_vendor.o(() => {
         })
       } : {}, {
-        K: ["2", "3"].includes(__props.record.Status),
-        P: ["4"].includes(__props.record.Status),
-        S: common_vendor.o(toDetail)
+        N: ["2", "3"].includes(__props.record.Status),
+        U: ["4"].includes(__props.record.Status)
+      }) : {}, {
+        Y: common_vendor.o(toDetail),
+        Z: common_vendor.sr(confirm, "6d1eb3e7-10", {
+          "k": "confirm"
+        })
       });
     };
   }
