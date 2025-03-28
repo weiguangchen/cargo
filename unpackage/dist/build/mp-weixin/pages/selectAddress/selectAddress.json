@@ -1,8 +1,0 @@
-{
-  "navigationBarTitleText": "",
-  "usingComponents": {
-    "uv-line": "../../uni_modules/uv-line/components/uv-line/uv-line",
-    "uv-button": "../../uni_modules/uv-button/components/uv-button/uv-button",
-    "address-list": "./components/AddressList"
-  }
-}

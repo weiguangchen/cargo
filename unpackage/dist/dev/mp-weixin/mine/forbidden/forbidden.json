@@ -1,8 +1,0 @@
-{
-  "navigationBarTitleText": "司机黑名单",
-  "usingComponents": {
-    "uv-image": "../../uni_modules/uv-image/components/uv-image/uv-image",
-    "uv-load-more": "../../uni_modules/uv-load-more/components/uv-load-more/uv-load-more",
-    "uv-button": "../../uni_modules/uv-button/components/uv-button/uv-button"
-  }
-}

@@ -1,1 +1,0 @@
-"use strict";const e=require("../../../common/vendor.js"),o={};if(!Array){e.resolveComponent("uv-icon")()}Math;const r=e._export_sfc(o,[["render",function(o,r){return{a:e.p({name:"close",size:"24rpx",color:"#B0BECC"})}}],["__scopeId","data-v-c5226e42"]]);wx.createComponent(r);

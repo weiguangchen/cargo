@@ -1,1 +1,0 @@
-.material{padding:32rpx 0;display:flex;justify-content:space-between;align-items:center;font-size:28rpx;line-height:48rpx}.material .name{color:var(--content-color)}.material .status{display:flex;align-items:center;font-weight:700;color:var(--title-color)}.material.disabled .status{font-weight:400;color:var(--intr-color)}.drawer-form{padding:0 24rpx}
