@@ -33,7 +33,7 @@
         maxlength="300"
         count
         v-model="remark"
-        placeholder="请填写备注"
+        placeholder="请填写备注，司机接单可见"
         border="none"
         height="308rpx"
       />

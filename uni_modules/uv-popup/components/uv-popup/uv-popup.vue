@@ -517,8 +517,8 @@ export default {
     }
 
     &__close--top-right {
-      top: 15px;
-      right: 15px;
+      top: 8px;
+      right: 10px;
     }
 
     &__close--bottom-left {

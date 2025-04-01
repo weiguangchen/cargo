@@ -54,9 +54,9 @@
         :custom-style="{ marginRight: '24rpx' }"
       />
       <view class="time-wrapper">
-        <view v-if="validHour" class="valid-hour">
-          根据厂家设置，派车成功
-          <text class="hour">{{ validHour }}小时</text> 后将自动结束
+        <view v-if="model.validHour" class="valid-hour">
+          根据厂家设置，派车
+          <text class="hour">{{ model.validHour }}小时</text> 后将自动结束
         </view>
         <template v-else>
           <view
@@ -80,7 +80,7 @@
               />
             </view>
             <view class="placeholder" v-else>
-              车辆入场时间<uv-image
+              选填车辆入厂时间<uv-image
                 src="/static/images/arrow.png"
                 :duration="0"
                 width="24rpx"
@@ -116,7 +116,7 @@
               />
             </view>
             <view class="placeholder" v-else>
-              结束派单时间<uv-image
+              选填结束派单时间<uv-image
                 src="/static/images/arrow.png"
                 :duration="0"
                 width="24rpx"
@@ -164,7 +164,7 @@
     </view>
     <view class="form-item-wrapper material">
       <view class="title-wrapper">
-        <view class="title">装运物料</view>
+        <view class="title">计划装运物料</view>
         <view v-if="order" class="no" @click="openOrder"
           >来自订单 {{ order.SSOrderNo }}
           <uv-image
@@ -179,7 +179,7 @@
       <uv-form-item prop="material" labelPosition="top">
         <view class="select-material">
           <view v-if="!(supply && model.OwnerId)" class="tip"
-            >请先确认装货地和订单</view
+            >请先确认装货地、货主公司和订单</view
           >
           <view v-else-if="orderList.length === 0" class="tip"
             >未查询到生效中的订单</view
@@ -236,7 +236,7 @@
     </view>
 
     <view class="warning" v-if="showTip"
-      >预估价超出余额，存在车辆装货后不能出厂风险，请及时充值</view
+      >余额较低，存在车辆无法装运风险，请及时充值</view
     >
   </view>
 
@@ -332,6 +332,8 @@ function selectAddress(type) {
         if (res.type === 1) {
           supply.value = res.data;
           model.OwnerId = "";
+          order.value = null;
+          orderList.value = [];
           getCargpOptions();
         }
         if (res.type === 2) unload.value = res.data;

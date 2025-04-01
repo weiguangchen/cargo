@@ -39,7 +39,7 @@
               color="linear-gradient( 270deg, #31CE57 0%, #07B130 100%);"
               @click="confirm"
               :loading="loading"
-              :custom-style="{ borderRadius: '16rpx' }"
+              :custom-style="{ borderRadius: '8px', height: '48px' }"
             />
           </slot>
         </view>

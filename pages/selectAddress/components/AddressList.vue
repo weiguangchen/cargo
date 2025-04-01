@@ -3,16 +3,19 @@
 		<template v-if="(type === 1 && supplyList.length > 0 ) || (type === 2) && unloadList.length > 0">
 			<view class="location-list">
 				<template v-if="type === 1" >
-					<view class="location" :class="{ 'my-border-bottom' : index < supplyList.length - 1 }" v-for="(item,index) in supplyList" :key="item.Id" @click="select(item)">
-						<view class="name">
-							<view class="icon">
-								<uv-image src="/static/images/location.png" width="32rpx" height="32rpx" :duration="0" />
+					<my-empty v-if="isInit1 && supplyList.length === 0"/>
+					<template v-else>
+						<view class="location" :class="{ 'my-border-bottom' : index < supplyList.length - 1 }" v-for="(item,index) in supplyList" :key="item.Id" @click="select(item)">
+							<view class="name">
+								<view class="icon">
+									<uv-image src="/static/images/location.png" width="32rpx" height="32rpx" :duration="0" />
+								</view>
+								{{ item.Name }}
 							</view>
-							{{ item.Name }}
+							<view class="address">{{ item.Province || '' }}{{ item.City || '' }}{{ item.Address || '' }}</view>
+							<view class="dis" v-if="getDis({ latitude: item.Latitude, longitude: item.Logitude })">距您 {{ getDis({ latitude: item.Latitude, longitude: item.Logitude }) }} km</view>
 						</view>
-						<view class="address">{{ item.Province || '' }}{{ item.City || '' }}{{ item.Address || '' }}</view>
-						<view class="dis" v-if="getDis({ latitude: item.Latitude, longitude: item.Logitude })">距您 {{ getDis({ latitude: item.Latitude, longitude: item.Logitude }) }} km</view>
-					</view>
+					</template>
 				</template>
 				<template v-if="type === 2" >
 					<view class="location" :class="{ 'my-border-bottom' : index < unloadList.length - 1 }" v-for="(item,index) in unloadList" :key="item.Id" @click="select(item)">
@@ -51,7 +54,8 @@
 	})
 	const emits = defineEmits(['change'])
 
-	
+	const isInit1 = ref(false);
+	const isInit2 = ref(false);	
 	watchEffect(() => {
 		if(props.type === 1) {
 			getSupply();
@@ -66,7 +70,8 @@
 	// 获取装货地
 	async function getSupply() {
 		const res = await GetSupplierList();
-		supplyList.value = res;
+		// supplyList.value = res;
+		isInit1.value = true;
 	}
 	// 获取卸货地
 	async function getUnload() {
@@ -74,6 +79,7 @@
 			useStatus: 1
 		})
 		unloadList.value = res.filter(m => m.EnabledMark === '1');
+		isInit2.value = true;
 	}
 
 	function select(record) {

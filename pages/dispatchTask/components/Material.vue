@@ -6,12 +6,12 @@
   >
     <view class="name">{{ model.SSMaterialName }}</view>
     <view class="status">
-      <template v-if="modelValue.Limittype === '0'">不拉运</template>
+      <template v-if="modelValue.Limittype === '0'">不装运</template>
       <template v-if="modelValue.Limittype === '1'"
-        >最大 {{ modelValue.EstimiteWeight }} 吨</template
+        >{{ modelValue.EstimiteWeight }} 吨</template
       >
       <template v-if="modelValue.Limittype === '2'"
-        >最大 {{ modelValue.EstimiteTimes }} 车次</template
+        >{{ modelValue.EstimiteTimes }} 车次</template
       >
       <uv-image
         src="/static/images/arrow.png"
@@ -194,6 +194,7 @@ async function confirm() {
   }
 
   .status {
+    line-height: 1;
     display: flex;
     align-items: center;
     font-weight: bold;

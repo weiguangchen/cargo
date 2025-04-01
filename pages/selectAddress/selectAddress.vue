@@ -73,6 +73,15 @@
 		channel.on('setData', async res => {
 			console.log('setData', res);
 			type.value = res.type;
+			if(res.type === 1) {
+				uni.setNavigationBarTitle({
+					title: '选择装货地'
+				})
+			}else {
+				uni.setNavigationBarTitle({
+					title: '选择卸货地'
+				})
+			}
 			data.value = res.data;
 			translateY.value = res.data ? '100%' : 0;
 			
