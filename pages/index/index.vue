@@ -163,7 +163,7 @@
 
 <script setup>
 import { ref, getCurrentInstance } from "vue";
-import { onReady, onLoad } from "@dcloudio/uni-app";
+import { onReady, onLoad, onShow } from "@dcloudio/uni-app";
 import SelectCarType from "../dispatchTask/components/SelectCarType.vue";
 import { getWxSetting, getLocationInfo } from "@/utils/authorize.js";
 import { useAppStore } from "@/stores/app.js";
@@ -173,7 +173,7 @@ import { sleep } from "@/utils/index.js";
 const { ctx } = getCurrentInstance();
 
 const appStore = useAppStore();
-onLoad(() => {
+onShow(() => {
   appStore.switchTab(0);
 });
 onLoad(async () => {

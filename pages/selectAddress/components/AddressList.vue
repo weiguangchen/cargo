@@ -33,7 +33,7 @@
               {{ item.Name }}
             </view>
             <view class="address"
-              >{{ item.Province || "" }}{{ item.City || ""
+              >{{ item.City || ""
               }}{{ item.Address || "" }}</view
             >
             <view
@@ -56,7 +56,7 @@
           查看全部生产企业
           <uv-icon name="/static/images/arrow/green.png" size="28rpx" />
         </view>
-        <uv-load-more status="nomore" color="#B0BECC" line-color="#B0BECC" />
+        <!-- <uv-load-more status="nomore" color="#B0BECC" line-color="#B0BECC" /> -->
       </scroll-view>
     </template>
     <template v-if="type === 2">
@@ -89,7 +89,7 @@
               {{ item.Placename }}
             </view>
             <view class="address"
-              >{{ item.Province || "" }}{{ item.City || ""
+              >{{ item.City || ""
               }}{{ item.District || "" }}{{ item.Address || "" }}</view
             >
             <view
@@ -112,7 +112,7 @@
           管理卸货地址
           <uv-icon name="/static/images/arrow/green.png" size="28rpx" />
         </view>
-        <uv-load-more status="nomore" color="#B0BECC" line-color="#B0BECC" />
+        <!-- <uv-load-more status="nomore" color="#B0BECC" line-color="#B0BECC" /> -->
       </scroll-view>
     </template>
   </view>
@@ -148,7 +148,7 @@ function supplyConfirm() {
 }
 function unloadConfirm() {
   uni.navigateTo({
-    url: "/pages/addressList/addressList",
+    url: "/pages/addAddress/addAddress",
   });
 }
 const supplyList = ref([]);
@@ -284,7 +284,7 @@ defineExpose({
   justify-content: center;
   font-size: 26rpx;
   color: var(--main-color);
-  margin: 20rpx 0 34rpx;
+  margin: 28rpx 0 34rpx;
   line-height: 1;
   font-weight: bold;
 }

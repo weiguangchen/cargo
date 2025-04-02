@@ -22,7 +22,7 @@
         <view class="tag zhuang">装货地</view>
         <view class="name">{{ data.Name }}</view>
         <view class="address"
-          >{{ data.Province || "" }}{{ data.City || ""
+          >{{ data.City || ""
           }}{{ data.Address || "" }}</view
         >
         <uv-line color="#E3E9EF" margin="28rpx 0 32rpx" />
@@ -35,7 +35,7 @@
         <view class="tag xie">卸货地</view>
         <view class="name">{{ data.Placename }}</view>
         <view class="address"
-          >{{ data.Province || "" }}{{ data.City || "" }}{{ data.District || ""
+          >{{ data.City || "" }}{{ data.District || ""
           }}{{ data.Address || "" }}</view
         >
         <uv-line color="#E3E9EF" margin="28rpx 0 32rpx" />
@@ -83,12 +83,7 @@ const { ctx } = getCurrentInstance();
 const mapContext = ref();
 onMounted(() => {
   mapContext.value = uni.createMapContext("map", ctx);
-});
 
-const type = ref(1);
-const data = ref();
-const eventChannel = ref();
-onLoad((options) => {
   const instance = getCurrentInstance().proxy;
   const channel = instance.getOpenerEventChannel();
   eventChannel.value = channel;
@@ -121,6 +116,10 @@ onLoad((options) => {
     });
   });
 });
+
+const type = ref(1);
+const data = ref();
+const eventChannel = ref();
 
 const addressListRef = ref();
 function openList() {

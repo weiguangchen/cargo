@@ -120,7 +120,8 @@
 		getCurrentInstance
 	} from 'vue'
 	import {
-		onLoad
+		onLoad,
+		onShow
 	} from '@dcloudio/uni-app'
 	import {
 		useAppStore
@@ -137,7 +138,7 @@
 		ctx
 	} = getCurrentInstance();
 
-	onLoad(() => {
+	onShow(() => {
 		appStore.switchTab(3)
 	})
 

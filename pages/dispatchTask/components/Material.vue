@@ -67,7 +67,7 @@
         </uv-form-item>
         <uv-form-item
           labelPosition="top"
-          label="最大装运重量"
+          label="计划装运重量"
           prop="EstimiteWeight"
           v-if="model.Limittype === '1'"
         >
@@ -87,7 +87,7 @@
         </uv-form-item>
         <uv-form-item
           labelPosition="top"
-          label="最大装运车次"
+          label="计划装运车次"
           prop="EstimiteTimes"
           v-if="model.Limittype === '2'"
         >

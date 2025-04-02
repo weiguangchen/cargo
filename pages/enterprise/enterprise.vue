@@ -55,7 +55,7 @@
 		reactive,
 		ref
 	} from "vue";
-	import { onLoad } from '@dcloudio/uni-app'
+	import { onLoad, onShow } from '@dcloudio/uni-app'
 	import Item from './components/Item.vue'
 	import {
 		useAppStore
@@ -64,7 +64,7 @@
 	import { getToken } from '@/utils/token.js'
 	import { GetSupplierList } from '@/api/index.js'
 	const appStore = useAppStore();
-	onLoad(() => {
+	onShow(() => {
 		appStore.switchTab(1)
 	})
 	// 登录

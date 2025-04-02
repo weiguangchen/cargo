@@ -71,7 +71,7 @@
 	import useList from '@/hooks/useList.js'
 	
 	const appStore = useAppStore();
-	onLoad(() => {
+	onShow(() => {
 		appStore.switchTab(2)
 	})
 	// 登录
