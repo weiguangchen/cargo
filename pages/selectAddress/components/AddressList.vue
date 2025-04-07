@@ -12,7 +12,7 @@
         buttonText="查看生产企业"
         @confirm="supplyConfirm"
       />
-      <scroll-view scroll-y v-else>
+      <scroll-view scroll-y v-else style="height:100%;">
         <view class="location-list">
           <view
             class="location"
@@ -56,6 +56,7 @@
           查看全部生产企业
           <uv-icon name="/static/images/arrow/green.png" size="28rpx" />
         </view>
+		<uv-safe-bottom />
         <!-- <uv-load-more status="nomore" color="#B0BECC" line-color="#B0BECC" /> -->
       </scroll-view>
     </template>
@@ -68,7 +69,7 @@
         buttonText="新建卸货地址"
         @confirm="unloadConfirm"
       />
-      <scroll-view scroll-y v-else>
+      <scroll-view scroll-y v-else style="height:100%;">
         <view class="location-list">
           <view
             class="location"
@@ -112,6 +113,7 @@
           管理卸货地址
           <uv-icon name="/static/images/arrow/green.png" size="28rpx" />
         </view>
+		<uv-safe-bottom />
         <!-- <uv-load-more status="nomore" color="#B0BECC" line-color="#B0BECC" /> -->
       </scroll-view>
     </template>
@@ -221,8 +223,7 @@ defineExpose({
   transform: translateY(100%);
   transition: all 0.4s;
   box-sizing: border-box;
-  height: 100vh;
-  padding: 24rpx;
+  padding: 0 24rpx;
   background-color: var(--page-bg);
   margin-bottom: 24rpx;
   .scroll-view {
@@ -232,6 +233,7 @@ defineExpose({
 
 .location-list {
   padding: 0 24rpx;
+  margin-top: 24rpx;
   background-color: #ffffff;
   border-radius: 24rpx;
   overflow: hidden;
@@ -284,7 +286,7 @@ defineExpose({
   justify-content: center;
   font-size: 26rpx;
   color: var(--main-color);
-  margin: 28rpx 0 34rpx;
+  margin: 28rpx 0 0;
   line-height: 1;
   font-weight: bold;
 }
