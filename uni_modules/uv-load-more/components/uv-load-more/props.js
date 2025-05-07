@@ -18,7 +18,7 @@ export default {
     // 字体大小
     fontSize: {
       type: [String, Number],
-      default: 14,
+      default: 13,
     },
     // 图标大小
     iconSize: {

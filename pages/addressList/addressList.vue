@@ -8,7 +8,7 @@
 					</view>
 					{{ item.Placename }}
 				</view>
-				<view class="address">{{ item.Province }}{{ item.City }}{{ item.Distinct }}{{ item.Address }}</view>
+				<view class="address">{{ item.City }}{{ item.Distinct }}{{ item.Address }}</view>
 				<view class="person">
 					<text class="user">{{ item.Nickname }}</text>
 					<text class="phone">{{ item.Mobile }}</text>
@@ -27,12 +27,12 @@
 				</view>
 			</view>
 		</view>
-		<uv-load-more status="nomore" line color="#B0BECC" />
+		<uv-load-more status="nomore" line color="#B0BECC" :customStyle="{ marginTop: '14px' }"/>
 	</template>
-	<my-empty v-else height="400px" text="暂无卸货地"/>
+	<my-empty v-else height="400px" img="/static/images/empty/address2.png"  text="暂无地址"/>
 	
 	<view class="page-footer">
-		<uv-button text="+ 添加卸货地址" color="linear-gradient( 270deg, #31CE57 0%, #07B130 100%)" @click="add"/>
+		<uv-button text="+ 添加卸货地址" :custom-style="{ height: '96rpx', borderRadius: '16rpx' }" color="linear-gradient( 270deg, #31CE57 0%, #07B130 100%)" @click="add"/>
 	</view>
 
 	<my-confirm ref="confirm"/>

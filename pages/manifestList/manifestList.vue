@@ -22,13 +22,11 @@
 		</view>
 		<!-- end -->
 		<!-- 列表 -->
-		<scroll-view scroll-y class="scroll-view">
-			<view class="bill-list" v-if="list.length > 0">
-				<Item v-for="item in list" :key="item.Id" :record="item" @success="getList"/>
-				<uv-load-more status="nomore" color="#B0BECC"/>
-			</view>
-			<my-empty v-else/>
-		</scroll-view>
+		<my-list :list="list" rowKey="Id" :noMore="noMore" :loading="loading" :fetchData="fetchData">
+			<template #item="{ item }">
+				<Item :record="item" @success="fetchData(true)" />
+			</template>
+		</my-list>
 		<!-- end -->
 	</view>
 </template>
@@ -36,6 +34,7 @@
 <script setup>
 	import {
 		ref,
+		computed,
 		onMounted
 	} from 'vue'
 	import {
@@ -43,8 +42,10 @@
 		onShow
 	} from '@dcloudio/uni-app'
 	import Item from './components/item.vue';
-	import { GetAssignCarList, GetAssignCarListWithCount } from '@/api/index.js';
+	import { GetAssignCarListWithCount } from '@/api/index.js';
 	import FilterDrawer from './components/FilterDrawer.vue';
+	import useList from '@/hooks/useList.js'
+
 	// hack滚动穿透
 	const show = ref(false);
 	
@@ -79,62 +80,52 @@
 	}) {
 		console.log(index, name)
 		status.value = tabs.value?.find(m => m.name === name)?.value ?? '';
-		getList()
+		fetchData(true)
 	}
 	// 筛选
 	const filter = ref();
 	const isFilter = ref(false);
 	const isFiltering = ref(false);	
-	function changeFilter(data) {
+	async function changeFilter(data) {
 		console.log('changeFilter',data)
 		isFiltering.value = true;
 		isFilter.value = data.isFilter;
 		params.value = data.params;
-		getList();
+		await fetchData(true)
+		isFiltering.value = false;
 	}
 	const keyWord = ref('');
 	const isKeyWord = ref(false);
-	function handleSearch() {
+	async function handleSearch() {
 		isFiltering.value = true;
 		isKeyWord.value = !!keyWord.value;
-		getList();
+		await fetchData(true)
+		isFiltering.value = false;
 	}
 	// 列表
-	const list = ref([]);
 	const params = ref({});
-	const total = ref(0);
-	async function getList() {
-		try {
-			uni.showLoading();
-			const { dateMode, date, ...rest } = params.value;
-			const res = await GetAssignCarListWithCount({
-				status: status.value,
-				keyWord: keyWord.value,
-				...rest
-			});
-			list.value = res.list;
-			total.value = res.cnt;
-			uni.hideLoading();
-		}
-		catch(err) {
-			uni.hideLoading();
-			uni.showToast({
-				title: err.data,
-				icon: 'none'
-			})
-		}
-		finally {
-			isFiltering.value = false;
-		}
-	}
 	function reset() {
 		keyWord.value = '';
 		isKeyWord.value = false;
 		filter.value.reset();
 	}
 	onShow(() => {
-		getList();
+		fetchData(true)
 	})
+
+	// 货单列表
+	const listParams = computed(() => {
+		const { dateMode, date, ...rest } = params.value;
+		return {
+			status: status.value,
+			keyword: keyWord.value,
+			...rest,
+		};
+	});
+	const { list, noMore, loading, total, fetchData } = useList({
+		api: GetAssignCarListWithCount,
+		params: listParams,
+	});
 </script>
 
 <style lang="scss">

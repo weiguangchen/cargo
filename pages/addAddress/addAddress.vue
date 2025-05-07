@@ -1,16 +1,19 @@
 <template>
 	<uv-form errorType="toast" :model="model" :rules="rules" ref="form" label-width="88rpx">
-		<view class="form-title">卸货地信息</view>
+		<view class="form-title">卸货地信息 <text v-if="model.Id">（不可修改）</text></view>
 		<view class="form-wrapper">
 			<uv-form-item labelPosition="left" label="名称" prop="Placename" borderBottom>
-				<uv-input v-model="model.Placename" placeholder="请输入" border="none" maxlength="30"
-					laceholder-style="color:var(--intr-color)" />
+				<template v-if="model.Id" >{{ model.Placename }}</template>
+				<uv-input v-else v-model="model.Placename" placeholder="请输入，提交后不可修改" border="none" maxlength="30" placeholder-style="color:var(--intr-color)" />
 			</uv-form-item>
 			<uv-form-item labelPosition="left" label="地区" borderBottom v-if="model.Area.province">
 				{{ model.Area.province }} {{ model.Area.city }} {{ model.Area.district }}
 			</uv-form-item>
-			<uv-form-item labelPosition="left" label="地址" prop="Area.address" @click="chooseLocation">
-				<uv-input v-model="model.Area.address" placeholder="请选择" placeholder-style="color:var(--intr-color)"
+			<uv-form-item v-if="model.Id" labelPosition="left" label="地址" prop="Area.address">
+				{{ model.Area.address }}
+			</uv-form-item>
+			<uv-form-item v-else labelPosition="left" label="地址" prop="Area.address" @click="chooseLocation">
+				<uv-input v-model="model.Area.address" placeholder="请输入，提交后不可修改" placeholder-style="color:var(--intr-color)"
 					border="none" readonly />
 				<template v-slot:right>
 					<uv-icon name="arrow-right" :custom-style="{ color: 'var(--intr-color)' }" size="12" />
@@ -19,21 +22,29 @@
 		</view>
 		<view class="form-title">联系人信息</view>
 		<view class="form-wrapper">
-			<uv-form-item labelPosition="left" label="昵称" prop="Nickname" borderBottom>
-				<uv-input v-model="model.Nickname" placeholder="请输入" placeholder-style="color:var(--intr-color)"
+			<uv-form-item labelPosition="left" label="称呼" prop="Nickname" borderBottom>
+				<uv-input v-model="model.Nickname" placeholder="请输入，提交后不可修改" placeholder-style="color:var(--intr-color)"
 					maxlength="6" border="none" />
 			</uv-form-item>
 			<uv-form-item labelPosition="left" label="电话" prop="Mobile">
-				<uv-input v-model="model.Mobile" placeholder="请输入" placeholder-style="color:var(--intr-color)"
+				<uv-input v-model="model.Mobile" placeholder="请输入，提交后不可修改" placeholder-style="color:var(--intr-color)"
 					maxlength="11" border="none" />
 			</uv-form-item>
 		</view>
 	</uv-form>
 
 	<view class="page-footer">
-		<uv-button :loading="loading" text="确认添加" color="linear-gradient( 270deg, #31CE57 0%, #07B130 100%)"
-			@click="submit" />
+		<view style="width: 262rpx;" v-if="model.Id">
+			<uv-button :loading="loading" text="删除地址" :custom-style="{ height: '96rpx', borderRadius: '16rpx', backgroundColor: '#FFF0EE', borderColor: '#FFF0EE' }" :custom-text-style="{ color: 'var(--red-color)' }" color="var(--red-color)"
+				@click="remove" />
+		</view>
+		<view style="flex:1;">
+			<uv-button :loading="loading" text="确认添加" :custom-style="{ height: '96rpx', borderRadius: '16rpx' }" color="linear-gradient( 270deg, #31CE57 0%, #07B130 100%)"
+				@click="submit" />
+		</view>
 	</view>
+	
+	<my-confirm ref="confirm"/>
 </template>
 
 <script setup>
@@ -44,7 +55,8 @@
 	import {
 		UptUnloadPlace,
 		GetUnloadPlace,
-		GetLocationByJW
+		GetLocationByJW,
+		DeleteUnloadPlace
 	} from '@/api/index.js'
 	import {
 		onLoad,
@@ -56,6 +68,9 @@
 		} = options;
 		model.Id = unloadId;
 		if (unloadId) {
+			uni.setNavigationBarTitle({
+				title: '修改卸货地址'
+			})
 			try {
 				const res = await GetUnloadPlace({
 					unloadId
@@ -76,6 +91,10 @@
 			} catch {
 
 			}
+		}else {
+			uni.setNavigationBarTitle({
+				title: '添加卸货地址'
+			})
 		}
 	})
 
@@ -97,7 +116,7 @@
 		Placename: [{
 				type: 'string',
 				required: true,
-				message: '请填写姓名',
+				message: '请填写卸货地名称',
 				trigger: ['blur', 'change']
 			},
 			{
@@ -115,15 +134,23 @@
 		Nickname: {
 			type: 'string',
 			required: true,
-			message: '请填写昵称',
+			message: '请填写联系人称呼',
 			trigger: ['blur', 'change']
 		},
-		Mobile: {
-			type: 'string',
-			required: true,
-			message: '请填写手机号',
-			trigger: ['blur', 'change']
-		},
+		Mobile: [
+			{
+				type: 'string',
+				required: true,
+				message: '请填写联系人电话',
+				trigger: ['blur', 'change']
+			},
+			{
+				type: 'string',
+				message: '请填写正确的手机或电话号码',
+				pattern:  /^(?:(?:(?:\+|00)86)?1[3-9]\d{9}|(?:\d{3}-)?\d{8}|(?:\d{4}-)?\d{7,8})(?:-\d+)?$/,
+				trigger: ['blur', 'change'],
+			}
+		],
 	})
 
 	async function chooseLocation() {
@@ -165,7 +192,31 @@
 		}
 	}
 
-	const loading = ref(false)
+	const loading = ref(false);
+	const confirm = ref();
+	function remove() {
+		confirm.value.confirm({
+			title: '确定删除卸货地址？',
+			content: '您的货单和运单记录不会被影响',
+			confirmText: '删除',
+			asyncClose: true,
+			async confirm() {
+				try {
+					await DeleteUnloadPlace({
+						unloadId: model.Id
+					})
+					uni.showToast({
+						title: '卸货地删除成功',
+						icon: 'none'
+					})
+					uni.$emit('addAddress')
+					uni.navigateBack();
+				} catch {
+					confirm.value.closeLoading();
+				}
+			}
+		})
+	}
 	async function submit() {
 		const valid = await form.value.validate();
 		if (valid) {
@@ -205,6 +256,10 @@
 				uni.navigateBack();
 			} catch (err) {
 				console.log('err', err)
+				uni.showToast({
+					title:err.data,
+					icon: 'none'
+				})
 			} finally {
 				loading.value = false;
 			}
@@ -240,5 +295,10 @@
 				line-height: 36rpx;
 			}
 		}
+	}
+
+	.page-footer {
+		display: flex;
+		gap: 20rpx;
 	}
 </style>

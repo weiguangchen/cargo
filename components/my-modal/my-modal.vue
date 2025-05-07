@@ -1,6 +1,6 @@
 <template>
 	<uv-popup ref="modalPopup" mode="center" :zoom="zoom" :zIndex="zIndex" :customStyle="{
-			borderRadius: '6px', 
+			borderRadius: '12px', 
 			overflow: 'hidden',
 			marginTop: `-${$uv.addUnit(negativeTop)}`
 		}" :closeOnClickOverlay="closeOnClickOverlay" :safeAreaInsetBottom="false" :duration="0" @change="popupChange">
@@ -236,7 +236,7 @@
 <style lang="scss" scoped>
 	@import '@/uni_modules/uv-ui-tools/libs/css/components.scss';
 	@import '@/uni_modules/uv-ui-tools/libs/css/color.scss';
-	$uv-modal-border-radius: 6px;
+	$uv-modal-border-radius: 8px;
 
 	.uv-modal {
 		width: 650rpx;
