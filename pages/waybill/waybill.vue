@@ -1,6 +1,6 @@
 <template>
   <page-meta
-    :page-style="'overflow:' + (show ? 'hidden' : 'visible')"
+    :page-style="`overflow: ${show ? 'hidden' : 'visible'}`"
   ></page-meta>
   <view
     catchtouchmove="true"

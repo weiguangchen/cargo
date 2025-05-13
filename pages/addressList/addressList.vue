@@ -1,5 +1,5 @@
 <template>
-	<template v-if="list.length > 0">
+	<view class="addresslist-page" v-if="list.length > 0">
 		<view class="address-wrapper" v-for="item in list" :key="item.Id">
 			<view class="content my-border-bottom">
 				<view class="name">
@@ -27,10 +27,10 @@
 				</view>
 			</view>
 		</view>
-		<uv-load-more status="nomore" line color="#B0BECC" :customStyle="{ marginTop: '14px' }"/>
-	</template>
-	<my-empty v-else height="400px" img="/static/images/empty/address2.png"  text="暂无地址"/>
-	
+		<uv-load-more status="nomore" color="#B0BECC" :customStyle="{ marginTop: '14px' }"/>
+	</view>
+	<my-empty v-else height="calc(100vh - 112rpx)" img="/static/images/empty/address2.png"  text="暂无地址"/>
+
 	<view class="page-footer">
 		<uv-button text="+ 添加卸货地址" :custom-style="{ height: '96rpx', borderRadius: '16rpx' }" color="linear-gradient( 270deg, #31CE57 0%, #07B130 100%)" @click="add"/>
 	</view>
@@ -115,8 +115,8 @@
 </script>
 
 <style lang="scss">
-	page {
-		padding: 24rpx 24rpx 180rpx;
+	.addresslist-page {
+		padding: 24rpx 24rpx 112rpx;
 	}
 
 	.address-wrapper {

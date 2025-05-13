@@ -2,18 +2,18 @@
 	<uv-form errorType="toast" :model="model" :rules="rules" ref="form" label-width="88rpx">
 		<view class="form-title">卸货地信息 <text v-if="model.Id">（不可修改）</text></view>
 		<view class="form-wrapper">
-			<uv-form-item labelPosition="left" label="名称" prop="Placename" borderBottom>
+			<uv-form-item labelPosition="left" label="名称" prop="Placename" borderBottom :custom-style="{ alignItems: 'center' }">
 				<template v-if="model.Id" >{{ model.Placename }}</template>
 				<uv-input v-else v-model="model.Placename" placeholder="请输入，提交后不可修改" border="none" maxlength="30" placeholder-style="color:var(--intr-color)" />
 			</uv-form-item>
-			<uv-form-item labelPosition="left" label="地区" borderBottom v-if="model.Area.province">
-				{{ model.Area.province }} {{ model.Area.city }} {{ model.Area.district }}
+			<uv-form-item labelPosition="left" label="地区" borderBottom v-if="model.Area.province" :custom-style="{ alignItems: 'center' }">
+				<text style="padding-left: 4px;">{{ model.Area.province }} {{ model.Area.city }} {{ model.Area.district }}</text>
 			</uv-form-item>
-			<uv-form-item v-if="model.Id" labelPosition="left" label="地址" prop="Area.address">
+			<uv-form-item v-if="model.Id" labelPosition="left" label="地址" prop="Area.address" :custom-style="{ alignItems: 'center' }">
 				{{ model.Area.address }}
 			</uv-form-item>
-			<uv-form-item v-else labelPosition="left" label="地址" prop="Area.address" @click="chooseLocation">
-				<uv-input v-model="model.Area.address" placeholder="请输入，提交后不可修改" placeholder-style="color:var(--intr-color)"
+			<uv-form-item v-else labelPosition="left" label="地址" prop="Area.address" @click="chooseLocation" :custom-style="{ alignItems: 'center' }">
+				<uv-input v-model="model.Area.address" placeholder="请选择，提交后不可修改" placeholder-style="color:var(--intr-color)"
 					border="none" readonly />
 				<template v-slot:right>
 					<uv-icon name="arrow-right" :custom-style="{ color: 'var(--intr-color)' }" size="12" />
@@ -22,12 +22,12 @@
 		</view>
 		<view class="form-title">联系人信息</view>
 		<view class="form-wrapper">
-			<uv-form-item labelPosition="left" label="称呼" prop="Nickname" borderBottom>
-				<uv-input v-model="model.Nickname" placeholder="请输入，提交后不可修改" placeholder-style="color:var(--intr-color)"
+			<uv-form-item labelPosition="left" label="称呼" prop="Nickname" borderBottom :custom-style="{ alignItems: 'center' }">
+				<uv-input v-model="model.Nickname" placeholder="请输入" placeholder-style="color:var(--intr-color)"
 					maxlength="6" border="none" />
 			</uv-form-item>
-			<uv-form-item labelPosition="left" label="电话" prop="Mobile">
-				<uv-input v-model="model.Mobile" placeholder="请输入，提交后不可修改" placeholder-style="color:var(--intr-color)"
+			<uv-form-item labelPosition="left" label="电话" prop="Mobile" :custom-style="{ alignItems: 'center' }">
+				<uv-input v-model="model.Mobile" placeholder="请输入" placeholder-style="color:var(--intr-color)"
 					maxlength="11" border="none" />
 			</uv-form-item>
 		</view>
@@ -39,7 +39,7 @@
 				@click="remove" />
 		</view>
 		<view style="flex:1;">
-			<uv-button :loading="loading" text="确认添加" :custom-style="{ height: '96rpx', borderRadius: '16rpx' }" color="linear-gradient( 270deg, #31CE57 0%, #07B130 100%)"
+			<uv-button :loading="loading" :text="model.Id ? '确认修改' : '确认添加'" :custom-style="{ height: '96rpx', borderRadius: '16rpx' }" color="linear-gradient( 270deg, #31CE57 0%, #07B130 100%)"
 				@click="submit" />
 		</view>
 	</view>

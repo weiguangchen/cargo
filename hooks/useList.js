@@ -12,7 +12,9 @@ export default function useList({
   const pageSize = ref(10);
   const pageIndex = ref(1);
   const total = ref(0);
-
+  // 请求次数
+  const requestIndex = ref(0);
+  
   // 获取数据
   async function fetchData(isRefresh = false, newParams = {}) {
     if (isRefresh) {
@@ -23,9 +25,9 @@ export default function useList({
     try {
       loading.value = true;
       if (isRefresh) {
+        list.value = [];
         pageIndex.value = 1;
       }
-	  uni.showLoading()
       const res = await api({
         // pageSize: pageSize.value,
         pageIndex: pageIndex.value,
