@@ -1,6 +1,6 @@
 <template>
   <page-meta
-    :page-style="'overflow:' + (show ? 'hidden' : 'visible')"
+    :page-style="`overflow: ${show ? 'hidden' : 'visible'}`"
   ></page-meta>
   <view
     catchtouchmove="true"
@@ -53,27 +53,15 @@
     <!-- 列表 -->
     <template v-if="getToken()">
       <my-list
-        v-if="current === 0"
-        :list="list1"
-        rowKey="Id"
-        :noMore="noMore1"
-        :loading="loading1"
-        :fetchData="fetchData1"
+        :list="current === 0 ? list1 : list2"
+        :rowKey="current === 0 ? 'Id' : 'OnwayId'"
+        :noMore="current === 0 ? noMore1 : noMore2"
+        :loading="current === 0 ? loading1 : loading2"
+        :fetchData="current === 0 ? fetchData1 : fetchData2"
       >
         <template #item="{ item }">
-          <ManifestItem :record="item" @success="fetchData1(true)" />
-        </template>
-      </my-list>
-      <my-list
-        v-if="current === 1"
-        :list="list2"
-        rowKey="OnwayId"
-        :noMore="noMore2"
-        :loading="loading2"
-        :fetchData="fetchData2"
-      >
-        <template #item="{ item }">
-          <WaybillItem :record="item" @success="fetchData2(true)" />
+          <ManifestItem :record="item" v-if="current === 0" />
+          <WaybillItem :record="item" v-if="current === 1" />
         </template>
       </my-list>
     </template>
@@ -93,7 +81,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { onLoad, onShow } from "@dcloudio/uni-app";
+import { onLoad, onUnload, onShow } from "@dcloudio/uni-app";
 import { getToken } from "@/utils/token.js";
 import ManifestItem from "@/pages/manifestList/components/item.vue";
 import WaybillItem from "@/pages/waybill/components/item.vue";
@@ -190,6 +178,42 @@ const {
   api: GetAssignCarListWithCount,
   params: listParams1,
 });
+// 定义列表操作
+const handleMap1 = {
+  pause: async (record) => {
+    console.log("pause", record);
+    hideItem1(record);
+  },
+  finish: (record) => {
+    console.log("finish", record);
+    hideItem1(record);
+  },
+  goOn: () => {
+    fetchData1(true);
+  },
+};
+// 从前端缓存中隐藏数据
+function hideItem1(record) {
+  total1.value--;
+  list1.value.map((item) => {
+    if (item.Id === record.Id) {
+      item._isShow = false;
+    }
+  });
+}
+// 监听事件
+onLoad(() => {
+  for (let key in handleMap1) {
+    uni.$on(`taskManifest:${key}`, handleMap1[key]);
+  }
+});
+// 卸载事件
+onUnload(() => {
+  for (let key in handleMap1) {
+    uni.$off(`taskManifest:${key}`, handleMap1[key]);
+  }
+});
+
 // 运单列表
 const inInit2 = ref(false);
 const listParams2 = computed(() => {
@@ -221,6 +245,39 @@ onShow(() => {
     if (inInit2.value) return;
     inInit2.value = true;
     fetchData2(true);
+  }
+});
+
+// 定义列表操作
+const handleMap2 = {
+  confirmUnload: async (record) => {
+    console.log("confirmUnload", record);
+    hideItem2(record);
+  },
+  cancel: (record) => {
+    console.log("cancel", record);
+    hideItem2(record);
+  },
+};
+// 从前端缓存中隐藏数据
+function hideItem2(record) {
+  total2.value--;
+  list2.value.map((item) => {
+    if (item.Id === record.Id) {
+      item._isShow = false;
+    }
+  });
+}
+// 监听事件
+onLoad(() => {
+  for (let key in handleMap2) {
+    uni.$on(`taskWaybill:${key}`, handleMap2[key]);
+  }
+});
+// 卸载事件
+onUnload(() => {
+  for (let key in handleMap2) {
+    uni.$off(`taskWaybill:${key}`, handleMap2[key]);
   }
 });
 </script>

@@ -54,9 +54,15 @@
     </view>
     <!-- end -->
     <!-- 列表 -->
-    <my-list :list="list" rowKey="OnwayId" :noMore="noMore" :loading="loading" :fetchData="fetchData">
+    <my-list
+      :list="list"
+      rowKey="OnwayId"
+      :noMore="noMore"
+      :loading="loading"
+      :fetchData="fetchData"
+    >
       <template #item="{ item }">
-        <Item :record="item" @success="fetchData(true)" />
+        <Item :record="item" v-if="item" />
       </template>
     </my-list>
     <!-- end -->
@@ -65,12 +71,11 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { onLoad } from "@dcloudio/uni-app";
-import { getToken } from "@/utils/token.js";
+import { onLoad, onUnload } from "@dcloudio/uni-app";
 import Item from "./components/item.vue";
-import { GetOnwayOwnerWithCount } from "@/api/index.js";
+import { GetOnwayOwnerWithCount, GetSupplyOnwayDetail } from "@/api/index.js";
 import FilterDrawer from "./components/FilterDrawer.vue";
-import useList from '@/hooks/useList.js'
+import useList from "@/hooks/useList.js";
 import { computed } from "vue";
 // hack滚动穿透
 const show = ref(false);
@@ -118,7 +123,7 @@ async function changeFilter(data) {
   isFiltering.value = true;
   isFilter.value = data.isFilter;
   params.value = data.params;
-  await fetchData(true)
+  await fetchData(true);
   isFiltering.value = false;
 }
 const keyWord = ref("");
@@ -126,7 +131,7 @@ const isKeyWord = ref(false);
 async function handleSearch() {
   isFiltering.value = true;
   isKeyWord.value = !!keyWord.value;
-  await fetchData(true)
+  await fetchData(true);
   isFiltering.value = false;
 }
 // 运单列表
@@ -151,6 +156,58 @@ const listParams = computed(() => {
 const { list, noMore, loading, total, fetchData } = useList({
   api: GetOnwayOwnerWithCount,
   params: listParams,
+});
+
+// 定义列表操作
+const handleMap = {
+  confirmUnload: async (record) => {
+    console.log("confirmUnload", record);
+    if (status.value === "") {
+      updateItem(record);
+    } else {
+      hideItem(record);
+    }
+  },
+  cancel: (record) => {
+    console.log("cancel", record);
+    if (status.value === "") {
+      updateItem(record);
+    } else {
+      hideItem(record);
+    }
+  },
+};
+// 从前端缓存中隐藏数据
+function hideItem(record) {
+  total.value--;
+  list.value.map((item) => {
+    if (item.Id === record.Id) {
+      item._isShow = false;
+    }
+  });
+}
+// 更新前端缓存列表中数据
+async function updateItem(record) {
+  const res = await GetSupplyOnwayDetail({
+    onwayId: record.OnwayId,
+    supplyId: record.Supplier.Id,
+  });
+  list.value.map((item) => {
+    return item.Id === record.Id ? res : item;
+  });
+}
+// 监听事件
+onLoad(() => {
+  fetchData(true);
+  for (let key in handleMap) {
+    uni.$on(`waybill:${key}`, handleMap[key]);
+  }
+});
+// 卸载事件
+onUnload(() => {
+  for (let key in handleMap) {
+    uni.$off(`waybill:${key}`, handleMap[key]);
+  }
 });
 </script>
 
