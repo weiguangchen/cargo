@@ -78,7 +78,7 @@ export default {
     // 是否显示左边分割线
     line: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     // 线条颜色
     lineColor: {

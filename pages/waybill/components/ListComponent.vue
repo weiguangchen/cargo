@@ -7,18 +7,12 @@
     @refresherrefresh="onRefresh"
     @scrolltolower="onLoadMore"
   >
-    <view class="list-wrapper" v-if="list.filter((m) => m._isShow).length > 0">
-      <template
-        v-for="(item, index) in list"
+    <view class="list-wrapper" v-if="showList.length > 0">
+      <Item
+        v-for="(item, index) in showList"
         :key="item ? item[rowKey] : index"
-      >
-        <slot
-          v-if="item._isShow"
-          :record="item"
-          :index="index"
-          :refreshFlag="refreshFlag"
-        />
-      </template>
+        :record="item"
+      />
       <uv-load-more
         :status="noMore ? 'nomore' : loading ? 'loading' : 'loadmore'"
       />
@@ -44,7 +38,9 @@ export default {
 };
 </script>
 <script setup>
-import { ref, watch } from "vue";
+import { ref, computed } from "vue";
+import Item from "./item.vue";
+
 const props = defineProps({
   list: {
     type: Array,
@@ -70,24 +66,11 @@ const props = defineProps({
     type: Function,
     default: () => {},
   },
-  refreshFlag: {
-    type: Boolean,
-    default: true,
-  },
 });
 
-watch(
-  () => props.refreshFlag,
-  (val) => {
-    console.log("refreshFlag", val);
-  },
-  {
-    immediate: true,
-    deep: true,
-  }
-);
-
 const emit = defineEmits(["refresh", "loadMore"]);
+
+const showList = computed(() => props.list.filter((m) => m._isShow));
 
 const triggered = ref(false);
 

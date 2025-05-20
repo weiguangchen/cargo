@@ -27,6 +27,7 @@
     <!-- end -->
     <!-- tab -->
     <uv-tabs
+      :current="current"
       :activeStyle="{ fontWeight: 'bold', color: 'var(--title-color)' }"
       :inactiveStyle="{ color: 'var(--sub-color)' }"
       lineWidth="32rpx"
@@ -36,6 +37,7 @@
       :scrollable="false"
       lineColor="var(--main-color)"
       :customStyle="{ background: '#ffffff' }"
+      :loading="loading"
     />
     <view
       class="has-filter"
@@ -54,17 +56,12 @@
     </view>
     <!-- end -->
     <!-- 列表 -->
-    <my-list
+    <ListComponent
       :list="list"
-      rowKey="Id"
       :noMore="noMore"
       :loading="loading"
       :fetchData="fetchData"
-    >
-      <template #item="{ item }">
-        <Item :record="item" v-if="item" />
-      </template>
-    </my-list>
+    />
     <!-- end -->
   </view>
 </template>
@@ -73,6 +70,7 @@
 import { ref, computed, onMounted } from "vue";
 import { onLoad, onUnload, onShow } from "@dcloudio/uni-app";
 import Item from "./components/item.vue";
+import ListComponent from "./components/ListComponent.vue";
 import { GetAssignCarListWithCount, GetAssignDetail } from "@/api/index.js";
 import FilterDrawer from "./components/FilterDrawer.vue";
 import useList from "@/hooks/useList.js";
@@ -92,6 +90,7 @@ onMounted(() => {
 });
 // tab [1]正常[2]等待暂停[3]已暂停[4]等待完结[5]已完结
 const status = ref("");
+const current = ref(0);
 const tabs = ref([
   {
     name: "全部",
@@ -99,15 +98,15 @@ const tabs = ref([
   },
   {
     name: "进行中",
-    value: 10,
+    value: "10",
   },
   {
     name: "已暂停",
-    value: 3,
+    value: "3",
   },
   {
     name: "已完结",
-    value: 5,
+    value: "5",
   },
 ]);
 function changeTabs({ name, index }) {
@@ -148,7 +147,7 @@ const listParams = computed(() => {
   const { dateMode, date, ...rest } = params.value;
   return {
     status: status.value,
-    keyword: keyWord.value,
+    keyWord: keyWord.value,
     ...rest,
   };
 });
@@ -161,45 +160,64 @@ const { list, noMore, loading, total, fetchData } = useList({
 const handleMap = {
   pause: async (record) => {
     console.log("pause", record);
+    const res = await GetAssignDetail({
+      assignId: record.Id,
+      supplyId: record.Supply,
+    });
     if (status.value === "") {
-      updateItem(record);
+      updateItem(record, res);
     } else {
-      hideItem(record);
+      // 等待暂停
+      if (res.Status === "2") {
+        updateItem(record, res);
+      } else {
+        hideItem(record);
+      }
     }
   },
-  goOn: (record) => {
+  goOn: async (record) => {
     console.log("goOn", record);
-    if (status.value === "") {
-      updateItem(record);
-    } else {
+    const res = await GetAssignDetail({
+      assignId: record.Id,
+      supplyId: record.Supply,
+    });
+    if (status.value === "3") {
       hideItem(record);
+    } else {
+      updateItem(record, res);
     }
   },
-  finish: (record) => {
+  finish: async (record) => {
     console.log("finish", record);
+    const res = await GetAssignDetail({
+      assignId: record.Id,
+      supplyId: record.Supply,
+    });
     if (status.value === "") {
-      updateItem(record);
+      updateItem(record, res);
     } else {
-      hideItem(record);
+      // 等待完结
+      if (res.Status === "4") {
+        updateItem(record, res);
+      } else {
+        hideItem(record);
+      }
     }
   },
 };
 // 从前端缓存中隐藏数据
 function hideItem(record) {
   total.value--;
-  list.value.map((item) => {
+  list.value = list.value.map((item) => {
     if (item.Id === record.Id) {
       item._isShow = false;
     }
+    return item;
   });
 }
 // 更新前端缓存列表中数据
-async function updateItem(record) {
-  const res = await GetAssignDetail({
-    assignId: record.Id,
-    supplyId: record.Supply,
-  });
-  list.value.map((item) => {
+async function updateItem(record, res) {
+  list.value = list.value.map((item) => {
     if (item.Id === record.Id) {
       item.Status = res.Status;
     }
@@ -208,6 +226,8 @@ async function updateItem(record) {
 }
 // 监听事件
 onLoad(() => {
+  status.value = "10";
+  current.value = 1;
   fetchData(true);
   for (let key in handleMap) {
     uni.$on(`manifest:${key}`, handleMap[key]);

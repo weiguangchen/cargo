@@ -27,6 +27,7 @@
     <!-- end -->
     <!-- tab -->
     <uv-tabs
+      :current="current"
       :activeStyle="{ fontWeight: 'bold', color: 'var(--title-color)' }"
       :inactiveStyle="{ color: 'var(--sub-color)' }"
       lineWidth="32rpx"
@@ -36,6 +37,7 @@
       :scrollable="false"
       lineColor="var(--main-color)"
       :customStyle="{ background: '#ffffff' }"
+      :loading="loading"
     />
     <view
       class="has-filter"
@@ -54,17 +56,13 @@
     </view>
     <!-- end -->
     <!-- 列表 -->
-    <my-list
+    <ListComponent
       :list="list"
-      rowKey="OnwayId"
+      :refreshFlag="refreshFlag"
       :noMore="noMore"
       :loading="loading"
       :fetchData="fetchData"
-    >
-      <template #item="{ item }">
-        <Item :record="item" v-if="item" />
-      </template>
-    </my-list>
+    />
     <!-- end -->
   </view>
 </template>
@@ -72,11 +70,12 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { onLoad, onUnload } from "@dcloudio/uni-app";
-import Item from "./components/item.vue";
+import ListComponent from "./components/ListComponent.vue";
 import { GetOnwayOwnerWithCount, GetSupplyOnwayDetail } from "@/api/index.js";
 import FilterDrawer from "./components/FilterDrawer.vue";
 import useList from "@/hooks/useList.js";
 import { computed } from "vue";
+
 // hack滚动穿透
 const show = ref(false);
 
@@ -92,6 +91,7 @@ onMounted(() => {
 });
 // tab
 const status = ref();
+const current = ref(0);
 const tabs = ref([
   {
     name: "全部",
@@ -135,9 +135,6 @@ async function handleSearch() {
   isFiltering.value = false;
 }
 // 运单列表
-onLoad(() => {
-  fetchData(true);
-});
 const params = ref({});
 function reset() {
   keyWord.value = "";
@@ -149,7 +146,7 @@ const listParams = computed(() => {
   const { dateMode, date, ...rest } = params.value;
   return {
     status: status.value,
-    keyword: keyWord.value,
+    keyWord: keyWord.value,
     ...rest,
   };
 });
@@ -180,10 +177,11 @@ const handleMap = {
 // 从前端缓存中隐藏数据
 function hideItem(record) {
   total.value--;
-  list.value.map((item) => {
+  list.value = list.value.map((item) => {
     if (item.Id === record.Id) {
       item._isShow = false;
     }
+    return item;
   });
 }
 // 更新前端缓存列表中数据
@@ -192,12 +190,19 @@ async function updateItem(record) {
     onwayId: record.OnwayId,
     supplyId: record.Supplier.Id,
   });
-  list.value.map((item) => {
-    return item.Id === record.Id ? res : item;
+  list.value = list.value.map((item) => {
+    return item.Id === record.Id
+      ? {
+          ...res,
+          _isShow: true,
+        }
+      : item;
   });
 }
 // 监听事件
 onLoad(() => {
+  status.value = "10";
+  current.value = 1;
   fetchData(true);
   for (let key in handleMap) {
     uni.$on(`waybill:${key}`, handleMap[key]);

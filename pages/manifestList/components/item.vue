@@ -1,14 +1,6 @@
 <template>
-  <view class="bill" @click="toDetail" v-if="record">
-    <view
-      class="tag"
-      :class="{
-        process: record.Status === '1',
-        pause: ['2', '3'].includes(record.Status),
-        finish: ['4', '5'].includes(record.Status),
-      }"
-      >{{ statusText }}</view
-    >
+  <view class="bill" @click="toDetail" v-if="record.Id">
+    <view class="tag" :class="className">{{ statusText }}</view>
     <view class="material-name">{{ materialName }}</view>
     <view class="weight">
       <template v-if="!!record.EstimateCarWeight && !!record.EstimateCarTimes">
@@ -166,7 +158,6 @@ import { SetAssignStatusChg, ResetAssignStatusChg } from "@/api/index.js";
 const emits = defineEmits(["toDetail", "success"]);
 const props = defineProps({
   record: {
-    default: () => ({}),
     type: Object,
   },
 });
@@ -181,6 +172,13 @@ const statusText = computed(() => {
     ManifestStatusOptions?.find((m) => m.value == props.record.Status)?.name ??
     ""
   );
+});
+const className = computed(() => {
+  return {
+    process: props.record.Status === "1",
+    pause: ["2", "3"].includes(props.record.Status),
+    finish: ["4", "5"].includes(props.record.Status),
+  };
 });
 
 function toDetail() {

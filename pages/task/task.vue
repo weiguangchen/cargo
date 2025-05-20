@@ -26,6 +26,8 @@
     <!-- end -->
     <!-- tab -->
     <uv-tabs
+      v-if="tabHack"
+      :current="current"
       :activeStyle="{ fontWeight: 'bold', color: 'var(--title-color)' }"
       :inactiveStyle="{ color: 'var(--sub-color)' }"
       lineWidth="32rpx"
@@ -35,10 +37,10 @@
       :scrollable="false"
       lineColor="var(--main-color)"
       :customStyle="{ background: '#ffffff' }"
-      :current="current"
+      :loading="loading1 || loading2"
     />
     <view class="has-filter" v-if="isKeyWord && !isFiltering">
-      已按条件筛选出 {{ total }} 条数据
+      已按条件筛选出 {{ current === 0 ? total1 : total2 }} 条数据
       <view class="redo" @click="reset">
         <uv-image
           :duration="0"
@@ -52,18 +54,20 @@
     <!-- end -->
     <!-- 列表 -->
     <template v-if="getToken()">
-      <my-list
-        :list="current === 0 ? list1 : list2"
-        :rowKey="current === 0 ? 'Id' : 'OnwayId'"
-        :noMore="current === 0 ? noMore1 : noMore2"
-        :loading="current === 0 ? loading1 : loading2"
-        :fetchData="current === 0 ? fetchData1 : fetchData2"
-      >
-        <template #item="{ item }">
-          <ManifestItem :record="item" v-if="current === 0" />
-          <WaybillItem :record="item" v-if="current === 1" />
-        </template>
-      </my-list>
+      <ManifestList
+        v-if="current === 0"
+        :list="list1"
+        :noMore="noMore1"
+        :loading="loading1"
+        :fetchData="fetchData1"
+      />
+      <WaybillList
+        v-if="current === 1"
+        :list="list2"
+        :noMore="noMore2"
+        :loading="loading2"
+        :fetchData="fetchData2"
+      />
     </template>
     <my-empty
       height="100%"
@@ -80,22 +84,20 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, nextTick } from "vue";
 import { onLoad, onUnload, onShow } from "@dcloudio/uni-app";
 import { getToken } from "@/utils/token.js";
-import ManifestItem from "@/pages/manifestList/components/item.vue";
-import WaybillItem from "@/pages/waybill/components/item.vue";
+import ManifestList from "@/pages/manifestList/components/ListComponent.vue";
+import WaybillList from "@/pages/waybill/components/ListComponent.vue";
 import { useAppStore } from "@/stores/app.js";
 import {
   GetAssignCarListWithCount,
   GetOnwayOwnerWithCount,
+  GetAssignDetail,
 } from "@/api/index.js";
 import useList from "@/hooks/useList.js";
 
 const appStore = useAppStore();
-onShow(() => {
-  appStore.switchTab(2);
-});
 // 登录
 const loginDrawer = ref();
 function openLoginDrawer() {
@@ -148,6 +150,7 @@ function handleSearch() {
   if (current.value === 1) {
     fetchData2(true);
   }
+  isFiltering.value = false;
 }
 function reset() {
   keyWord.value = "";
@@ -159,7 +162,6 @@ function reset() {
     fetchData2(true);
   }
 }
-const total = ref(0);
 // 货单
 const inInit1 = ref(false);
 const listParams1 = computed(() => {
@@ -182,23 +184,53 @@ const {
 const handleMap1 = {
   pause: async (record) => {
     console.log("pause", record);
-    hideItem1(record);
+    const res = await GetAssignDetail({
+      assignId: record.Id,
+      supplyId: record.Supply,
+    });
+    if (res.Status === "2") {
+      updateItem1(record, res);
+    } else {
+      hideItem1(record);
+    }
   },
-  finish: (record) => {
+  finish: async (record) => {
     console.log("finish", record);
-    hideItem1(record);
+    const res = await GetAssignDetail({
+      assignId: record.Id,
+      supplyId: record.Supply,
+    });
+    if (res.Status === "4") {
+      updateItem1(record, res);
+    } else {
+      hideItem1(record);
+    }
   },
-  goOn: () => {
-    fetchData1(true);
+  goOn: async (record) => {
+    const res = await GetAssignDetail({
+      assignId: record.Id,
+      supplyId: record.Supply,
+    });
+    updateItem1(record, res);
   },
 };
 // 从前端缓存中隐藏数据
 function hideItem1(record) {
   total1.value--;
-  list1.value.map((item) => {
+  list1.value = list1.value.map((item) => {
     if (item.Id === record.Id) {
       item._isShow = false;
     }
+    return item;
+  });
+}
+// 更新前端缓存列表中数据
+async function updateItem1(record, res) {
+  list1.value = list1.value.map((item) => {
+    if (item.Id === record.Id) {
+      item.Status = res.Status;
+    }
+    return item;
   });
 }
 // 监听事件
@@ -232,21 +264,34 @@ const {
   api: GetOnwayOwnerWithCount,
   params: listParams2,
 });
-onShow(() => {
-  if (!getToken()) {
-    return;
-  }
-  if (current.value === 0) {
-    if (inInit1.value) return;
-    inInit1.value = true;
-    fetchData1(true);
-  }
-  if (current.value === 1) {
-    if (inInit2.value) return;
-    inInit2.value = true;
-    fetchData2(true);
-  }
+
+const isInit = ref(false);
+onLoad(async () => {
+  if (!getToken()) return;
+
+  if (isInit.value) return;
+  console.log("onLoad");
+  uni.$on(`task:reload`, handleShow);
+  await fetchData1(true);
+  isInit.value = true;
 });
+onUnload(() => {
+  uni.$off(`task:reload`, handleShow);
+});
+onShow(() => {
+  appStore.switchTab(2);
+});
+
+const tabHack = ref(true);
+async function handleShow() {
+  tabHack.value = false;
+  await nextTick();
+  tabHack.value = true;
+  isKeyWord.value = false;
+  keyWord.value = "";
+  current.value = 0;
+  fetchData1(true);
+}
 
 // 定义列表操作
 const handleMap2 = {
@@ -262,10 +307,11 @@ const handleMap2 = {
 // 从前端缓存中隐藏数据
 function hideItem2(record) {
   total2.value--;
-  list2.value.map((item) => {
+  list2.value = list2.value.map((item) => {
     if (item.Id === record.Id) {
       item._isShow = false;
     }
+    return item;
   });
 }
 // 监听事件

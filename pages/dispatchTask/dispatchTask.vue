@@ -587,6 +587,7 @@ async function submit() {
   try {
     submiting.value = true;
     await SetAssignTicket(params);
+    uni.$emit("task:reload");
     uni.showToast({
       title: "派单成功！",
       icon: "none",

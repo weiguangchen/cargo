@@ -156,7 +156,7 @@
       <!-- 登录弹窗 -->
       <my-login-drawer ref="loginDrawer" @success="loginSuccess" />
       <!-- tabbar -->
-      <my-tabbar />
+      <my-tabbar @change="tabbarChange" />
     </view>
   </scroll-view>
 </template>
@@ -171,6 +171,12 @@ import { getToken } from "@/utils/token.js";
 import { GetGoodsOrderCount } from "@/api/index.js";
 import { sleep } from "@/utils/index.js";
 const { ctx } = getCurrentInstance();
+
+function tabbarChange(index) {
+  if (index === 2) {
+    uni.$emit("task:reload");
+  }
+}
 
 const appStore = useAppStore();
 onShow(() => {

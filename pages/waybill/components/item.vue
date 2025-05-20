@@ -1,16 +1,7 @@
 <template>
-  <view class="bill" @click="toDetail">
-    <view
-      class="tag"
-      :class="{
-        process: ['0', '1', '2', '3', '4', '5', '6', '7'].includes(
-          props.record.Weightedstatus
-        ),
-        finish: ['8', '9'].includes(props.record.Weightedstatus),
-      }"
-      >{{ billStatusName }}</view
-    >
-    <view class="material-name">{{ record.Materialname }}</view>
+  <view class="bill" @click="toDetail" v-if="record.Id">
+    <view class="tag" :class="className">{{ billStatusName }}</view>
+    <view class="material-name">{{ record.Materialname || "" }}</view>
     <view class="weight">
       <template
         v-if="
@@ -68,29 +59,22 @@
       <view
         class="price"
         v-if="
-          ['0', '1', '2', '3', '4', '5', '9'].includes(
-            props.record.Weightedstatus
-          )
+          ['0', '1', '2', '3', '4', '5', '9'].includes(record.Weightedstatus)
         "
       >
         预估总价
         <text style="font-weight: bold">¥ {{ record.EstimateAmount }}</text>
       </view>
-      <view class="price" v-if="['6'].includes(props.record.Weightedstatus)">
+      <view class="price" v-if="['6'].includes(record.Weightedstatus)">
         待结算 <text style="font-weight: bold">¥ {{ record.RealAmount }}</text>
       </view>
-      <view
-        class="price"
-        v-if="['7', '8'].includes(props.record.Weightedstatus)"
-      >
+      <view class="price" v-if="['7', '8'].includes(record.Weightedstatus)">
         已支付 <my-price color="var(--red-color)" :price="record.RealAmount" />
       </view>
     </view>
     <template
       v-if="
-        ['0', '1', '2', '3', '4', '5', '6', '7'].includes(
-          props.record.Weightedstatus
-        )
+        ['0', '1', '2', '3', '4', '5', '6', '7'].includes(record.Weightedstatus)
       "
     >
       <uv-line color="var(--divider)" margin="24rpx 0" />
@@ -98,7 +82,7 @@
         <view
           class="btn"
           @click.stop
-          v-if="['0', '1'].includes(props.record.Weightedstatus)"
+          v-if="['0', '1'].includes(record.Weightedstatus)"
         >
           <uv-button
             shape="circle"
@@ -117,7 +101,7 @@
           @click.stop
           v-if="
             ['0', '1', '2', '3', '4', '5', '6', '7'].includes(
-              props.record.Weightedstatus
+              record.Weightedstatus
             )
           "
         >
@@ -136,7 +120,7 @@
         <view
           class="btn"
           @click.stop
-          v-if="['7'].includes(props.record.Weightedstatus)"
+          v-if="['7'].includes(record.Weightedstatus)"
         >
           <uv-button
             shape="circle"
@@ -156,12 +140,11 @@
 
 <script setup>
 import { BillStatus } from "@/utils/dict.js";
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { DisableOnwayEnt, UnloadConfirm } from "@/api/index.js";
 import { getToken } from "@/utils/token.js";
 const props = defineProps({
   record: {
-    default: () => ({}),
     type: Object,
   },
 });
@@ -186,6 +169,14 @@ const billStatusName = computed(() => {
   } else if (["9"].includes(props.record?.Weightedstatus)) {
     return "已取消";
   }
+});
+const className = computed(() => {
+  return {
+    process: ["0", "1", "2", "3", "4", "5", "6", "7"].includes(
+      props.record?.Weightedstatus
+    ),
+    finish: ["8", "9"].includes(props.record?.Weightedstatus),
+  };
 });
 
 function toDetail() {

@@ -72,6 +72,7 @@ function cancel() {
 }
 
 function confirm() {
+  uni.$emit("task:reload");
   uni.switchTab({
     url: "/pages/task/task",
   });

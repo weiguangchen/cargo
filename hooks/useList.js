@@ -61,7 +61,6 @@ export default function useList({
           ...m,
           _isShow: true,
         })) ?? [];
-
       if (isRefresh) {
         list.value = [...newList];
       } else {
