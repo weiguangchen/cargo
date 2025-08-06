@@ -163,6 +163,8 @@ onLoad(async (options) => {
         city: res.City,
         district: res.Distinct,
         districtCode: res.DistrictCode,
+        provinceCode: res.ProvinceCode,
+        cityCode: res.CityCode,
         latitude: res.Latitude,
         longitude: res.Logitude,
       };
@@ -243,9 +245,19 @@ async function chooseLocation() {
         latitude: latitude,
       });
       console.log("response", response);
-      const { province, city, distinct, address, districtCode } = response;
+      const {
+        province,
+        city,
+        distinct,
+        address,
+        districtCode,
+        provinceCode,
+        cityCode,
+      } = response;
       let area = {
         province,
+        provinceCode,
+        cityCode,
         city,
         district: distinct,
         districtCode: districtCode,
@@ -294,6 +306,8 @@ async function submit() {
         province,
         district,
         districtCode,
+        provinceCode,
+        cityCode,
         longitude,
         latitude,
       },
@@ -309,6 +323,8 @@ async function submit() {
       Province: province,
       Distinct: district,
       DistrictCode: districtCode,
+      ProvinceCode: provinceCode,
+      CityCode: cityCode,
       Placename,
       Logitude: longitude,
       Latitude: latitude,

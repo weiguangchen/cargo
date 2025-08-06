@@ -145,6 +145,7 @@ function reset() {
 // 货单列表
 const listParams = computed(() => {
   const { dateMode, date, ...rest } = params.value;
+  console.log("listParams", params.value);
   return {
     status: status.value,
     keyWord: keyWord.value,

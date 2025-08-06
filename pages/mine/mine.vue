@@ -262,11 +262,6 @@ function navigate(type) {
       });
       break;
     case "数据统计":
-      uni.showToast({
-        title: "敬请期待",
-        icon: "none",
-      });
-      return;
       uni.navigateTo({
         url: "/mine/statistics/statistics",
       });

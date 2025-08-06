@@ -17,6 +17,7 @@
       :bgColor="bgColor"
       @change="change"
       @maskClick="maskClick"
+      @close="close"
     >
       <view class="drawer-wrapper">
         <view class="title-wrapper" :style="titleStyle" v-if="showTitle">
@@ -124,7 +125,7 @@ const props = defineProps({
     default: false,
   },
 });
-const emits = defineEmits(["maskClick", "change", "confirm"]);
+const emits = defineEmits(["maskClick", "change", "confirm", "close"]);
 
 function maskClick() {
   emits("maskClick");
@@ -146,6 +147,10 @@ async function change(show) {
   if (show.show) {
     resize();
   }
+}
+
+function close() {
+  emits("close");
 }
 
 async function resize() {

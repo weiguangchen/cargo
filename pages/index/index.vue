@@ -286,13 +286,8 @@ function navigate(type) {
   }
   switch (type) {
     case "数据统计":
-      uni.showToast({
-        title: "敬请期待",
-        icon: "none",
-      });
-      return;
       uni.navigateTo({
-        url: "/pages/statistics/statistics",
+        url: "/mine/statistics/statistics",
       });
       break;
     case "问题反馈":

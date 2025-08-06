@@ -5,6 +5,7 @@ export default function useList({
   params = {},
   totalField = "cnt",
   listField = "list",
+  callback = null,
 }) {
   // 当第一次请求时保存全部缓存数据
   const list = ref([]);
@@ -13,6 +14,8 @@ export default function useList({
   const pageSize = ref(10);
   const pageIndex = ref(1);
   const total = ref(0);
+
+  let bigData = [];
 
   let lastFetchId = 0;
 
@@ -62,12 +65,13 @@ export default function useList({
           _isShow: true,
         })) ?? [];
       if (isRefresh) {
-        list.value = [...newList];
+        list.value = newList;
       } else {
         list.value = [...list.value, ...newList];
       }
       total.value = res[totalField] || 0;
       // console.log(total.value, noMore.value);
+      callback?.(res);
 
       if (!noMore.value) {
         pageIndex.value++;

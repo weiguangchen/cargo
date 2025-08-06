@@ -1,131 +1,171 @@
 <template>
-	<view class="stat-wrapper">
-		<view class="stat">
-			<view class="">
-				<view class="title">账户总余额 (元)</view>
-				<view class="amount">{{ formatNumberToThousand(total) }}</view>
-			</view>
-			<uv-button shape="circle" text="账单明细" color="#ffffff" :custom-style="{ border: '1px solid var(--main-color)', color: 'var(--main-color)', height: '64rpx' }" :customTextStyle="{ color: '26rpx', fontWeight: 'bold' }" @click="toDetail"></uv-button>
-		</view>
-	</view>
-	<view class="list-wrapper">
-		<view class="list-title">账户详情</view>
-		<template v-if="list.length > 0">
-			<view class="item" v-for="item in list" :key="item.supplyId">
-				<view class="mfrs">{{ item.supplyName }}</view>
-				<view class="info-wrapper">
-					<view class="info">
-						<view class="amount-title">账户余额 (元)</view>
-						<view class="amount">{{ item.amountTotal ? formatNumberToThousand(item.amountTotal) : '' }}</view>
-					</view>
-					<view class="info">
-						<view class="amount-title">授信额度 (元)</view>
-						<view class="amount">{{ item.creditTotal ? formatNumberToThousand(item.creditTotal) : '' }}</view>
-					</view>
-				</view>
-			</view>
-		</template>
-		<my-empty img="/static/images/empty/account.png" v-else/>
-	</view>
-	
+  <my-empty
+    v-if="loading"
+    img="/static/images/empty/loading.gif"
+    text="查询中"
+    height="100%"
+  />
+  <my-empty
+    v-else-if="list.length === 0"
+    img="/static/images/empty/account.png"
+    text="暂无账户"
+    height="100%"
+  />
+  <template v-else>
+    <view class="account-item" v-for="item in list" :key="item.supplyId">
+      <view
+        class="custom-item"
+        v-for="(custom, index) in item.OwnerAccountList"
+        :key="index"
+      >
+        <view class="custom-header">
+          <view class="custom-title">{{ custom.OwnerName }}</view>
+          <view class="link" @click="toDetail(custom, item)">
+            看账单
+            <uv-icon name="/static/images/arrow/green.png" size="28rpx" />
+          </view>
+        </view>
+        <view class="custom-info">
+          <view class="info-item">
+            <view class="info-title">账户余额 (元)</view>
+            <view class="info-number">{{
+              Big(custom.Balance).toFixed(2)
+            }}</view>
+          </view>
+          <view class="info-item" v-if="custom.Credit > 0">
+            <view class="info-title">授信额度 (元)</view>
+            <view class="info-number">{{ Big(custom.Credit).toFixed(2) }}</view>
+          </view>
+        </view>
+      </view>
+      <view class="from-info">
+        <text class="text">来自与</text>
+        <text class="uv-line-1 company">{{ item.supplyName }}</text>
+        <text class="text">的签约</text>
+      </view>
+    </view>
+    <uv-load-more status="nomore" />
+  </template>
 </template>
 
 <script setup>
-	import { ref } from 'vue'
-	import { onLoad } from '@dcloudio/uni-app'
-	import { GetOwnerBalanceTotal } from '@/api/index.js';
-	import { formatNumberToThousand } from '@/utils/index.js'
-	
-	onLoad(() => {
-		getInfo();
-	})
-	
-	const total = ref(0);
-	const list = ref([])
-	async function getInfo() {
-		try {
-			uni.showLoading()
-			const res = await GetOwnerBalanceTotal();
-			list.value = res?.supplyList ?? [];
-			total.value = res?.totalAmount ?? 0;
-		}
-		finally {
-			uni.hideLoading()
-		}
-	}
-	
-	function toDetail() {
-		uni.navigateTo({
-			url: '/mine/amountDetail/amountDetail'
-		})
-	}
+import { ref } from "vue";
+import { onLoad } from "@dcloudio/uni-app";
+import { GetOwnerBalanceTotal } from "@/api/index.js";
+import { formatNumberToThousand } from "@/utils/index.js";
+import Big from "big.js";
+
+onLoad(() => {
+  getInfo();
+});
+
+const list = ref([]);
+const loading = ref(false);
+async function getInfo() {
+  try {
+    loading.value = true;
+    const res = await GetOwnerBalanceTotal();
+    list.value =
+      res?.filter((m) => {
+        return m?.OwnerAccountList?.length > 0;
+      }) ?? [];
+  } finally {
+    loading.value = false;
+  }
+}
+
+function toDetail(custom, item) {
+  uni.navigateTo({
+    url: `/mine/amountDetail/amountDetail?customerId=${custom.OwnerId}&supplyId=${item.supplyId}`,
+    success: function (res) {
+      // 通过eventChannel向被打开页面传送数据
+      res.eventChannel.emit("acceptDataFromOpenerPage", {
+        customerId: custom.OwnerId,
+        supplyId: item.supplyId,
+        customerName: custom.OwnerName,
+      });
+    },
+  });
+}
 </script>
 
-<style lang="scss" scoped>
-	.stat-wrapper {
-		padding: 24rpx;
-		margin-bottom: 32rpx;
-		.stat {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			padding: 44rpx 28rpx;
-			border-radius: 32rpx;
-			background-color: rgba(2, 183, 46, .08);
-			.title {
-				font-weight: bold;
-				color: var(--title-color);
-				font-size: 30rpx;
-				line-height: 48rpx;
-			}
-			.amount {
-				color: var(--main-color);
-				font-weight: bold;
-				font-size: 48rpx;
-				line-height: 56rpx;
-			}
-		}
-	}
-	.list-wrapper {
-		padding: 0 24rpx;
-		.list-title {
-			font-weight: bold;
-			font-size: 32rpx;
-			color: var(--title-color);
-			line-height: 40rpx;
-			margin-bottom: 20rpx;
-			padding-left: 8rpx
-		}
-		.item {
-			padding: 28rpx;
-			background: #FFFFFF;
-			border-radius: 24rpx;
-			margin-bottom: 20rpx;
-			.mfrs {
-				font-weight: bold;
-				font-size: 32rpx;
-				color: var(--title-color);
-				line-height: 48rpx;
-				margin-bottom: 24rpx;
-			}
-			.info-wrapper {
-				display: flex;
-				.info {
-					flex:1;
-					.amount-title {
-						font-size: 24rpx;
-						color: var(--sub-color);
-						line-height: 40rpx;
-					}
-					.amount {
-						font-weight: bold;
-						font-size: 34rpx;
-						color: var(--title-color);
-						line-height: 48rpx;
-					}
-				}
-			}
-		}
-	}
-	
+<style lang="scss">
+page {
+  padding: 24rpx;
+  height: 100vh;
+}
+.account-item {
+  padding: 24rpx;
+  background-color: #ffffff;
+  border-radius: 24rpx;
+  margin-bottom: 20rpx;
+  .custom-item {
+    padding: 28rpx;
+    background-color: var(--page-bg);
+    border-radius: 24rpx;
+    margin-bottom: 20rpx;
+    &:last-child {
+      margin-bottom: 28rpx;
+    }
+    .custom-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40rpx;
+      gap: 24rpx;
+      .custom-title {
+        font-weight: bold;
+        font-size: 32rpx;
+        color: var(--title-color);
+        line-height: 40rpx;
+      }
+      .link {
+        font-size: 26rpx;
+        display: flex;
+        align-items: center;
+        flex: none;
+        color: var(--main-color);
+        font-weight: bold;
+      }
+    }
+    .custom-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 64rpx;
+      .info-item {
+        flex: 1;
+        .info-title {
+          font-size: 26rpx;
+          color: var(--sub-color);
+          line-height: 40rpx;
+          margin-bottom: 8rpx;
+        }
+        .info-number {
+          font-size: 36rpx;
+          color: var(--title-color);
+          line-height: 40rpx;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+  .from-info {
+    padding-left: 8rpx;
+    display: flex;
+    align-items: center;
+    font-size: 26rpx;
+    color: var(--sub-color);
+    line-height: 40rpx;
+    .text {
+      flex: none;
+    }
+    .company {
+      display: inlinne-block;
+      color: var(--main-color);
+      margin: 0 14rpx;
+      font-weight: bold;
+    }
+  }
+}
 </style>

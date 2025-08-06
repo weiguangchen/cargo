@@ -37,7 +37,7 @@
           <uv-safe-bottom v-if="safeAreaInsetBottom"></uv-safe-bottom>
           <view
             v-if="closeable"
-            @tap.stop="close"
+            @tap.stop="close(), handleClose()"
             class="uv-popup__content__close"
             :class="['uv-popup__content__close--' + closeIconPos]"
             hover-class="uv-popup__content__close--hover"
@@ -105,7 +105,7 @@ export default {
 		// #endif
 	},
 	mixins: [mpMixin, mixin],
-	emits: ['change', 'maskClick'],
+	emits: ['change', 'maskClick', 'close'],
 	props: {
 		// 弹出层类型，可选值，top: 顶部弹出层；bottom：底部弹出层；center：全屏弹出层
 		// message: 消息提示 ; dialog : 对话框
@@ -331,6 +331,9 @@ export default {
 				show: true,
 				type: direction
 			})
+		},
+		handleClose() {
+			this.$emit('close')
 		},
 		close(type) {
 			this.showTrans = false
