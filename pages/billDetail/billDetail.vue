@@ -614,6 +614,10 @@ function confirmUnload() {
           supplyId: supplyId.value,
           userId: getToken().userInfo.Id,
           uType: "owner",
+          driverId: "",
+          memo: "",
+          imgChkPath: "",
+          imgUnChkPath: "",
         });
         confirm.value.close();
         uni.showToast({

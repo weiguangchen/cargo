@@ -63,6 +63,7 @@ const props = defineProps({
     padding: 0 24rpx;
     margin: 0 24rpx 24rpx;
     .item-box {
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: space-between;

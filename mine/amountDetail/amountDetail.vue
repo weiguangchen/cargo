@@ -139,7 +139,7 @@ const tabbarList = ref([
     label: "充值",
   },
   {
-    value: "tj",
+    value: "qt",
     label: "调价",
   },
 ]);

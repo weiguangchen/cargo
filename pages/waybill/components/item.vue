@@ -249,6 +249,10 @@ function confirmUnload() {
           supplyId: props.record.SupplyId,
           userId: getToken().userInfo.Id,
           uType: "owner",
+          driverId: "",
+          memo: "",
+          imgChkPath: "",
+          imgUnChkPath: "",
         });
         await uni.showToast({
           title: "操作成功",
