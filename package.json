@@ -23,7 +23,7 @@
         "title": "货主端:测试环境",
         "env": {
           "UNI_PLATFORM": "mp-weixin",
-          "BASE_URL": "https://www.wwwxapp.cn:28065",
+          "BASE_URL": "https://www.wwwxapp.cn:28064",
           "TOKEN_KEY": "cargo-test-token"
         }
       },
@@ -31,7 +31,7 @@
 	    "title": "万宁货主端:测试环境",
 	    "env": {
 	      "UNI_PLATFORM": "mp-weixin",
-	      "BASE_URL": "https://www.wnlsjc.com:8026",
+	      "BASE_URL": "https://www.wnlsjc.com:8029",
 	      "TOKEN_KEY": "cargo-test-token:wanning"
 	    }
 	  },

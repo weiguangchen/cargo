@@ -17,6 +17,7 @@ view {
   --intr-color: #a0afba;
   --divider: #e3e9ef;
   --page-bg: #f2f4f7;
+  --clickable: #f3f4f6;
 }
 
 page {
@@ -106,4 +107,8 @@ page {
       font-weight: 600;
     }
   }
+}
+
+.clickable {
+  background-color: var(--clickable);
 }

@@ -19,7 +19,7 @@ export default {
 };
 </script>
 <script setup>
-import { ref } from "vue";
+import { ref, computed, watch } from "vue";
 const props = defineProps({
   modelValue: {
     default: "",
@@ -28,10 +28,14 @@ const props = defineProps({
     default: () => {},
     type: Object,
   },
+  supplyIsOffline: {
+    default: "0",
+    type: String,
+  },
 });
 const emits = defineEmits(["update:modelValue", "change"]);
 
-const options = ref([
+const defaultOptions = [
   {
     value: "0",
     label: "不装运",
@@ -44,11 +48,45 @@ const options = ref([
     value: "2",
     label: "按车次",
   },
-]);
+];
+const options = ref([...defaultOptions]);
+
+watch(
+  () => props.supplyIsOffline,
+  (supplyIsOffline) => {
+    console.log("myRadio", supplyIsOffline);
+    if (supplyIsOffline == "0") {
+      options.value = [...defaultOptions];
+    }
+    if (supplyIsOffline == "1") {
+      options.value = [
+        {
+          value: "0",
+          label: "不装运",
+        },
+        {
+          value: "3",
+          label: "临时装运",
+        },
+      ];
+    }
+    if (supplyIsOffline == "2") {
+      options.value = [
+        {
+          value: "0",
+          label: "不装运",
+        },
+      ];
+    }
+  },
+  {
+    immediate: true,
+  }
+);
 
 function select(item) {
   console.log("select", item, props.record);
-  if (item.value === "0") {
+  if (item.value === "0" || item.value === "3") {
     emits("update:modelValue", item.value);
     emits("change", item.value);
     return;

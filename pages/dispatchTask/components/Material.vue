@@ -13,6 +13,7 @@
       <template v-if="modelValue.Limittype === '2'"
         >{{ modelValue.EstimiteTimes }} 车次</template
       >
+      <template v-if="modelValue.Limittype === '3'">临时装运</template>
       <uv-image
         src="/static/images/arrow.png"
         :duration="0"
@@ -53,13 +54,14 @@
         label-width="auto"
       >
         <uv-form-item
-          label="装运设置"
+          label="计划类型"
           prop="Limittype"
           :customStyle="{ padding: '44rpx 0!important' }"
         >
           <view style="display: flex; justify-content: flex-end">
             <MyRadio
               :record="model"
+              :supplyIsOffline="supplyIsOffline"
               v-model="model.Limittype"
               @change="typeChange"
             />
@@ -127,6 +129,10 @@ const props = defineProps({
   order: {
     type: Object,
     default: () => {},
+  },
+  supplyIsOffline: {
+    type: String,
+    default: "0",
   },
 });
 const emits = defineEmits(["update:modelValue"]);

@@ -22,8 +22,7 @@
         <view class="tag zhuang">装货地</view>
         <view class="name">{{ data.Name }}</view>
         <view class="address"
-          >{{ data.City || ""
-          }}{{ data.Address || "" }}</view
+          >{{ data.City || "" }}{{ data.Address || "" }}</view
         >
         <uv-line color="#E3E9EF" margin="28rpx 0 32rpx" />
         <view class="person">
@@ -56,14 +55,16 @@
             borderRadius: '16rpx',
             height: '96rpx',
           }"
+          :custom-text-style="{ fontWeight: 'bold' }"
           @click="openList"
         />
       </uv>
       <view class="right">
         <uv-button
-          text="确认所选"
+          :text="type === 1 ? '确认装货地' : '确认卸货地'"
           color="linear-gradient( 270deg, #31CE57 0%, #07B130 100%)"
           :custom-style="{ borderRadius: '16rpx', height: '96rpx' }"
+          :custom-text-style="{ fontWeight: 'bold' }"
           @click="submit"
         />
       </view>

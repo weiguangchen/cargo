@@ -61,7 +61,7 @@
     {
       "path": "pages/dispatchTask/dispatchTask",
       "style": {
-        "navigationBarTitleText": "确认派单信息",
+        "navigationBarTitleText": "确认派车信息",
         "navigationBarBackgroundColor": "#07b130",
         "navigationBarTextStyle": "white"
       }
