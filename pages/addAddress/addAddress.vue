@@ -137,14 +137,16 @@
 </template>
 
 <script setup>
-import { reactive, ref } from "vue";
+import { reactive, ref, unref, getCurrentInstance, onMounted } from "vue";
 import {
   UptUnloadPlace,
   GetUnloadPlace,
   GetLocationByJW,
   DeleteUnloadPlace,
 } from "@/api/index.js";
-import { onLoad, onUnload } from "@dcloudio/uni-app";
+import { onLoad } from "@dcloudio/uni-app";
+
+const channel = ref();
 onLoad(async (options) => {
   const { unloadId } = options;
   model.Id = unloadId;
@@ -161,7 +163,7 @@ onLoad(async (options) => {
         address: res.Address,
         province: res.Province,
         city: res.City,
-        district: res.Distinct,
+        district: res.District,
         districtCode: res.DistrictCode,
         provinceCode: res.ProvinceCode,
         cityCode: res.CityCode,
@@ -177,6 +179,11 @@ onLoad(async (options) => {
       title: "添加卸货地址",
     });
   }
+});
+
+onMounted(() => {
+  const instance = getCurrentInstance().proxy;
+  channel.value = instance.getOpenerEventChannel();
 });
 
 const form = ref(null);
@@ -288,7 +295,7 @@ function remove() {
           title: "卸货地删除成功",
           icon: "none",
         });
-        uni.$emit("addAddress");
+        unref(channel)?.emit("handleAddUnload"); // 通知卸货地组件页面刷新
         uni.navigateBack();
       } catch {
         confirm.value.closeLoading();
@@ -321,7 +328,7 @@ async function submit() {
       Address: address,
       City: city,
       Province: province,
-      Distinct: district,
+      District: district,
       DistrictCode: districtCode,
       ProvinceCode: provinceCode,
       CityCode: cityCode,
@@ -335,7 +342,7 @@ async function submit() {
     try {
       loading.value = true;
       await UptUnloadPlace(params);
-      uni.$emit("addAddress");
+      unref(channel)?.emit("handleAddUnload"); // 通知卸货地组件页面刷新
       uni.navigateBack();
     } catch (err) {
       console.log("err", err);

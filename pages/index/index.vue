@@ -23,25 +23,86 @@
             v-if="!getToken()"
             @click="openLoginDrawer"
           >
-            派单前需要先完成登录
-            <uv-image
-              src="/static/images/dispatchTask/arrow2.png"
+            派车前需要完成登录
+            <uv-icon
+              name="/static/images/index/green.png"
               width="24rpx"
               height="24rpx"
-              :duration="0"
+              :customStyle="{ marginLeft: '4rpx' }"
             />
           </view>
-          <view class="content green" v-else-if="count === 0"
-            >暂无进行中任务，快派单吧！</view
+          <view
+            class="content green"
+            v-else-if="AssignNum === 0 && OnwayNum === 0"
+            @click="toTask(0)"
           >
-          <view class="content orange" v-else>
-            有 {{ count }} 项进行中的运输任务
-            <uv-image
-              src="/static/images/orange-arrow.png"
+            暂无进行中的派车任务
+            <uv-icon
+              name="/static/images/index/green.png"
               width="24rpx"
               height="24rpx"
-              :duration="0"
+              :customStyle="{ marginLeft: '4rpx' }"
             />
+          </view>
+          <view
+            class="content orange"
+            v-else-if="AssignNum !== 0 && OnwayNum === 0"
+            @click="toTask(0)"
+          >
+            已发布 <text class="num">{{ AssignNum }}</text> 项派车调度
+            <uv-icon
+              name="/static/images/index/orange.png"
+              width="24rpx"
+              height="24rpx"
+              :customStyle="{ marginLeft: '4rpx' }"
+            />
+          </view>
+          <view
+            class="content orange"
+            v-else-if="AssignNum === 0 && OnwayNum !== 0"
+            @click="toTask(1)"
+          >
+            正在进行 <text class="num">{{ OnwayNum }}</text> 项运输任务
+            <uv-icon
+              name="/static/images/index/orange.png"
+              width="24rpx"
+              height="24rpx"
+              :customStyle="{ marginLeft: '4rpx' }"
+            />
+          </view>
+          <view v-else class="task-swiper-wrapper orange">
+            <swiper
+              class="task-swiper"
+              circular
+              vertical
+              :indicator-dots="false"
+              autoplay
+              :interval="3000"
+              :duration="300"
+            >
+              <swiper-item>
+                <view class="task-swiper__item" @click="toTask(0)"
+                  >已发布 <text class="num">{{ AssignNum }}</text> 项派车调度
+                  <uv-icon
+                    name="/static/images/index/orange.png"
+                    width="24rpx"
+                    height="24rpx"
+                    :customStyle="{ marginLeft: '4rpx' }"
+                  />
+                </view>
+              </swiper-item>
+              <swiper-item>
+                <view class="task-swiper__item" @click="toTask(1)">
+                  正在进行 <text class="num">{{ OnwayNum }}</text> 项运输任务
+                  <uv-icon
+                    name="/static/images/index/orange.png"
+                    width="24rpx"
+                    height="24rpx"
+                    :customStyle="{ marginLeft: '4rpx' }"
+                  />
+                </view>
+              </swiper-item>
+            </swiper>
           </view>
         </view>
         <view class="form-wrapper">
@@ -84,7 +145,7 @@
             </view>
           </view>
           <uv-button
-            text="立即派单"
+            text="立即派车"
             color="linear-gradient( 270deg, #31CE57 0%, #07B130 100%)"
             :custom-style="{
               height: '104rpx',
@@ -167,9 +228,11 @@ import { onReady, onLoad, onShow } from "@dcloudio/uni-app";
 import SelectCarType from "../dispatchTask/components/SelectCarType.vue";
 import { getWxSetting, getLocationInfo } from "@/utils/authorize.js";
 import { useAppStore } from "@/stores/app.js";
+import { useUserStore } from "@/stores/user.js";
 import { getToken } from "@/utils/token.js";
-import { GetGoodsOrderCount } from "@/api/index.js";
+import { GetGoodsOrderCount, GetNumberOfOnGoing } from "@/api/index.js";
 import { sleep } from "@/utils/index.js";
+import { storeToRefs } from "pinia";
 const { ctx } = getCurrentInstance();
 
 function tabbarChange(index) {
@@ -179,8 +242,17 @@ function tabbarChange(index) {
 }
 
 const appStore = useAppStore();
+const userStore = useUserStore();
+const { userInfo } = storeToRefs(userStore);
+const { reloadTaskInit } = storeToRefs(appStore);
+
 onShow(() => {
   appStore.switchTab(0);
+
+  if (!getToken()) {
+    return;
+  }
+  getCount();
 });
 onLoad(async () => {
   if (!getToken()) {
@@ -190,7 +262,6 @@ onLoad(async () => {
     // 定位授权
     await getLocationInfo();
   } finally {
-    getCount();
   }
 });
 // 登录
@@ -204,11 +275,30 @@ function loginSuccess() {
   });
 }
 // 获取运单数
-const count = ref(0);
+const AssignNum = ref(0);
+const OnwayNum = ref(0);
 async function getCount() {
-  const res = await GetGoodsOrderCount();
-  count.value = res;
+  const res = await GetNumberOfOnGoing({
+    mobile: userInfo.value.Mobile,
+  });
+  AssignNum.value = res.AssignNum;
+  OnwayNum.value = res.OnwayNum;
 }
+function toTask(index = 0) {
+  if (reloadTaskInit.value) {
+    uni.$emit("task:reload", {
+      current: index,
+    });
+  } else {
+    appStore.setTaskQuery({
+      current: index,
+    });
+  }
+  uni.switchTab({
+    url: "/pages/task/task",
+  });
+}
+
 // 选择地址
 const supply = ref(null);
 const unload = ref(null);
@@ -304,10 +394,6 @@ function navigate(type) {
 </script>
 
 <style lang="scss">
-// page {
-//   padding: 40rpx 24rpx 20rpx;
-// }
-
 .scroll-view {
   box-sizing: border-box;
   height: 100vh;
@@ -353,29 +439,60 @@ function navigate(type) {
       border-radius: 32rpx 32rpx 0rpx 0rpx;
     }
 
+    .green {
+      background: linear-gradient(90deg, #e7f9e9 65%, #ffffff 100%);
+      color: var(--main-color);
+    }
+    .orange {
+      color: #fc7e2c;
+      background: linear-gradient(
+        90deg,
+        #fff1e1 65%,
+        rgba(255, 242, 233, 0) 100%
+      );
+    }
+    .num {
+      font-family: misans500;
+      font-weight: normal;
+      margin: 0 10rpx;
+    }
+
     .content {
       display: flex;
       align-items: center;
       position: absolute;
       left: 24rpx;
       bottom: 0;
-      width: fit-content;
+      // width: fit-content;
+      width: 400rpx;
       padding: 24rpx 0 24rpx 24rpx;
       border-radius: 16rpx 0rpx 0rpx 16rpx;
-      font-weight: bold;
+      font-weight: 500;
       font-size: 28rpx;
       line-height: 36rpx;
-      &.green {
-        background: linear-gradient(90deg, #e7f9e9 65%, #ffffff 100%);
-        color: var(--main-color);
-      }
-      &.orange {
-        color: #fc7e2c;
-        background: linear-gradient(
-          90deg,
-          #fff1e1 65%,
-          rgba(255, 242, 233, 0) 100%
-        );
+    }
+
+    .task-swiper-wrapper {
+      display: flex;
+      align-items: center;
+      position: absolute;
+      height: 84rpx;
+      left: 24rpx;
+      bottom: 0;
+      width: 400rpx;
+      border-radius: 16rpx;
+      overflow: hidden;
+      .task-swiper {
+        flex: 1;
+        height: 60rpx;
+        .task-swiper__item {
+          padding: 0 0 0 24rpx;
+          height: 60rpx;
+          display: flex;
+          align-items: center;
+          font-size: 28rpx;
+          font-weight: bold;
+        }
       }
     }
   }
@@ -412,7 +529,7 @@ function navigate(type) {
           margin: 0 24rpx;
           font-size: 32rpx;
           font-weight: bold;
-          line-height: 48rpx;
+          line-height: 1;
 
           .placeholder {
             color: var(--intr-color);

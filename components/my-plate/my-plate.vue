@@ -52,7 +52,7 @@ watchEffect(() => {
   font-weight: bold;
 
   .inner {
-    font-family: misans;
+    font-family: misans500;
     flex: 1;
     display: flex;
     border-radius: 10rpx;

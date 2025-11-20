@@ -23,7 +23,9 @@ export function UptOwnerUserNickName(data) {
 export function GetGoodsOrderCount(data) {
   return request.post("/api/permission/WechatApi/GetGoodsOrderCount", data);
 }
-
+export function GetNumberOfOnGoing(data) {
+  return request.post("/api/permission/WechatApi/GetNumberOfOnGoing", data);
+}
 /**
  * 获取生产企业列表
  */

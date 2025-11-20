@@ -36,13 +36,42 @@ onLaunch(async () => {
     });
   });
 });
+
+wx.loadFontFace({
+  global: true,
+  family: "misans400",
+  source: 'url("https://www.wwwxapp.cn:28064/Resources/MiSansLatinVF.ttf")',
+  desc: {
+    weight: "380",
+  },
+  success: console.log,
+});
+
+wx.loadFontFace({
+  global: true,
+  family: "misans500",
+  source: 'url("https://www.wwwxapp.cn:28064/Resources/MiSansLatinVF.ttf")',
+  desc: {
+    weight: "520",
+  },
+  success: console.log,
+});
+
+wx.loadFontFace({
+  global: true,
+  family: "misans600",
+  source: 'url("https://www.wwwxapp.cn:28064/Resources/MiSansLatinVF.ttf")',
+  desc: {
+    weight: "630",
+  },
+  success: console.log,
+});
 </script>
 
 <style lang="scss">
 /*每个页面公共css */
 @import "@/uni_modules/uv-ui-tools/index.scss";
 @import "@/styles/public.scss";
-@import "@/static/fonts/misans.css";
 
 page {
   --safe-area-inset-top: 0px;

@@ -13,7 +13,7 @@
       :text="buttonText"
       color="linear-gradient( 270deg, #31CE57 0%, #07B130 100%);"
       :custom-style="{ width: '268rpx', height: '72rpx' }"
-      :customTextStyle="{ fontSize: '28rpx' }"
+      :customTextStyle="{ fontSize: '28rpx', fontWeight: '500' }"
       shape="circle"
       @click="confirm"
     />

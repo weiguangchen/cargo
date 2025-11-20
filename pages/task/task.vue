@@ -265,15 +265,26 @@ const {
   params: listParams2,
 });
 
-const isInit = ref(false);
 onLoad(async () => {
   if (!getToken()) return;
 
-  if (isInit.value) return;
-  console.log("onLoad");
+  console.log("绑定task:reload事件");
   uni.$on(`task:reload`, handleShow);
-  await fetchData1(true);
-  isInit.value = true;
+  appStore.setReloadTaskInit(true);
+  console.log("跳转参数", appStore.taskQuery);
+  if (appStore.taskQuery.current === null) {
+    await fetchData1(true);
+    return;
+  }
+  current.value = appStore.taskQuery.current;
+  if (current.value === 0) {
+    await fetchData1(true);
+  } else {
+    await fetchData2(true);
+  }
+  appStore.setTaskQuery({
+    current: null,
+  });
 });
 onUnload(() => {
   uni.$off(`task:reload`, handleShow);
@@ -283,14 +294,20 @@ onShow(() => {
 });
 
 const tabHack = ref(true);
-async function handleShow() {
+async function handleShow(query = {}) {
+  console.log("task:reload", query);
   tabHack.value = false;
   await nextTick();
   tabHack.value = true;
   isKeyWord.value = false;
   keyWord.value = "";
-  current.value = 0;
-  fetchData1(true);
+  current.value = query.current || 0;
+
+  if (current.value === 0) {
+    await fetchData1(true);
+  } else {
+    await fetchData2(true);
+  }
 }
 
 // 定义列表操作

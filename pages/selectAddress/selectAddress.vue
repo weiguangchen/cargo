@@ -1,6 +1,8 @@
 <template>
   <view class="map-wrapper">
     <map
+      longitude="116.4039069"
+      latitude="39.9164916"
       style="width: 100%; height: 1000rpx"
       id="map"
       :markers="markers"
@@ -71,13 +73,18 @@
     </view>
   </view>
 
-  <AddressList ref="addressListRef" @change="changeAddress" />
+  <!-- 选择装货地 -->
+  <SupplyList ref="supplyListRef" @change="changeSupply" />
+  <!-- 选择卸货地 -->
+  <UnloadList ref="unloadListRef" @change="changeUnload" />
 </template>
 
 <script setup>
 import { ref, getCurrentInstance, onMounted, nextTick } from "vue";
-import AddressList from "./components/AddressList.vue";
+import SupplyList from "./components/SupplyList.vue";
+import UnloadList from "./components/UnloadList.vue";
 import { onLoad } from "@dcloudio/uni-app";
+import { sleep } from "@/utils/index.js";
 const { ctx } = getCurrentInstance();
 
 // 地图
@@ -91,26 +98,31 @@ onMounted(() => {
   channel.on("setData", async (res) => {
     console.log("setData", res);
     type.value = res.type;
+    data.value = res.data;
+
     if (res.type === 1) {
       uni.setNavigationBarTitle({
         title: "选择装货地",
       });
-    } else {
+    }
+    if (res.type === 2) {
       uni.setNavigationBarTitle({
         title: "选择卸货地",
       });
     }
-    data.value = res.data;
-    if (res.data) {
-      addressListRef.value.close();
-    } else {
-      addressListRef.value.open({
-        type: res.type,
-      });
+    if (!res.data) {
+      if (res.type === 1) {
+        supplyListRef.value.open(); // 选择装货地
+      }
+      if (res.type === 2) {
+        unloadListRef.value.open(); // 选择卸货地
+      }
+      return;
     }
 
-    if (!res.data) return;
-    await nextTick();
+    supplyListRef.value.close();
+    unloadListRef.value.close();
+    await sleep(500);
     setLocation({
       longitude: res.data.Logitude,
       latitude: res.data.Latitude,
@@ -122,14 +134,18 @@ const type = ref(1);
 const data = ref();
 const eventChannel = ref();
 
-const addressListRef = ref();
 function openList() {
-  addressListRef.value.open({
-    type: type.value,
-  });
+  if (type.value === 1) {
+    supplyListRef.value.open(); // 选择装货地
+  }
+  if (type.value === 2) {
+    unloadListRef.value.open(); // 选择卸货地
+  }
 }
-function changeAddress(res) {
-  console.log("changeAddress", res);
+
+const supplyListRef = ref();
+function changeSupply(res) {
+  console.log("changeSupply", res);
   data.value = res.data;
   type.value = res.type;
 
@@ -138,10 +154,23 @@ function changeAddress(res) {
     latitude: res.data.Latitude,
   });
 }
+
+const unloadListRef = ref();
+function changeUnload(res) {
+  console.log("changeUnload", res);
+  data.value = res.data;
+  type.value = res.type;
+
+  setLocation({
+    longitude: res.data.Logitude,
+    latitude: res.data.Latitude,
+  });
+}
+
 const markers = ref([]);
 function setLocation(data) {
   const { longitude, latitude } = data;
-  console.log("setLocation", longitude, latitude, mapContext.value);
+  console.log("setLocation", longitude, latitude, mapContext.value, data);
   if (longitude && latitude) {
     const marker = {
       id: 123,

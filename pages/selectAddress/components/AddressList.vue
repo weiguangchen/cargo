@@ -12,7 +12,7 @@
         buttonText="查看生产企业"
         @confirm="supplyConfirm"
       />
-      <scroll-view scroll-y v-else style="height:100%;">
+      <scroll-view scroll-y v-else style="height: 100%">
         <view class="location-list">
           <view
             class="location"
@@ -33,8 +33,7 @@
               {{ item.Name }}
             </view>
             <view class="address"
-              >{{ item.City || ""
-              }}{{ item.Address || "" }}</view
+              >{{ item.City || "" }}{{ item.Address || "" }}</view
             >
             <view
               class="dis"
@@ -56,7 +55,7 @@
           查看全部生产企业
           <uv-icon name="/static/images/arrow/green.png" size="28rpx" />
         </view>
-		<uv-safe-bottom />
+        <uv-safe-bottom />
         <!-- <uv-load-more status="nomore" color="#B0BECC" line-color="#B0BECC" /> -->
       </scroll-view>
     </template>
@@ -69,7 +68,7 @@
         buttonText="新建卸货地址"
         @confirm="unloadConfirm"
       />
-      <scroll-view scroll-y v-else style="height:100%;">
+      <scroll-view scroll-y v-else style="height: 100%">
         <view class="location-list">
           <view
             class="location"
@@ -90,8 +89,8 @@
               {{ item.Placename }}
             </view>
             <view class="address"
-              >{{ item.City || ""
-              }}{{ item.District || "" }}{{ item.Address || "" }}</view
+              >{{ item.City || "" }}{{ item.District || ""
+              }}{{ item.Address || "" }}</view
             >
             <view
               class="dis"
@@ -113,7 +112,7 @@
           管理卸货地址
           <uv-icon name="/static/images/arrow/green.png" size="28rpx" />
         </view>
-		<uv-safe-bottom />
+        <uv-safe-bottom />
         <!-- <uv-load-more status="nomore" color="#B0BECC" line-color="#B0BECC" /> -->
       </scroll-view>
     </template>
@@ -132,14 +131,14 @@ const emits = defineEmits(["change"]);
 
 const type = ref(1);
 
-onPageShow(() => {
-  if (type.value === 1) {
-    getSupply();
-  }
-  if (type.value === 2) {
-    getUnload();
-  }
-});
+// onPageShow(() => {
+//   if (type.value === 1) {
+//     getSupply();
+//   }
+//   if (type.value === 2) {
+//     getUnload();
+//   }
+// });
 const isSupplyInit = ref(false);
 const isUnloadInit = ref(false);
 

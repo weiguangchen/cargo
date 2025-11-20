@@ -74,3 +74,12 @@ export function formatNumberToThousand(value) {
   // 使用正则表达式来插入逗号
   return numStr.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
+
+// 拼接省市区地址
+export function joinAddStr(province, city, district, address) {
+  let newProvince = province;
+  let newCity = city === province ? "" : city;
+  let newDistrict = district === city ? "" : district;
+  let newAddress = address === district ? "" : address;
+  return `${newProvince}${newCity}${newDistrict}${newAddress}`;
+}

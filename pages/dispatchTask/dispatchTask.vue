@@ -64,14 +64,18 @@
             <view class="time-box" v-if="startTime">
               <text class="time">{{ formatDateTime(startTime) }}</text
               >入场
-              <view @click.stop>
-                <uv-icon
-                  name="/static/images/dispatchTask/close.png"
-                  width="32rpx"
-                  height="32rpx"
-                  :custom-style="{ marginLeft: '14rpx' }"
+              <view class="close-wrapper" @click.stop>
+                <view
+                  style="flex: 1; display: flex; align-items: center"
                   @click="clearTime('start')"
-                />
+                >
+                  <uv-icon
+                    name="/static/images/dispatchTask/close.png"
+                    width="32rpx"
+                    height="32rpx"
+                    :custom-style="{ marginLeft: '14rpx' }"
+                  />
+                </view>
               </view>
             </view>
             <view class="placeholder" v-else
@@ -100,14 +104,18 @@
             <view class="time-box" v-if="endTime">
               <text class="time">{{ formatDateTime(endTime) }}</text
               >结束
-              <view @click.stop>
-                <uv-icon
-                  name="/static/images/dispatchTask/close.png"
-                  width="32rpx"
-                  height="32rpx"
-                  :custom-style="{ marginLeft: '14rpx' }"
+              <view class="close-wrapper" @click.stop>
+                <view
+                  style="flex: 1; display: flex; align-items: center"
                   @click="clearTime('end')"
-                />
+                >
+                  <uv-icon
+                    name="/static/images/dispatchTask/close.png"
+                    width="32rpx"
+                    height="32rpx"
+                    :custom-style="{ marginLeft: '14rpx' }"
+                  />
+                </view>
               </view>
             </view>
             <view class="placeholder" v-else
@@ -246,7 +254,7 @@
               >-</view
             >
             <text v-else>¥ {{ totalPrice }}</text>
-            <view style="display: inline-block; margin-left: 8rpx">
+            <view style="float: right; margin-left: 8rpx; margin-top: 16rpx">
               <uv-icon
                 name="arrow-right"
                 color="var(--red-color)"
@@ -267,7 +275,7 @@
               >-</text
             >
             <text v-else>¥ {{ balancePrice }}</text>
-            <view style="display: inline-block; margin-left: 8rpx">
+            <view style="float: right; margin-left: 8rpx; margin-top: 16rpx">
               <uv-icon
                 name="arrow-right"
                 color="var(--sub-color)"
@@ -378,6 +386,10 @@ onLoad(() => {
 
     if (res.supply) {
       getCargpOptions();
+
+      if (res.supply && res.supply.OwnerAnnouncement) {
+        noticeModal.value.open();
+      }
     }
   });
 });
@@ -418,8 +430,8 @@ const timeMode = ref("start");
 const timeValue = ref("");
 const startTime = ref("");
 const endTime = ref("");
-const min = dayjs().valueOf();
-const max = dayjs().add(1, "year").valueOf();
+const min = roundTimeToNextTenMinute().valueOf();
+const max = roundTimeToNextTenMinute().add(1, "year").valueOf();
 const minDate = ref();
 const maxDate = ref();
 const showTimeSelect = ref(true); // 是否显示时间选择器
@@ -440,12 +452,32 @@ function formatter(type, value) {
   if (type === "minute") return `${value}分`;
   return value;
 }
+// 获取时间picker最小值，为了处理当前时间为51-59分时，显示的时间为下一个被10整除的整点
+function roundTimeToNextTenMinute() {
+  const dayjsObj = dayjs();
+  const minute = dayjsObj.minute();
+
+  if (minute === 0) {
+    // 分钟为0，保持不变
+    return dayjsObj;
+  } else if (minute >= 1 && minute <= 49) {
+    // 分钟在1-49之间，向上取整到10的倍数
+    const roundedMinute = Math.ceil(minute / 10) * 10;
+    return dayjsObj.minute(roundedMinute).second(0).millisecond(0);
+  } else if (minute >= 51 && minute <= 59) {
+    // 分钟在51-59之间，增加1小时，并将分钟、秒、毫秒归零（即下一个整点）
+    return dayjsObj.add(1, "hour").startOf("hour");
+  } else {
+    // 其他情况（例如50分钟），保持不变
+    return dayjsObj;
+  }
+}
 function selectTime(type) {
   timeMode.value = type;
   if (type === "start") {
     minDate.value = min;
     maxDate.value = model.validHour
-      ? dayjs().add(model.validHour, "hour").valueOf()
+      ? roundTimeToNextTenMinute().add(model.validHour, "hour").valueOf()
       : endTime.value
       ? dayjs(endTime.value).valueOf()
       : max;
@@ -454,7 +486,7 @@ function selectTime(type) {
   if (type === "end") {
     minDate.value = startTime.value ? dayjs(startTime.value).valueOf() : min;
     maxDate.value = model.validHour
-      ? dayjs().add(model.validHour, "hour").valueOf()
+      ? roundTimeToNextTenMinute().add(model.validHour, "hour").valueOf()
       : max;
     timeValue.value = endTime.value ? dayjs(endTime.value).valueOf() : max;
   }
@@ -525,7 +557,9 @@ async function getCargpOptions() {
   supplyPromptType.value = res?.PromptType ?? "1";
   supplyPromptContent.value = res?.PromptContent ?? "";
   if (model.validHour) {
-    endTime.value = dayjs().add(model.validHour, "hour").valueOf();
+    endTime.value = roundTimeToNextTenMinute()
+      .add(model.validHour, "hour")
+      .valueOf();
   }
 
   if (res?.list?.length === 1) {
@@ -726,8 +760,8 @@ async function submit() {
         ? dayjs(endTime.value).format("YYYY-MM-DD HH:mm")
         : ""; // 截止接单时间
     } else {
-      params.StartTime = dayjs().format("YYYY-MM-DD HH:mm"); //开始进厂时间
-      params.EndTime = dayjs()
+      params.StartTime = ""; //开始进厂时间
+      params.EndTime = roundTimeToNextTenMinute()
         .add(model.validHour, "hour")
         .format("YYYY-MM-DD HH:mm"); // 截止接单时间
     }
@@ -916,6 +950,11 @@ page {
             font-weight: bold;
             color: var(--dark-main);
           }
+          .close-wrapper {
+            flex: 1;
+            align-self: stretch;
+            display: flex;
+          }
         }
       }
 
@@ -1028,19 +1067,17 @@ page {
       text-align: right;
       flex: 1;
       display: flex;
-      align-items: baseline;
       justify-content: flex-end;
       margin-left: 12rpx;
       font-size: 28rpx;
+      font-family: misans500;
     }
 
     .price1 {
-      font-weight: 600;
       color: var(--red-color);
     }
 
     .price2 {
-      font-weight: 400;
       color: var(--sub-color);
     }
   }
