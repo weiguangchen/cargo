@@ -8,7 +8,7 @@
     <my-empty
       v-if="list.length === 0"
       img="/static/images/empty/address1.png"
-      text="与生产企业签约后方可派单"
+      text="与生产企业签约后方可派车"
       showButton
       buttonText="查看生产企业"
       @confirm="supplyConfirm"
@@ -22,7 +22,7 @@
       @scrolltolower="scrolltolower"
       @refresherrefresh="refresherrefresh"
     >
-      <view style="padding: 20rpx 24rpx">
+      <view class="list-container">
         <view class="location-list">
           <view
             class="location"
@@ -180,6 +180,10 @@ defineExpose({
   transition: all 0.4s;
   box-sizing: border-box;
   background-color: var(--page-bg);
+
+  .list-container {
+    padding: 20rpx 24rpx max(var(--safe-area-inset-bottom), var(--safe-bottom));
+  }
 }
 
 .location-list {

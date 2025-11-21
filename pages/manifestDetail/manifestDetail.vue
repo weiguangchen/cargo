@@ -17,11 +17,11 @@
     </view>
     <view class="tip" v-if="['2', '3', '4'].includes(info.Status)">
       <template v-if="info.Status === '2'"
-        >已停止派单，等待进行中运单任务的结束</template
+        >已停止派车，等待进行中运单任务的结束</template
       >
-      <template v-if="info.Status === '3'">可点击下方按钮继续派单</template>
+      <template v-if="info.Status === '3'">可点击下方按钮继续派车</template>
       <template v-if="info.Status === '4'"
-        >已停止派单，等待进行中运单任务的结束</template
+        >已停止派车，等待进行中运单任务的结束</template
       >
     </view>
   </view>
@@ -154,7 +154,7 @@
       <view class="value">{{ info.StartTime }}</view>
     </view>
     <view class="item my-border-bottom" v-if="info.EndTime">
-      <view class="label">结束派单时间</view>
+      <view class="label">结束派车时间</view>
       <view class="value">{{ info.EndTime }}</view>
     </view>
     <view class="item">
@@ -176,7 +176,7 @@
       </view>
     </view>
     <view class="item" v-if="!!info.Memo">
-      <view class="label">派单备注</view>
+      <view class="label">派车备注</view>
       <view class="value" @click="openMemo">
         查看
         <uv-image
@@ -255,7 +255,7 @@
       </view>
       <view class="right">
         <uv-button
-          text="继续派单"
+          text="继续派车"
           color="linear-gradient( 270deg, #31CE57 0%, #07B130 100%)"
           :custom-style="{
             height: '96rpx',
@@ -268,7 +268,7 @@
     </view>
     <view class="btns" v-if="['5'].includes(info.Status)">
       <uv-button
-        text="继续派单"
+        text="继续派车"
         color="linear-gradient( 270deg, #31CE57 0%, #07B130 100%)"
         :custom-style="{
           height: '96rpx',
@@ -391,7 +391,7 @@ function openMapModal(type) {
 const remarkModal = ref();
 function openMemo() {
   remarkModal.value.open({
-    title: "派单备注",
+    title: "派车备注",
     memo: info.value.Memo,
   });
 }
@@ -433,7 +433,7 @@ function pauseHandle() {
   confirm.value.confirm({
     title: "确定暂停货单？",
     content:
-      "暂停后将不再派发新的运单任务，后续可随时继续派单，当前进行中的运单任务不受影响",
+      "暂停后将不再派发新的运单任务，后续可随时继续派车，当前进行中的运单任务不受影响",
     cancelText: "再想想",
     confirmText: "暂停货单",
     confirmBgColor: "var(--main-color)",
@@ -465,10 +465,10 @@ function pauseHandle() {
 }
 function goOnHandle() {
   confirm.value.confirm({
-    title: "确定继续派单？",
+    title: "确定继续派车？",
     content: "将继续派发运单任务",
     cancelText: "再想想",
-    confirmText: "继续派单",
+    confirmText: "继续派车",
     confirmBgColor: "var(--main-color)",
     asyncClose: true,
     async confirm() {

@@ -225,7 +225,7 @@ export function GetOwnerOrderList(data) {
 }
 
 /**
- * 派单
+ * 派车
  */
 export function SetAssignTicket(data) {
   return request.post("/api/permission/WechatApi/SetAssignTicket", data);

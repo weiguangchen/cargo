@@ -7,7 +7,7 @@
       <my-empty
         v-if="isSupplyInit && supplyList.length === 0"
         img="/static/images/empty/address1.png"
-        text="与生产企业签约后方可派单"
+        text="与生产企业签约后方可派车"
         showButton
         buttonText="查看生产企业"
         @confirm="supplyConfirm"
@@ -63,7 +63,7 @@
       <my-empty
         v-if="isUnloadInit && unloadList.length === 0"
         img="/static/images/empty/address2.png"
-        text="派单前需先维护卸货地址"
+        text="派车前需先维护卸货地址"
         showButton
         buttonText="新建卸货地址"
         @confirm="unloadConfirm"

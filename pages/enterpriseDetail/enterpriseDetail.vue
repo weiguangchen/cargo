@@ -165,7 +165,7 @@
               <!-- <text class="seek">咨询企业获取价格</text> -->
             </view>
           </view>
-          <!-- <view class="dispatch">派单</view> -->
+          <!-- <view class="dispatch">派车</view> -->
         </view>
       </view>
     </view>

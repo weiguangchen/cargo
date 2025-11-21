@@ -9,6 +9,7 @@
       mode="bottom"
       :custom-style="{ minHeight: '100rpx' }"
       :closeOnClickOverlay="false"
+      :safeAreaInsetBottom="false"
       @confirm="confirm"
     >
       <view class="result-drawer-content">
@@ -21,9 +22,9 @@
               :duration="0"
             />
           </view>
-          <view class="result-drawer-content-title">派单成功</view>
+          <view class="result-drawer-content-title">派车成功</view>
           <view class="result-drawer-content-info"
-            >可在「当前任务」中查看装运进度</view
+            >可在「当前任务」中查看进度</view
           >
         </view>
         <view class="result-drawer-footer">
@@ -89,9 +90,11 @@ defineExpose({
   flex-direction: column;
   justify-content: space-between;
   position: relative;
-  height: 464rpx;
   text-align: center;
-  padding: 196rpx 24rpx 0;
+  padding: 196rpx 24rpx max(var(--safe-area-inset-bottom), var(--safe-bottom));
+  .result-drawer-content-wrapper {
+    padding-bottom: 64rpx;
+  }
   .result-drawer-content-img {
     position: absolute;
     top: -128rpx;

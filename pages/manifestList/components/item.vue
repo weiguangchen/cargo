@@ -124,7 +124,7 @@
           <view class="btn" @click.stop>
             <uv-button
               shape="circle"
-              text="继续派单"
+              text="继续派车"
               color="linear-gradient( 270deg, #31CE57 0%, #07B130 100%);"
               :customTextStyle="{ fontSize: '26rpx' }"
               :customStyle="{ height: '32px' }"
@@ -136,7 +136,7 @@
           <view class="btn" @click.stop>
             <uv-button
               shape="circle"
-              text="继续派单"
+              text="继续派车"
               color="linear-gradient( 270deg, #31CE57 0%, #07B130 100%);"
               :customTextStyle="{ fontSize: '26rpx' }"
               :customStyle="{ height: '32px' }"
@@ -225,7 +225,7 @@ function pauseHandle() {
   confirm.value.confirm({
     title: "确定暂停货单？",
     content:
-      "暂停后将不再派发新的运单任务，后续可随时继续派单，当前进行中的运单任务不受影响",
+      "暂停后将不再派发新的运单任务，后续可随时继续派车，当前进行中的运单任务不受影响",
     cancelText: "再想想",
     confirmText: "暂停货单",
     confirmBgColor: "var(--main-color)",
@@ -258,10 +258,10 @@ function pauseHandle() {
 }
 function goOnHandle() {
   confirm.value.confirm({
-    title: "确定继续派单？",
+    title: "确定继续派车？",
     content: "将继续派发运单任务",
     cancelText: "再想想",
-    confirmText: "继续派单",
+    confirmText: "继续派车",
     confirmBgColor: "var(--main-color)",
     asyncClose: true,
     async confirm() {

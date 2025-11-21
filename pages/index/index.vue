@@ -9,7 +9,7 @@
     <view class="page-wrapper">
       <uv-status-bar />
       <view class="page-bg" />
-      <!-- 派单模块 -->
+      <!-- 派车模块 -->
       <view class="dispatch-wrapper">
         <uv-image
           src="/static/images/home/logo.png"
@@ -331,7 +331,7 @@ function selectAddress(type) {
 }
 // 车辆类型
 const carType = ref([]);
-// 派单
+// 派车
 function dispatch() {
   if (!getToken()) {
     openLoginDrawer();
@@ -463,13 +463,12 @@ function navigate(type) {
       position: absolute;
       left: 24rpx;
       bottom: 0;
-      // width: fit-content;
       width: 400rpx;
-      padding: 24rpx 0 24rpx 24rpx;
+      padding: 0 0 0 24rpx;
+      height: 84rpx;
       border-radius: 16rpx 0rpx 0rpx 16rpx;
       font-weight: 500;
       font-size: 28rpx;
-      line-height: 36rpx;
     }
 
     .task-swiper-wrapper {
@@ -491,7 +490,7 @@ function navigate(type) {
           display: flex;
           align-items: center;
           font-size: 28rpx;
-          font-weight: bold;
+          font-weight: 500;
         }
       }
     }

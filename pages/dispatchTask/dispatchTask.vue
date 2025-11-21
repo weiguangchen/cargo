@@ -63,7 +63,7 @@
           >
             <view class="time-box" v-if="startTime">
               <text class="time">{{ formatDateTime(startTime) }}</text
-              >入场
+              >准入
               <view class="close-wrapper" @click.stop>
                 <view
                   style="flex: 1; display: flex; align-items: center"
@@ -119,7 +119,7 @@
               </view>
             </view>
             <view class="placeholder" v-else
-              >选填结束派单时间
+              >选填结束派车时间
               <uv-icon
                 name="/static/images/arrow.png"
                 width="24rpx"
@@ -173,6 +173,7 @@
             v-model="model.OwnerId"
             :options="cargoOptions"
             :disabled="cargoDisabled"
+            :loading="cargoLoading"
             @disabledClick="cargoDisabledClick"
             @change="cargoChange"
           />
@@ -335,7 +336,7 @@
     </view>
   </my-drawer>
 
-  <!-- 派单结果 -->
+  <!-- 派车结果 -->
   <ResultDrawer ref="resultDrawer" />
 
   <!-- 通知 -->
@@ -533,6 +534,7 @@ const rules = ref({
   ],
 });
 // 选择货主公司
+const cargoLoading = ref(false);
 const cargoOptions = ref([]);
 const supplyIsOffline = ref("0"); //2：离线-不可派车，1：离线-可派车，0:正常
 const supplyPromptContent = ref("");
@@ -541,30 +543,36 @@ async function getCargpOptions() {
   if (!supply.value.Id) {
     return;
   }
-  const res = await GetOwnerBySupply({
-    supplyId: supply.value.Id,
-    qType: 1,
-  });
-  cargoOptions.value =
-    res?.list?.map((m) => ({
-      value: m.Id,
-      label: m.Ownername,
-    })) ?? [];
-  // 设置结束时间范围
-  model.validHour = res?.validHour ?? "";
-  showTimeSelect.value = !res.validHour;
-  supplyIsOffline.value = res?.IsOffline ?? "0";
-  supplyPromptType.value = res?.PromptType ?? "1";
-  supplyPromptContent.value = res?.PromptContent ?? "";
-  if (model.validHour) {
-    endTime.value = roundTimeToNextTenMinute()
-      .add(model.validHour, "hour")
-      .valueOf();
-  }
 
-  if (res?.list?.length === 1) {
-    model.OwnerId = res?.list?.[0]?.Id ?? "";
-    getOrder();
+  try {
+    cargoLoading.value = true;
+    const res = await GetOwnerBySupply({
+      supplyId: supply.value.Id,
+      qType: 1,
+    });
+    cargoOptions.value =
+      res?.list?.map((m) => ({
+        value: m.Id,
+        label: m.Ownername,
+      })) ?? [];
+    // 设置结束时间范围
+    model.validHour = res?.validHour ?? "";
+    showTimeSelect.value = !res.validHour;
+    supplyIsOffline.value = res?.IsOffline ?? "0";
+    supplyPromptType.value = res?.PromptType ?? "1";
+    supplyPromptContent.value = res?.PromptContent ?? "";
+    if (model.validHour) {
+      endTime.value = roundTimeToNextTenMinute()
+        .add(model.validHour, "hour")
+        .valueOf();
+    }
+
+    if (res?.list?.length === 1) {
+      model.OwnerId = res?.list?.[0]?.Id ?? "";
+      getOrder();
+    }
+  } finally {
+    cargoLoading.value = false;
   }
 }
 const cargoDisabled = computed(() => {
@@ -778,10 +786,6 @@ async function submit() {
     submiting.value = true;
     await SetAssignTicket(params);
     uni.$emit("task:reload");
-    uni.showToast({
-      title: "派单成功！",
-      icon: "none",
-    });
     disabledScroll.value = true;
     resultDrawer.value.open();
   } catch (err) {
@@ -917,7 +921,7 @@ page {
           .hour {
             margin: 0 10rpx;
             font-weight: bold;
-            color: var(--main-color);
+            color: var(--dark-main);
           }
         }
         .customize {

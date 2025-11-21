@@ -8,9 +8,9 @@
     <my-empty
       v-else-if="defaultEmpty"
       img="/static/images/empty/address2.png"
-      text="派单前需先维护卸货地址"
+      text="派车前需先维护卸货地址"
       showButton
-      buttonText="新建卸货地址"
+      buttonText="添加卸货地址"
       @confirm="unloadConfirm"
     />
     <view v-else class="list-wrapper">
@@ -68,7 +68,7 @@
         @refresherrefresh="refresherrefresh"
         @scroll="scroll"
       >
-        <view style="padding: 0 24rpx">
+        <view class="list-container">
           <view class="location-list">
             <view
               class="location"
@@ -298,6 +298,10 @@ defineExpose({
         overflow: hidden;
       }
     }
+  }
+
+  .list-container {
+    padding: 0 24rpx max(var(--safe-area-inset-bottom), var(--safe-bottom));
   }
 }
 
