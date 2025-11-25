@@ -477,10 +477,10 @@ function selectTime(type) {
   timeMode.value = type;
   if (type === "start") {
     minDate.value = min;
-    maxDate.value = model.validHour
-      ? roundTimeToNextTenMinute().add(model.validHour, "hour").valueOf()
-      : endTime.value
+    maxDate.value = endTime.value
       ? dayjs(endTime.value).valueOf()
+      : model.validHour
+      ? roundTimeToNextTenMinute().add(model.validHour, "hour").valueOf()
       : max;
     timeValue.value = startTime.value ? dayjs(startTime.value).valueOf() : min;
   }

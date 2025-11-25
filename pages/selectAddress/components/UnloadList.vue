@@ -15,7 +15,7 @@
     />
     <view v-else class="list-wrapper">
       <view class="search-box">
-        <uv-search
+        <!-- <uv-search
           placeholder="搜索卸货地"
           :showAction="false"
           height="72rpx"
@@ -24,6 +24,19 @@
             borderRadius: '36rpx',
           }"
           v-model="unloadName"
+          @search="search"
+        /> -->
+        <search-box
+          placeholder="搜索卸货地"
+          :showAction="false"
+          height="72rpx"
+          bgColor="#fff"
+          :boxStyle="{
+            borderRadius: '36rpx',
+          }"
+          v-model="unloadName"
+          color="#1A1B1C"
+          placeholderColor="#AOAFBA"
           @search="search"
         />
         <view class="btn-wrapper">
@@ -129,6 +142,7 @@ import { ref, unref, onMounted, nextTick } from "vue";
 import { GetOwnerUnloadPlace } from "@/api/index.js";
 import { gcj02Distance, joinAddStr } from "@/utils/index.js";
 import { useLocationStore } from "@/stores/location.js";
+import SearchBox from "./SearchBox.vue";
 const locationStore = useLocationStore();
 
 const emits = defineEmits(["change"]);
