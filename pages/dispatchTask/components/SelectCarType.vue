@@ -3,12 +3,11 @@
     <view :class="{ placeholder: !text, text: text }">{{
       text || "全部车辆类型"
     }}</view>
-    <uv-image
-      src="/static/images/arrow.png"
+    <uv-icon
+      name="/static/images/arrow.png"
       width="24rpx"
       height="24rpx"
       :custom-style="{ marginLeft: '6rpx' }"
-      :duration="0"
     />
   </view>
 

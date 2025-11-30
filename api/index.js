@@ -320,3 +320,34 @@ export function GetCustomerAmountDetail(data) {
 export function GetownerTotalsupply(data) {
   return request.post("/api/permission/wechatapi/GetownerTotalsupply", data);
 }
+
+/**
+ * 根据货主id获取标签列表
+ */
+export function GetOwnerLabel(data) {
+  return request.post("/api/permission/WechatApi/GetOwnerLabel", data);
+}
+/**
+ * 添加修改标签
+ */
+export function UptOwnerLabel(data) {
+  return request.post("/api/permission/WechatApi/UptOwnerLabel", data);
+}
+/**
+ * 删除标签
+ */
+export function DelteOwnerLabel(data) {
+  return request.post("/api/permission/WechatApi/DelteOwnerLabel", data);
+}
+/**
+ * 批量修改或批量导入标签
+ */
+export function BatchOwnerUserCarno(data) {
+  return request.post("/api/permission/WechatApi/BatchOwnerUserCarno", data);
+}
+/**
+ * 快速选车
+ */
+export function GetOwnerCarByLabel(data) {
+  return request.post("/api/permission/WechatApi/GetOwnerCarByLabel", data);
+}

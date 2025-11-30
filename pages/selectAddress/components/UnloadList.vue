@@ -15,50 +15,14 @@
     />
     <view v-else class="list-wrapper">
       <view class="search-box">
-        <!-- <uv-search
-          placeholder="搜索卸货地"
-          :showAction="false"
-          height="72rpx"
-          bgColor="#fff"
-          :boxStyle="{
-            borderRadius: '36rpx',
-          }"
+        <my-search-box
           v-model="unloadName"
-          @search="search"
-        /> -->
-        <search-box
           placeholder="搜索卸货地"
-          :showAction="false"
-          height="72rpx"
-          bgColor="#fff"
-          :boxStyle="{
-            borderRadius: '36rpx',
-          }"
-          v-model="unloadName"
-          color="#1A1B1C"
-          placeholderColor="#AOAFBA"
+          rightBtnText="添加"
+          @rightClick="unloadConfirm"
           @search="search"
+          @clear="clear"
         />
-        <view class="btn-wrapper">
-          <uv-button
-            :customStyle="{ borderRadius: '36rpx', borderColor: '#fff' }"
-            @click="unloadConfirm"
-          >
-            <uv-icon
-              name="/static/images/index/plus.png"
-              width="32rpx"
-              height="32rpx"
-              :customStyle="{ marginRight: '12rpx' }"
-            /><text
-              style="
-                font-size: 26rpx;
-                font-weight: 600;
-                color: var(--dark-main);
-              "
-              >添加</text
-            >
-          </uv-button>
-        </view>
       </view>
       <my-empty
         v-if="showLoading"
@@ -142,7 +106,6 @@ import { ref, unref, onMounted, nextTick } from "vue";
 import { GetOwnerUnloadPlace } from "@/api/index.js";
 import { gcj02Distance, joinAddStr } from "@/utils/index.js";
 import { useLocationStore } from "@/stores/location.js";
-import SearchBox from "./SearchBox.vue";
 const locationStore = useLocationStore();
 
 const emits = defineEmits(["change"]);
@@ -208,6 +171,15 @@ async function goTop() {
 }
 
 async function search() {
+  try {
+    showLoading.value = true;
+    await getList(true);
+  } finally {
+    showLoading.value = false;
+  }
+}
+
+async function clear() {
   try {
     showLoading.value = true;
     await getList(true);
@@ -302,15 +274,15 @@ defineExpose({
     flex-direction: column;
     .search-box {
       flex: none;
-      display: flex;
+      // display: flex;
       padding: 20rpx 24rpx;
-      .btn-wrapper {
-        flex: none;
-        width: 160rpx;
-        margin-left: 20rpx;
-        border-radius: 36rpx;
-        overflow: hidden;
-      }
+      // .btn-wrapper {
+      //   flex: none;
+      //   width: 160rpx;
+      //   margin-left: 20rpx;
+      //   border-radius: 36rpx;
+      //   overflow: hidden;
+      // }
     }
   }
 

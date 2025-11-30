@@ -11,11 +11,12 @@
   >
     <view
       class="uv-search__content"
+      :class="{
+        border: keyword || focused,
+      }"
       :style="[
         {
           backgroundColor: bgColor,
-          //   borderRadius: shape == 'round' ? '100px' : '4px',
-          //   borderColor: borderColor,
         },
         $uv.addStyle(boxStyle),
       ]"
@@ -26,8 +27,9 @@
           <uv-icon
             @tap="clickIcon"
             :size="searchIconSize"
-            :name="searchIcon"
-            :color="searchIconColor ? searchIconColor : color"
+            name="/static/images/ui/search.png"
+            width="32rpx"
+            height="32rpx"
           ></uv-icon>
         </view>
       </slot>
@@ -43,7 +45,7 @@
         :maxlength="maxlength"
         placeholder-class="uv-search__content__input--placeholder"
         :placeholder="placeholder"
-        :placeholder-style="`color: ${placeholderColor};font-weight:400`"
+        :placeholder-style="`color: ${placeholderColor};font-weight:400;`"
         class="uv-search__content__input"
         type="text"
         :style="[
@@ -59,7 +61,7 @@
       />
       <view
         class="uv-search__content__icon uv-search__content__close"
-        v-if="keyword && clearabled && focused"
+        v-if="keyword && clearabled"
         @tap="clear"
       >
         <uv-icon
@@ -243,7 +245,7 @@ $uv-search-close-radius: 100px !default;
 $uv-search-close-bgColor: #c6c7cb !default;
 $uv-search-close-transform: scale(0.82) !default;
 $uv-search-input-font-size: 14px !default;
-$uv-search-input-margin: 0 15px 0 5px !default;
+$uv-search-input-margin: 0 15px 0 12rpx !default;
 $uv-search-input-color: $uv-main-color !default;
 $uv-search-input-placeholder-color: $uv-tips-color !default;
 $uv-search-action-font-size: 14px !default;
@@ -272,7 +274,7 @@ $uv-search-action-margin-left: 5px !default;
     // border-color: transparent;
     // border-style: solid;
     overflow: hidden;
-    border: 2rpx solid #31ce57;
+    border: 2rpx solid var(--page-bg);
 
     &__icon {
       @include flex;
@@ -313,6 +315,9 @@ $uv-search-action-margin-left: 5px !default;
       bottom: 0;
       right: 0;
       z-index: 2;
+    }
+    &.border {
+      border-color: var(--main-color);
     }
   }
   &__action {

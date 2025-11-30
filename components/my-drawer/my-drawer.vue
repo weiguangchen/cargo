@@ -33,8 +33,10 @@
             @click="handleClose"
           />
         </view>
+        <slot v-if="customScrollView"></slot>
         <scroll-view
-          scroll-y="true"
+          v-else
+          scroll-y
           class="scroll-view"
           :style="{ height: `${scrollHeight}px` }"
         >
@@ -133,6 +135,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // 是否自定义中间滚动部分
+  customScrollView: {
+    type: Boolean,
+    default: false,
+  },
 });
 const emits = defineEmits(["maskClick", "change", "confirm", "close"]);
 
@@ -159,6 +166,7 @@ async function change(show) {
 }
 
 function close() {
+  debugger;
   emits("close");
 }
 

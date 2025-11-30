@@ -188,7 +188,7 @@
       </uv-form-item>
       <uv-form-item label="车牌限制" prop="Carno">
         <view style="display: flex; justify-content: flex-end">
-          <SelectPlate v-model="model.Carno" />
+          <SelectCar v-model="model.Carno" />
         </view>
       </uv-form-item>
     </view>
@@ -356,6 +356,7 @@ import { ref, reactive, unref, getCurrentInstance, computed } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import SelectCarType from "./components/SelectCarType.vue";
 import SelectPlate from "./components/SelectPlate.vue";
+import SelectCar from "./components/SelectCar/index.vue";
 import SelectCargo from "./components/SelectCargo.vue";
 import Remark from "./components/Remark.vue";
 // import SelectOrder from "./components/SelectOrder.vue";
@@ -738,7 +739,7 @@ async function submit() {
     UnloadPlaceId: unload.value.Id, // 卸货地址主键
     Orderid: order.value.SSOrderId, //订单主键
     Orderno: order.value.SSOrderNo, // 订单编码
-    Carno: model.Carno.join(","), // 限制车牌，多个‘,’分隔
+    Carno: model.Carno.map((m) => m.Id).join(","), // 限制车牌，多个‘,’分隔
     CarType: model.CarType.join(","),
     MatList: order.value.MaterialsList.map((m) => {
       const item = {

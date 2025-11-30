@@ -1,6 +1,7 @@
 <template>
   <view class="my-empty" :style="{ height, background: bgColor }">
     <uv-image
+      v-if="showImg"
       :src="img"
       width="176rpx"
       height="176rpx"
@@ -29,6 +30,9 @@ export default {
 </script>
 <script setup>
 const props = defineProps({
+  showImg: {
+    default: true,
+  },
   img: {
     default: "/static/images/empty/enterprise.png",
   },

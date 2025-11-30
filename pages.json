@@ -54,8 +54,7 @@
       "path": "pages/carList/carList",
       "style": {
         "navigationBarTitleText": "车辆管理",
-        "backgroundColorTop": "#F2F4F7",
-        "enablePullDownRefresh": true
+        "backgroundColorTop": "#F2F4F7"
       }
     },
     {
@@ -143,6 +142,13 @@
       "path": "pages/agreement/agreement",
       "style": {
         "navigationBarTitleText": ""
+      }
+    },
+    {
+      "path": "pages/addCar/addCar",
+      "style": {
+        "navigationBarTitleText": "添加车辆",
+        "navigationBarBackgroundColor": "#ffffff"
       }
     }
   ],

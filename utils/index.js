@@ -83,3 +83,16 @@ export function joinAddStr(province, city, district, address) {
   let newAddress = address === district ? "" : address;
   return `${newProvince}${newCity}${newDistrict}${newAddress}`;
 }
+
+export function showToast(msg, timer = 1500) {
+  return new Promise((resolve) => {
+    uni.showToast({
+      title: msg,
+      icon: "none",
+      duration: timer,
+    });
+    setTimeout(() => {
+      resolve();
+    }, timer);
+  });
+}
