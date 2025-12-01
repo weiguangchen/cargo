@@ -1,9 +1,12 @@
 <template>
   <view class="identify-car-list" @click="openDrawer">
     <view>
-      <view class="input-text placeholder" v-if="selectedList.length === 0"
-        >请选择</view
-      >
+      <template v-if="selectedList.length === 0">
+        <view class="input-text placeholder" v-if="list.length === 0"
+          >识别后自动添加</view
+        >
+        <view class="input-text placeholder" v-else>请选择</view>
+      </template>
       <view v-else class="input-text">{{ inputText }}</view>
     </view>
     <uv-icon
@@ -66,6 +69,10 @@ const inputText = computed(() => {
 async function tagChange(list) {
   emits("update:modelValue", list);
 }
+
+defineExpose({
+  open: openDrawer,
+});
 </script>
 
 <style lang="scss" scoped>

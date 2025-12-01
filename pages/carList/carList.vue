@@ -22,18 +22,16 @@
         img="/static/images/empty/loading.gif"
         text="查询中"
       />
-      <template v-else-if="list.length === 0">
-        <my-empty
-          v-if="emptyType === '1'"
-          img="/static/images/empty/car.png"
-          text="暂无车辆"
-        />
-        <my-empty
-          v-if="emptyType === '2'"
-          img="/static/images/empty/car.png"
-          text="暂无搜索结果"
-        />
-      </template>
+      <my-empty
+        v-else-if="list.length === 0 && searchTemp"
+        img="/static/images/empty/car.png"
+        text="暂无搜索结果"
+      />
+      <my-empty
+        v-else-if="list.length === 0"
+        img="/static/images/empty/car.png"
+        text="暂无车辆"
+      />
       <scroll-view v-else scroll-y class="scroll-view">
         <view class="scroll-content">
           <view class="car-list">
@@ -83,8 +81,11 @@
               />
             </view>
           </view>
-          <view class="total"
+          <view v-if="searchTemp" class="total"
             >- 已绑定 <text class="num">{{ list.length }}</text> 辆车 -</view
+          >
+          <view v-else class="total"
+            >- 搜索到 <text class="num">{{ list.length }}</text> 辆车 -</view
           >
         </view>
       </scroll-view>
@@ -160,9 +161,10 @@
   <!-- 选择标签 -->
   <SelectCarTag
     ref="selectCarTag"
+    v-model="selectedCarTagList"
     :carList="carList"
     @change="tagChange"
-    showConfirm
+    batch
   />
 </template>
 
@@ -177,11 +179,12 @@ const confirm = ref();
 const carno = ref("");
 const list = ref([]);
 const loading = ref(false);
-const emptyType = ref(); //1没有搜索条件2有搜索条件
+const searchTemp = ref(""); //搜索内容
 const isEdit = ref(false);
 async function getList() {
   try {
     loading.value = true;
+    searchTemp.value = unref(carno);
     const res = await GetOwnerCarMgr({
       carno: unref(carno),
     });
@@ -190,7 +193,6 @@ async function getList() {
       ...m,
       checked: false,
     }));
-    emptyType.value = res.length > 0 ? "" : unref(carno) ? "2" : "1";
   } finally {
     loading.value = false;
   }
@@ -282,12 +284,22 @@ function handleDelete() {
 // 批量设置标签
 const selectCarTag = ref();
 const carList = ref();
+const selectedCarTagList = ref([]);
 function handleSetTag() {
+  if (unref(list).filter((m) => m.checked).length === 0) {
+    uni.showToast({
+      title: "请选择车辆",
+      icon: "none",
+    });
+    return;
+  }
+  selectedCarTagList.value = [];
   carList.value = unref(list)
     .filter((m) => m.checked)
     .map((m) => ({
       Id: m.Id,
       Carno: m.Carno,
+      labelList: m.labelList,
     }));
   selectCarTag.value.open();
 }

@@ -90,6 +90,7 @@ export function showToast(msg, timer = 1500) {
       title: msg,
       icon: "none",
       duration: timer,
+      mask: true,
     });
     setTimeout(() => {
       resolve();

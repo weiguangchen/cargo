@@ -44,7 +44,7 @@
             </uv-form-item>
           </view>
           <uv-form-item label="所属标签" prop="labelList">
-            <CarTag v-model="model.labelList" />
+            <CarTag v-model="model.labelList" @change="carTagChange" />
           </uv-form-item>
         </uv-form>
       </view>
@@ -52,7 +52,6 @@
         <view class="left" v-if="model.Id">
           <uv-button
             text="删除车辆"
-            :loading="loading"
             color="#ffffff"
             :customStyle="{
               height: '96rpx',
@@ -85,23 +84,33 @@
     <template v-if="current === 1">
       <view class="identify-wrapper">
         <view class="identify">
-          <uv-textarea
-            v-model="identify"
-            border="none"
-            height="218rpx"
-            :textStyle="{
-              fontSize: '28rpx',
-              color: 'var(--title-color)',
-              lineHeight: '44rpx',
-            }"
-            :customStyle="{
-              padding: '8rpx 8rpx 36rpx!important',
-            }"
-            :placeholderStyle="{
-              color: 'var(--intr-color)',
-            }"
-            placeholder="粘贴带有车牌号的文本，自动进行识别和拆分"
-          />
+          <view style="flex: 1">
+            <uv-textarea
+              v-model="identify"
+              border="none"
+              height="218rpx"
+              :textStyle="{
+                fontSize: '28rpx',
+                color: 'var(--title-color)',
+                lineHeight: '44rpx',
+              }"
+              :customStyle="{
+                padding: '8rpx 8rpx 36rpx!important',
+              }"
+              :placeholderStyle="{
+                color: 'var(--intr-color)',
+              }"
+              placeholder="粘贴带有车牌号的文本，自动进行识别和拆分"
+            />
+          </view>
+          <view class="close" v-if="isShowClear" @click="handleClear">
+            <uv-icon
+              name="close"
+              size="11"
+              color="#ffffff"
+              customStyle="line-height: 12px"
+            />
+          </view>
         </view>
         <view class="identify-button">
           <uv-button
@@ -119,7 +128,7 @@
             @click="handleImage"
           />
           <uv-button
-            text="粘贴并识别"
+            :text="identify ? '识别' : '粘贴并识别'"
             color="linear-gradient( 270deg, #31CE57 0%, #07B130 100%)"
             :customStyle="{
               height: '72rpx',
@@ -148,7 +157,11 @@
         >
           <view class="my-border-bottom">
             <uv-form-item label="车辆" prop="carList">
-              <CarList v-model="model2.carList" :list="matchList" />
+              <CarList
+                v-model="model2.carList"
+                :list="matchList"
+                ref="carListRef"
+              />
             </uv-form-item>
           </view>
           <uv-form-item label="所属标签" prop="labelList">
@@ -178,7 +191,7 @@
 </template>
 
 <script setup>
-import { ref, unref, reactive, getCurrentInstance } from "vue";
+import { ref, unref, reactive, getCurrentInstance, computed } from "vue";
 import CarNumber from "./components/CarNumber.vue";
 import CarTag from "./components/CarTag.vue";
 import CarList from "./components/CarList.vue";
@@ -203,7 +216,13 @@ onLoad(() => {
     model.Id = data.Id || "";
     model.Carno = data.Carno || "";
     model.labelList = data.labelList || [];
+    originModel.Id = data.Id || "";
+    originModel.Carno = data.Carno || "";
+    originModel.labelList = data.labelList || [];
     current.value = 0;
+    uni.setNavigationBarTitle({
+      title: "修改车辆",
+    });
   });
 });
 
@@ -224,6 +243,12 @@ function tabChange({ index }) {
 // 车牌号录入
 const form = ref(null);
 const model = reactive({
+  Id: "",
+  Carno: "",
+  labelList: [],
+});
+// 编辑时缓存原有数据
+const originModel = reactive({
   Id: "",
   Carno: "",
   labelList: [],
@@ -255,9 +280,43 @@ async function handleAdd() {
     labelList: model.labelList,
   };
   console.log("params", params);
+
+  // 当修改时，如果不选标签，弹窗提示
+  if (
+    model.Id &&
+    model.labelList.length === 0 &&
+    originModel.labelList.length !== 0
+  ) {
+    confirm.value.confirm({
+      title: "移除车辆标签?",
+      content: "您未选择标签，车辆的原有标签会被移除",
+      cancelText: "再想想",
+      confirmText: "确认移除",
+      asyncClose: true,
+      closeOnClickOverlay: false,
+      async confirm() {
+        try {
+          await CreateOwnerUserCarno(params);
+          confirm.value.close();
+          await showToast("车辆修改成功");
+          eventChannel.emit("success");
+          uni.navigateBack();
+        } catch (err) {
+          uni.showToast({
+            title: err.data,
+            icon: "none",
+          });
+          confirm.value.closeLoading();
+        }
+      },
+    });
+    return;
+  }
+
   try {
     loading.value = true;
     await CreateOwnerUserCarno(params);
+    loading.value = false;
     await showToast(model.Id ? "车辆修改成功" : "车辆添加成功");
     eventChannel.emit("success");
     uni.navigateBack();
@@ -266,11 +325,11 @@ async function handleAdd() {
       title: err.data,
       icon: "none",
     });
-  } finally {
     loading.value = false;
   }
 }
 function handleDelete() {
+  if (unref(loading)) return;
   confirm.value.confirm({
     title: "确定删除车辆？",
     content: "相关的派车单和运单不会被影响",
@@ -297,6 +356,9 @@ function handleDelete() {
     },
   });
 }
+function carTagChange() {
+  eventChannel.emit("success");
+}
 
 // 文本导入
 const identify = ref("");
@@ -314,6 +376,15 @@ const rules2 = ref({
     message: "暂无可添加车辆",
   },
 });
+
+const carListRef = ref(null);
+const isShowClear = computed(() => {
+  return unref(identify) !== "";
+});
+function handleClear() {
+  identify.value = "";
+}
+
 function handleImage() {
   uni.showToast({
     title: "暂未开放",
@@ -321,37 +392,47 @@ function handleImage() {
   });
 }
 async function handleMatch() {
+  model2.carList = [];
+
+  if (unref(identify)) {
+    const list = matchText(unref(identify));
+    matchList.value = list;
+    if (list.length > 0) {
+      unref(carListRef).open();
+    }
+    return;
+  }
+
   try {
-    uni.showLoading({
-      title: "识别中...",
-      mask: true,
-    });
     const res = await wx.getClipboardData();
     identify.value = strIsEmpty(res.data) ? "" : res.data;
     console.log("res", res);
-    const pattern =
-      /[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z]{1}[A-Z]{1}[A-Z0-9]{4}[A-Z0-9挂学警港澳]{1}([A-Z0-9挂学警港澳]{1})?/g;
-    const matches = res.data.match(pattern);
-    console.log("matches", matches);
-    if (matches) {
-      const uniquePlates = [
-        ...new Set(matches.map((plate) => plate.toUpperCase())),
-      ].map((m) => ({
-        Carno: m,
-      }));
-      model2.carList = uniquePlates;
-      matchList.value = uniquePlates;
-    } else {
-      uni.showToast({
-        title: "未识别到车牌号",
-        icon: "none",
-      });
-      model2.carList = [];
-      matchList.value = [];
+    const list = matchText(res.data);
+    matchList.value = list;
+    if (list.length > 0) {
+      unref(carListRef).open();
     }
-  } catch {
-  } finally {
-    uni.hideLoading();
+  } catch {}
+}
+
+function matchText(text) {
+  const pattern =
+    /[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z]{1}[A-Z]{1}[A-Z0-9]{4}[A-Z0-9挂学警港澳]{1}([A-Z0-9挂学警港澳]{1})?/g;
+  const matches = text.match(pattern);
+
+  if (matches) {
+    const uniquePlates = [
+      ...new Set(matches.map((plate) => plate.toUpperCase())),
+    ].map((m) => ({
+      Carno: m,
+    }));
+    return uniquePlates;
+  } else {
+    uni.showToast({
+      title: "未识别到车牌号",
+      icon: "none",
+    });
+    return [];
   }
 }
 
@@ -433,6 +514,20 @@ async function handleBatchAdd() {
     padding: 20rpx;
     margin-bottom: 20rpx;
 
+    .identify {
+      display: flex;
+
+      .close {
+        width: 20px;
+        height: 20px;
+        border-radius: 100px;
+        background-color: #c6c7cb;
+        align-self: flex-start;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
     .identify-button {
       display: flex;
       justify-content: space-between;

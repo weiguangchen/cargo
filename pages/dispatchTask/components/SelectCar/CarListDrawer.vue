@@ -5,8 +5,8 @@
         <my-search-box
           v-model="carno"
           placeholder="搜索车辆"
-          :showRightBtnIcon="false"
           rightBtnText="快速选车"
+          rightBtnIcon="/static/images/ui/quickSelectCar.png"
           rightBtnColor="var(--dark-main)"
           @search="search"
           @clear="clear"
@@ -215,6 +215,9 @@ function handleReset() {
   searchTemp.value = "";
   carno.value = "";
   getList();
+  emits("update:modelValue", []);
+  emits("change", []);
+  unref(drawer).popup.close();
 }
 function handleConfirm() {
   console.log("handleConfirm", unref(selectedList));

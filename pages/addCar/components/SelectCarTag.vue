@@ -85,6 +85,7 @@
       <uv-button
         v-else
         text="确认"
+        :loading="confirmLoading"
         color="linear-gradient( 270deg, #31CE57 0%, #07B130 100%);"
         @click="handleConfirm"
         :custom-style="{ borderRadius: '8px', height: '48px' }"
@@ -115,6 +116,11 @@ const props = defineProps({
   carList: {
     type: Array,
     default: () => [],
+  },
+  // 提交时是否判断弹窗
+  batch: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -216,60 +222,132 @@ function clear() {
   getList();
 }
 
-function handleConfirm() {
-  console.log("handleConfirm", unref(selectedList));
+const confirmLoading = ref(false);
+async function handleConfirm() {
+  console.log("handleConfirm", unref(selectedList), props.carList);
 
-  if (props.carList.length > 0) {
-    confirm.value.confirm({
-      title: "确认标签设置类型",
-      content: "车辆的原有标签如何处理?",
-      cancelText: "清除并替换",
-      cancelColor: "var(--red-color)",
-      cancelBgColor: "#FFF0EE",
-      confirmText: "保留并新增",
-      confirmColor: "var(--dark-main)",
-      confirmBgColor: "#E7F9E9",
-      asyncClose: true,
-      useCancelLoading: true,
-      closeOnClickOverlay: false,
-      closeable: true,
-      async cancel() {
-        const params = {
-          oprType: "SetLabel",
-          setType: "ClearReplace",
-          carList: props.carList,
-          labelList: unref(selectedList),
-        };
-        console.log("params", params);
-        try {
-          await BatchOwnerUserCarno(params);
-          showToast("设置成功");
-          confirm.value.close();
-          drawer.value.popup.close();
-          emits("change", unref(selectedList));
-        } catch {
-          confirm.value.closeLoading();
+  if (props.batch) {
+    // 判断carList是否至少有一辆车的的labelList有值
+    if (unref(selectedList).length === 0) {
+      if (props.carList.some((m) => m.labelList.length > 0)) {
+        confirm.value.confirm({
+          title: "移除车辆标签?",
+          content: "您未选择标签，车辆的原有标签会被移除",
+          cancelText: "再想想",
+          confirmText: "确认移除",
+          closeOnClickOverlay: false,
+          async confirm() {
+            const params = {
+              oprType: "SetLabel",
+              setType: "ClearReplace",
+              carList: props.carList,
+              labelList: unref(selectedList),
+            };
+            console.log("params", params);
+            try {
+              confirmLoading.value = true;
+              await BatchOwnerUserCarno(params);
+              showToast("移除成功");
+              drawer.value.popup.close();
+              emits("change", unref(selectedList));
+            } finally {
+              confirmLoading.value = false;
+            }
+          },
+        });
+      } else {
+        uni.showToast({
+          title: "请选择车辆标签",
+          icon: "none",
+        });
+      }
+      return;
+    }
+
+    //至少selectedList有一个标签,在carList中至少一辆车的标签中存在则弹窗
+    let flag = false;
+    main: for (let i = 0; i < unref(selectedList).length; i++) {
+      const item = unref(selectedList)[i];
+      inner: for (let j = 0; j < props.carList.length; j++) {
+        const car = props.carList[j];
+        if (car.labelList.find((m) => m.Id === item.Id)) {
+          flag = true;
+          break main;
         }
-      },
-      async confirm() {
-        const params = {
-          oprType: "SetLabel",
-          setType: "KeepAdd",
-          carList: props.carList,
-          labelList: unref(selectedList),
-        };
-        console.log("params", params);
-        try {
-          await BatchOwnerUserCarno(params);
-          showToast("设置成功");
-          confirm.value.close();
-          drawer.value.popup.close();
-          emits("change", unref(selectedList));
-        } catch {
-          confirm.value.closeLoading();
-        }
-      },
-    });
+      }
+    }
+
+    console.log("flag", flag);
+
+    if (flag) {
+      confirm.value.confirm({
+        title: "确认标签设置类型",
+        content: "车辆的原有标签如何处理?",
+        cancelText: "清除并替换",
+        cancelColor: "var(--red-color)",
+        cancelBgColor: "#FFF0EE",
+        confirmText: "保留并新增",
+        confirmColor: "var(--dark-main)",
+        confirmBgColor: "#E7F9E9",
+        asyncClose: true,
+        useCancelLoading: true,
+        closeOnClickOverlay: false,
+        closeable: true,
+        async cancel() {
+          const params = {
+            oprType: "SetLabel",
+            setType: "ClearReplace",
+            carList: props.carList,
+            labelList: unref(selectedList),
+          };
+          console.log("params", params);
+          try {
+            await BatchOwnerUserCarno(params);
+            showToast("设置成功");
+            confirm.value.close();
+            drawer.value.popup.close();
+            emits("change", unref(selectedList));
+          } catch {
+            confirm.value.closeLoading();
+          }
+        },
+        async confirm() {
+          const params = {
+            oprType: "SetLabel",
+            setType: "KeepAdd",
+            carList: props.carList,
+            labelList: unref(selectedList),
+          };
+          console.log("params", params);
+          try {
+            await BatchOwnerUserCarno(params);
+            showToast("设置成功");
+            confirm.value.close();
+            drawer.value.popup.close();
+            emits("change", unref(selectedList));
+          } catch {
+            confirm.value.closeLoading();
+          }
+        },
+      });
+    } else {
+      const params = {
+        oprType: "SetLabel",
+        setType: "KeepAdd",
+        carList: props.carList,
+        labelList: unref(selectedList),
+      };
+      console.log("params", params);
+      try {
+        confirmLoading.value = true;
+        await BatchOwnerUserCarno(params);
+        showToast("设置成功");
+        drawer.value.popup.close();
+        emits("change", unref(selectedList));
+      } finally {
+        confirmLoading.value = false;
+      }
+    }
   } else {
     emits("update:modelValue", unref(selectedList));
     emits("change", unref(selectedList));
@@ -279,6 +357,7 @@ function handleConfirm() {
 
 // 暴露方法
 function open() {
+  isEdit.value = false;
   getList();
   drawer.value.popup.open();
 }

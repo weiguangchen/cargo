@@ -41,7 +41,6 @@
             text="删除标签"
             color="#fff"
             @click="handleDelete"
-            :loading="loading"
             :custom-style="{
               borderRadius: '8px',
               height: '96rpx',
@@ -68,7 +67,7 @@
 </template>
 
 <script setup>
-import { ref, reactive } from "vue";
+import { ref, unref, reactive } from "vue";
 import { UptOwnerLabel, DelteOwnerLabel } from "@/api/index.js";
 import { showToast } from "@/utils/index.js";
 
@@ -126,6 +125,7 @@ async function handleAdd() {
   }
 }
 async function handleDelete() {
+  if (unref(loading)) return;
   confirm.value.confirm({
     title: "确定删除标签？",
     content: "仅删除标签，相关的车辆不会被影响",

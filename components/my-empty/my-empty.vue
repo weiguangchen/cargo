@@ -8,7 +8,10 @@
       :duration="0"
       :custom-style="{ marginBottom: '28rpx' }"
     />
-    <view class="text">{{ text }}</view>
+    <view class="text">
+      <slot name="text" v-if="$slots.text">{{ text }}</slot>
+      <template v-else>{{ text }}</template>
+    </view>
     <uv-button
       v-if="showButton"
       :text="buttonText"

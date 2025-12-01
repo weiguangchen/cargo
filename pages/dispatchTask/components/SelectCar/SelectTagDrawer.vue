@@ -21,6 +21,14 @@
           :showImg="false"
           text="暂无搜索结果"
         />
+        <my-empty v-else-if="list.length === 0" :showImg="false">
+          <template #text>
+            <view style="text-align: center">暂未设置标签</view>
+            <view style="text-align: center"
+              >可前往「我的」-「车辆管理」为车辆添加标签</view
+            >
+          </template>
+        </my-empty>
         <scroll-view v-else scroll-y style="height: 100%">
           <view class="tag-list">
             <view
@@ -151,7 +159,7 @@ defineExpose({
     padding: 0 24rpx 20rpx;
   }
   .scroll-view {
-    height: 900rpx;
+    height: 648rpx;
 
     .tag-list {
       width: 100%;

@@ -23,7 +23,7 @@ import { ref, unref, onMounted, watch, computed } from "vue";
 import { GetOwnerLabel } from "@/api/index.js";
 import SelectCarTag from "./SelectCarTag.vue";
 
-const emits = defineEmits(["update:modelValue"]);
+const emits = defineEmits(["update:modelValue", "change"]);
 const props = defineProps({
   modelValue: {
     type: Array,
@@ -60,6 +60,7 @@ const inputText = computed(() => {
 // 添加标签成功
 async function tagChange(list) {
   emits("update:modelValue", list);
+  emits("change", list);
 }
 </script>
 
