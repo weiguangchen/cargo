@@ -185,12 +185,26 @@ function isSelected(item) {
 // 添加标签成功
 async function tagSuccess(data) {
   await getList();
-  // 处理标签被修改的情况
-  unref(selectedList).forEach((item) => {
-    if (item.Id === data.Id) {
-      item.LabelName = data.LabelName;
-    }
-  });
+
+  console.log("tagSuccess", data);
+  if (data.Id) {
+    // 处理标签被修改的情况
+    unref(selectedList).forEach((item) => {
+      if (item.Id === data.Id) {
+        item.LabelName = data.LabelName;
+      }
+    });
+  } else {
+    // 新增标签默认选中
+    unref(list).forEach((item) => {
+      if (item.LabelName === data.LabelName) {
+        unref(selectedList).push({
+          Id: item.Id,
+          LabelName: item.LabelName,
+        });
+      }
+    });
+  }
 
   emits("update:modelValue", unref(selectedList));
   emits("change", unref(selectedList));

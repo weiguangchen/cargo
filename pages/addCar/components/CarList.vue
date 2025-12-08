@@ -1,7 +1,7 @@
 <template>
-  <view class="identify-car-list" @click="openDrawer">
+  <view class="identify-car-list" @click="openDrawer()">
     <view>
-      <template v-if="selectedList.length === 0">
+      <template v-if="props.modelValue.length === 0">
         <view class="input-text placeholder" v-if="list.length === 0"
           >识别后自动添加</view
         >
@@ -10,6 +10,7 @@
       <view v-else class="input-text">{{ inputText }}</view>
     </view>
     <uv-icon
+      v-if="list.length !== 0"
       name="/static/images/arrow.png"
       width="24rpx"
       height="24rpx"
@@ -53,7 +54,12 @@ watch(
 );
 
 const selectCarDrawer = ref(null);
-function openDrawer() {
+function openDrawer(defaultSelectedList) {
+  console.log("openDrawer", defaultSelectedList);
+  if (props.list.length === 0) return;
+  selectedList.value = Array.isArray(defaultSelectedList)
+    ? [...defaultSelectedList]
+    : [...props.modelValue];
   selectCarDrawer.value.open();
 }
 // 控件显示文字

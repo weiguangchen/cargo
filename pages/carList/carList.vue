@@ -82,10 +82,10 @@
             </view>
           </view>
           <view v-if="searchTemp" class="total"
-            >- 已绑定 <text class="num">{{ list.length }}</text> 辆车 -</view
+            >- 搜索到 <text class="num">{{ list.length }}</text> 辆车 -</view
           >
           <view v-else class="total"
-            >- 搜索到 <text class="num">{{ list.length }}</text> 辆车 -</view
+            >- 已绑定 <text class="num">{{ list.length }}</text> 辆车 -</view
           >
         </view>
       </scroll-view>
@@ -390,6 +390,7 @@ function clear() {
               line-height: 36rpx;
               .line {
                 color: var(--divider);
+                margin: 0 8rpx;
               }
               &.no-tag {
                 color: var(--intr-color);

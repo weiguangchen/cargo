@@ -89,6 +89,7 @@
               v-model="identify"
               border="none"
               height="218rpx"
+              maxlength="-1"
               :textStyle="{
                 fontSize: '28rpx',
                 color: 'var(--title-color)',
@@ -105,10 +106,9 @@
           </view>
           <view class="close" v-if="isShowClear" @click="handleClear">
             <uv-icon
-              name="close"
-              size="11"
-              color="#ffffff"
-              customStyle="line-height: 12px"
+              name="/static/images/ui/clear.png"
+              width="60rpx"
+              height="60rpx"
             />
           </view>
         </view>
@@ -128,7 +128,7 @@
             @click="handleImage"
           />
           <uv-button
-            :text="identify ? '识别' : '粘贴并识别'"
+            :text="identify ? '智能识别' : '粘贴并识别'"
             color="linear-gradient( 270deg, #31CE57 0%, #07B130 100%)"
             :customStyle="{
               height: '72rpx',
@@ -191,7 +191,14 @@
 </template>
 
 <script setup>
-import { ref, unref, reactive, getCurrentInstance, computed } from "vue";
+import {
+  ref,
+  unref,
+  reactive,
+  getCurrentInstance,
+  computed,
+  nextTick,
+} from "vue";
 import CarNumber from "./components/CarNumber.vue";
 import CarTag from "./components/CarTag.vue";
 import CarList from "./components/CarList.vue";
@@ -397,22 +404,28 @@ async function handleMatch() {
   if (unref(identify)) {
     const list = matchText(unref(identify));
     matchList.value = list;
+    await nextTick();
     if (list.length > 0) {
-      unref(carListRef).open();
+      unref(carListRef).open(list);
     }
     return;
   }
 
-  try {
-    const res = await wx.getClipboardData();
-    identify.value = strIsEmpty(res.data) ? "" : res.data;
-    console.log("res", res);
-    const list = matchText(res.data);
-    matchList.value = list;
-    if (list.length > 0) {
-      unref(carListRef).open();
-    }
-  } catch {}
+  const res = await wx.getClipboardData();
+  if (!res.data) {
+    uni.showToast({
+      title: "暂无可粘贴内容",
+      icon: "none",
+    });
+    return;
+  }
+  identify.value = strIsEmpty(res.data) ? "" : res.data;
+  const list = matchText(res.data);
+  matchList.value = list;
+  await nextTick();
+  if (list.length > 0) {
+    unref(carListRef).open(list);
+  }
 }
 
 function matchText(text) {
@@ -518,10 +531,10 @@ async function handleBatchAdd() {
       display: flex;
 
       .close {
-        width: 20px;
-        height: 20px;
-        border-radius: 100px;
-        background-color: #c6c7cb;
+        // width: 20px;
+        // height: 20px;
+        // border-radius: 100px;
+        // background-color: #c6c7cb;
         align-self: flex-start;
         display: flex;
         align-items: center;
