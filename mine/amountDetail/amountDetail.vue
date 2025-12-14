@@ -1,7 +1,5 @@
 <template>
-  <page-meta
-    :page-style="'overflow:' + (show ? 'hidden' : 'visible')"
-  ></page-meta>
+  <page-meta :page-style="`overflow:${show ? 'hidden' : 'visible'}`" />
   <view class="page-container">
     <!-- 导航 -->
     <uv-navbar placeholder @leftClick="leftClick">
@@ -80,7 +78,7 @@
             <template v-else>- </template>
             {{ item.Amount }}
           </view>
-          <view class="rest"> 余额：{{ item.Balance || "-" }}</view>
+          <view class="rest"> 余额：{{ item.TotalBalance || "-" }}</view>
         </view>
       </view>
       <uv-load-more
@@ -105,7 +103,6 @@ import { GetCustomerAmountDetail } from "@/api/index.js";
 import { formatNumberToThousand } from "@/utils/index.js";
 import dayjs from "dayjs";
 import { onLoad, onReachBottom } from "@dcloudio/uni-app";
-import useList from "@/hooks/useList.js";
 
 const customerId = ref("");
 const supplyId = ref("");
@@ -120,7 +117,7 @@ onLoad(() => {
     supplyId.value = data?.supplyId ?? "";
     customerName.value = data?.customerName ?? "";
 
-    fetchData(true);
+    getList(true);
   });
 });
 
@@ -153,26 +150,46 @@ const params = ref({
   startTime: dayjs().format("YYYY-MM-DD"),
   endTime: dayjs().format("YYYY-MM-DD"),
 });
-const listParams = computed(() => {
-  const { startTime, endTime } = params.value;
-  return {
-    customerId: unref(customerId),
-    supplyId: unref(supplyId),
-    payType: unref(status),
-    startTime,
-    endTime,
-  };
-});
-const { list, noMore, loading, fetchData } = useList({
-  api: GetCustomerAmountDetail,
-  params: listParams,
-  callback(res) {
-    console.log("callback", res);
+
+const list = ref([]);
+const HasNextPage = ref(true);
+const lastCursor = ref("");
+const loading = ref(false);
+const pageSize = 10;
+async function getList(refresh = false) {
+  if (!refresh && !unref(HasNextPage)) {
+    return;
+  }
+  if (unref(loading)) {
+    return;
+  }
+  loading.value = true;
+
+  try {
+    const { startTime, endTime } = unref(params);
+    const newParams = {
+      lastCursor: refresh ? "" : unref(lastCursor),
+      pageSize,
+      customerId: unref(customerId),
+      supplyId: unref(supplyId),
+      payType: unref(status),
+      startTime,
+      endTime,
+    };
+    const res = await GetCustomerAmountDetail(newParams);
+    list.value = refresh ? res.list : [...list.value, ...res.list];
+    HasNextPage.value = res.HasNextPage;
+    lastCursor.value = res.NextCursor;
+
     payAmountTotal.value = res.payAmountTotal;
     inAmountTotal.value = res.inAmountTotal;
     wegAdjTotal.value = res.wegAdjTotal;
-  },
-});
+  } catch (err) {
+    console.log("err", err);
+  } finally {
+    loading.value = false;
+  }
+}
 
 const title = computed(() => {
   let date = "";
@@ -218,14 +235,10 @@ const title = computed(() => {
 
 function changeTab(value) {
   status.value = value;
-  fetchData(true);
+  getList(true);
 }
 onReachBottom(() => {
-  const last = unref(list)[unref(list).length - 1];
-  fetchData(false, {
-    Id: last?.Id,
-    timeStamp: last?.Paytime ? dayjs(last?.Paytime).valueOf() : "",
-  });
+  getList();
 });
 
 const filter = ref();
@@ -234,7 +247,7 @@ async function changeFilter(data) {
   console.log("changeFilter", data);
   isFiltering.value = true;
   params.value = data;
-  await fetchData(true);
+  await getList(true);
   isFiltering.value = false;
 }
 

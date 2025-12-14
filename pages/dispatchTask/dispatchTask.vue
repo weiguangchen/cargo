@@ -188,7 +188,7 @@
       </uv-form-item>
       <uv-form-item label="车牌限制" prop="Carno">
         <view style="display: flex; justify-content: flex-end">
-          <SelectCar v-model="model.Carno" />
+          <SelectCar ref="selectCarRef" v-model="model.Carno" />
         </view>
       </uv-form-item>
     </view>
@@ -243,6 +243,7 @@
     </view>
   </uv-form>
 
+  <!-- 底部 -->
   <view class="page-footer">
     <view class="left">
       <view class="price-wrapper">
@@ -254,7 +255,14 @@
               style="float: left; margin-top: 4rpx"
               >-</view
             >
-            <text v-else>¥ {{ totalPrice }}</text>
+            <text v-else
+              >¥
+              {{
+                Big(totalPrice).eq(0)
+                  ? "0.00"
+                  : formatNumberToThousand(totalPrice)
+              }}
+            </text>
             <view style="float: right; margin-left: 8rpx; margin-top: 16rpx">
               <uv-icon
                 name="arrow-right"
@@ -275,7 +283,14 @@
               style="float: left; margin-top: 4rpx"
               >-</text
             >
-            <text v-else>¥ {{ balancePrice }}</text>
+            <text v-else
+              >¥
+              {{
+                Big(balancePrice).eq(0)
+                  ? "0.00"
+                  : formatNumberToThousand(balancePrice)
+              }}</text
+            >
             <view style="float: right; margin-left: 8rpx; margin-top: 16rpx">
               <uv-icon
                 name="arrow-right"
@@ -298,8 +313,19 @@
         @click="submit"
       />
     </view>
-    <view class="warning" v-if="tipContent">{{ tipContent }}</view>
+    <view
+      class="warning"
+      :style="{
+        backgroundColor:
+          tipType === FOOTER_TIP_TYPE.NOBALANCE
+            ? 'var(--red-color)'
+            : '#fc7e2c',
+      }"
+      v-if="tipContent"
+      >{{ tipContent }}</view
+    >
   </view>
+  <!-- end -->
 
   <!-- 时间 -->
   <uv-datetime-picker
@@ -346,9 +372,9 @@
   />
 
   <!-- 账户限额 -->
-  <AccountLimitDrawer ref="accountLimit" />
+  <AccountLimitDrawer ref="accountLimit" :owner="owner" />
   <!-- 预估价格 -->
-  <EstimatePriceDrawer ref="estimatePrice" />
+  <EstimatePriceDrawer ref="estimatePrice" :order="order" />
 </template>
 
 <script setup>
@@ -373,8 +399,7 @@ import {
 } from "@/api/index.js";
 import { getToken } from "@/utils/token.js";
 import ResultDrawer from "./components/ResultDrawer.vue";
-import { formatDateTime } from "@/utils";
-
+import { formatDateTime, formatNumberToThousand } from "@/utils";
 const eventChannel = ref();
 onLoad(() => {
   const instance = getCurrentInstance().proxy;
@@ -417,6 +442,7 @@ function selectAddress(type) {
             noticeModal.value.open();
           }
           model.OwnerId = "";
+          owner.value = null;
           order.value = null;
           orderList.value = [];
           getCargpOptions();
@@ -524,6 +550,7 @@ const model = reactive({
   Memo: "",
   validHour: "",
 });
+const owner = ref(); //当前所选的货主信息
 const rules = ref({
   OwnerId: [
     {
@@ -539,7 +566,7 @@ const cargoLoading = ref(false);
 const cargoOptions = ref([]);
 const supplyIsOffline = ref("0"); //2：离线-不可派车，1：离线-可派车，0:正常
 const supplyPromptContent = ref("");
-const supplyPromptType = ref("1");
+const supplyPromptType = ref("0"); // 1 展示 0 不展示
 async function getCargpOptions() {
   if (!supply.value.Id) {
     return;
@@ -560,7 +587,7 @@ async function getCargpOptions() {
     model.validHour = res?.validHour ?? "";
     showTimeSelect.value = !res.validHour;
     supplyIsOffline.value = res?.IsOffline ?? "0";
-    supplyPromptType.value = res?.PromptType ?? "1";
+    supplyPromptType.value = res?.PromptType ?? "0";
     supplyPromptContent.value = res?.PromptContent ?? "";
     if (model.validHour) {
       endTime.value = roundTimeToNextTenMinute()
@@ -570,6 +597,7 @@ async function getCargpOptions() {
 
     if (res?.list?.length === 1) {
       model.OwnerId = res?.list?.[0]?.Id ?? "";
+      owner.value = res?.list?.[0] ?? null;
       getOrder();
     }
   } finally {
@@ -621,7 +649,8 @@ function openOrder() {
   }
   orderDrawer.value.popup.open();
 }
-
+// 选择车牌组件
+const selectCarRef = ref();
 function selectOrder(item) {
   order.value = item;
   orderDrawer.value.popup.close();
@@ -630,71 +659,123 @@ function selectOrder(item) {
 // 预估
 const totalPrice = computed(() => {
   let price = Big(0).toFixed(2);
-  if (!order.value) return price;
   if (
+    !order.value ||
     !order.value.MaterialsList ||
     (order.value.MaterialsList && order.value.MaterialsList.length === 0)
   )
-    return price;
+    return Big(0).toFixed(2);
   const total = order.value.MaterialsList.map((m) => {
     const { TaxPrice, Limittype, EstimiteWeight, EstimiteTimes } = m;
     const SingleWeight = order.value.SingleWeight;
-    if (Limittype === "0") price = Big(0).toFixed(2);
-    if (Limittype === "1")
-      price = Big(EstimiteWeight || 0)
+    if (Limittype === "0") return 0;
+    if (Limittype === "1") {
+      return Big(EstimiteWeight || 0)
         .times(TaxPrice || 0)
-        .toFixed(2);
-    if (Limittype === "2")
-      price = Big(EstimiteTimes || 0)
+        .toNumber();
+    }
+    if (Limittype === "2") {
+      return Big(EstimiteTimes || 0)
         .times(SingleWeight || 0)
         .times(TaxPrice || 0)
-        .toFixed(2);
-    console.log("price", price);
+        .toNumber();
+    }
     return price;
-  }).reduce((p, n) => Big(p).plus(n).toFixed(2), 0);
+  }).reduce((p, n) => Big(p).plus(n).toNumber(), 0);
   console.log("total", total, order.value.MaterialsList);
   return total;
 });
-
+// 可用
 const balancePrice = computed(() => {
   let price = Big(0).toFixed(2);
-  if (!order.value) return price;
-  return Big(order.value.Balance || 0).toFixed(2);
+  if (!owner.value) return price;
+  return owner.value.Balance || 0;
+});
+// 底部警告横幅
+const FOOTER_TIP_TYPE = {
+  NORMAL: "0", // 正常
+  OFFLINE: "1", // 离线
+  NOBALANCE: "2", // 余额不足
+  WARNING: "3", // 警告
+};
+const tipType = ref(FOOTER_TIP_TYPE.NORMAL);
+const tipContent = computed(() => {
+  // 离线派车
+  if (unref(supply) && supplyPromptType.value === "1") {
+    tipType.value = FOOTER_TIP_TYPE.OFFLINE;
+    return unref(supplyPromptContent);
+  }
+
+  if (unref(owner) && unref(order)) {
+    // 判断用户是否已经选择了物料
+    const existMat =
+      unref(order)?.MaterialsList.some(
+        (m) => m.Limittype === "1" || m.Limittype === "2"
+      ) ?? false;
+
+    // 「预估」小于「可用」时，可用额度不足
+    if (existMat && Big(unref(totalPrice)).gt(unref(balancePrice))) {
+      tipType.value = FOOTER_TIP_TYPE.NOBALANCE;
+      return "可用额度不足，无法派车，请及时充值";
+    }
+    // 「预估」-「可用」小于「订单中的AlertBalance」
+    if (
+      existMat &&
+      Big(unref(totalPrice))
+        .minus(unref(balancePrice))
+        .lt(unref(owner).AlertBalance)
+    ) {
+      tipType.value = FOOTER_TIP_TYPE.WARNING;
+      return "可用额度较低，后续存在车辆无法装运风险，建议及时充值";
+    }
+  }
+
+  tipType.value = FOOTER_TIP_TYPE.NORMAL;
+  return "";
 });
 
 const accountLimit = ref(null);
 function handleAccountLimit() {
-  return;
+  if (!model.OwnerId) {
+    uni.showToast({
+      title: "请先确定货主公司",
+      icon: "none",
+    });
+    return;
+  }
   accountLimit.value.open();
 }
 const estimatePrice = ref(null);
 function handleEstimatePrice() {
-  return;
+  console.log("order", order.value);
+
+  if (!unref(order)) {
+    uni.showToast({
+      title: "请选择订单",
+      icon: "none",
+    });
+    return;
+  }
+
+  const noMaterial = unref(order)?.MaterialsList.every(
+    (m) => m.Limittype === "0" || m.Limittype === "3"
+  );
+  if (unref(order)?.MaterialsList?.length === 0 || noMaterial) {
+    uni.showToast({
+      title: "请先选择派车物料",
+      icon: "none",
+    });
+    return;
+  }
   estimatePrice.value.open();
 }
-
-// 底部警告横幅
-const tipContent = computed(() => {
-  // 离线派车
-  if (supplyPromptType.value === "1") {
-    return unref(supplyPromptContent);
-  }
-  // 需要充值
-  if (!order.value) return "";
-  const limit = Big(order.value.AlertBalance || 0);
-  const total = Big(order.value.Balance || 0)
-    .plus(order.value.CreditBalance || 0)
-    .minus(totalPrice.value);
-  if (total.lt(limit)) return "余额较低，存在车辆无法装运风险，请及时充值";
-  return "";
-});
 
 // 提交
 const submiting = ref(false);
 const resultDrawer = ref();
 const disabledScroll = ref(false);
 async function submit() {
-  console.log("order", order.value);
+  // console.log("order", order.value);
   if (!supply.value) {
     uni.showToast({
       title: "请选择装货地",
@@ -723,6 +804,16 @@ async function submit() {
     });
     return;
   }
+  // 如果用户没维护过车辆，则提示用户维护车辆
+  if (unref(selectCarRef).carList.length === 0) {
+    uni.showToast({
+      title: "请添加派车车辆",
+      icon: "none",
+    });
+    unref(selectCarRef).open();
+    return;
+  }
+
   const hasMaterial = order.value.MaterialsList.some((m) => {
     return ["1", "2", "3"].includes(m.Limittype);
   });
@@ -733,6 +824,15 @@ async function submit() {
     });
     return;
   }
+
+  if (unref(tipType) === FOOTER_TIP_TYPE.NOBALANCE) {
+    uni.showToast({
+      title: "可用额度不足",
+      icon: "none",
+    });
+    return;
+  }
+
   const params = {
     Supply: supply.value.Id, //生产企业主键
     OwnerId: model.OwnerId, //货主主键

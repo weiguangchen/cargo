@@ -52,13 +52,10 @@ const defaultOptions = [
 const options = ref([...defaultOptions]);
 
 watch(
-  () => props.supplyIsOffline,
-  (supplyIsOffline) => {
-    console.log("myRadio", supplyIsOffline);
-    if (supplyIsOffline == "0") {
-      options.value = [...defaultOptions];
-    }
-    if (supplyIsOffline == "1") {
+  () => props.record,
+  (newVal) => {
+    console.log("myRadio record ", newVal);
+    if (newVal.LeftStatus === "tempAssign") {
       options.value = [
         {
           value: "0",
@@ -70,7 +67,21 @@ watch(
         },
       ];
     }
-    if (supplyIsOffline == "2") {
+    if (newVal.LeftStatus === "canAssign") {
+      options.value = [...defaultOptions];
+    }
+    if (newVal.LeftStatus === "noLimit") {
+      options.value = [...defaultOptions];
+    }
+    if (newVal.LeftStatus === "limitReached") {
+      options.value = [
+        {
+          value: "0",
+          label: "不装运",
+        },
+      ];
+    }
+    if (newVal.LeftStatus === "other") {
       options.value = [
         {
           value: "0",
@@ -86,21 +97,8 @@ watch(
 
 function select(item) {
   console.log("select", item, props.record);
-  if (item.value === "0" || item.value === "3") {
-    emits("update:modelValue", item.value);
-    emits("change", item.value);
-    return;
-  }
-
-  if (props.record.LeftStatus === "0") {
-    uni.showToast({
-      title: "订单剩余量过低，不满足装运条件",
-      icon: "none",
-    });
-  } else if (props.record.LeftStatus === "1") {
-    emits("update:modelValue", item.value);
-    emits("change", item.value);
-  }
+  emits("update:modelValue", item.value);
+  emits("change", item.value);
 }
 </script>
 

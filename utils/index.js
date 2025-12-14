@@ -1,3 +1,5 @@
+import Big from "big.js";
+
 export function sleep(time = 2000) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
@@ -66,11 +68,11 @@ export function formatDateTime(date) {
 /**
  * 数字转为千分位
  */
-export function formatNumberToThousand(value) {
+export function formatNumberToThousand(value, fixed = -1) {
   const isNumber = typeof value === "number" && !isNaN(value);
   if (!isNumber) return "";
   // 将数字转换为字符串
-  const numStr = value.toString();
+  const numStr = fixed === -1 ? value.toString() : Big(value).toFixed(fixed);
   // 使用正则表达式来插入逗号
   return numStr.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
@@ -96,4 +98,9 @@ export function showToast(msg, timer = 1500) {
       resolve();
     }, timer);
   });
+}
+
+// 判断数字是不是负数
+export function isNegativeNumber(num) {
+  return Big(num).lt(0);
 }

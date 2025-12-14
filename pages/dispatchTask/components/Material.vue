@@ -35,15 +35,27 @@
     @confirm="confirm"
   >
     <template #title>
-      <view style="margin-bottom: 8rpx">{{ model.SSMaterialName }} </view>
-      <view
+      <view class="material-drawer-title">
+        <view class="main-title">{{ model.SSMaterialName }}</view>
+
+        <view class="sub-title" @click="clickSubTitle">
+          <rich-text :nodes="model.DetailTxt" />
+          <uv-icon
+            v-if="subTitleCanClickType.includes(model.LeftStatus)"
+            name="/static/images/dispatchTask/arrow.png"
+            width="32rpx"
+            height="32rpx"
+          />
+        </view>
+      </view>
+      <!-- <view
         style="font-size: 26rpx; color: var(--sub-color); line-height: 32rpx"
       >
         <template v-if="model.LeftWeight"
           >订单剩余量 {{ model.LeftWeight }} 吨</template
         >
         <template v-else>不限制装运量</template>
-      </view>
+      </view> -->
     </template>
     <view class="drawer-form">
       <uv-form
@@ -99,7 +111,7 @@
             <my-number-box
               v-model="model.EstimiteTimes"
               decimal-length="0"
-              :max="maxCarNumber"
+              :max="model.LeftCarTimes != null ? model.LeftCarTimes : undefined"
               :max-limit-msg="(max) => `车次最多为${max}`"
               :min="1"
               :min-limit-msg="(min) => `车次最少为${min}`"
@@ -110,13 +122,18 @@
       </uv-form>
     </view>
   </my-drawer>
+
+  <!-- subtitle弹窗 -->
+  <MaterialLimitDrawer ref="limitDrawer" :material="modelValue" />
 </template>
 
 <script setup>
-import { nextTick, ref, computed, watchEffect } from "vue";
+import { nextTick, ref, unref, watchEffect } from "vue";
 import MyRadio from "./MyRadio.vue";
 import Big from "big.js";
 import { sleep } from "@/utils/index.js";
+import MaterialLimitDrawer from "./MaterialLimitDrawer.vue";
+
 const props = defineProps({
   modelValue: {
     type: Object,
@@ -152,17 +169,6 @@ watchEffect(() => {
   };
 });
 
-// 当选择按车次时,根据每辆车能装运重量计算出最多能选择多少车次
-const maxCarNumber = computed(() => {
-  if (!props.modelValue.LeftWeight || !props.order.SingleWeight)
-    return undefined;
-  const no = Big(props.modelValue.LeftWeight)
-    .div(props.order.SingleWeight)
-    .toFixed(0);
-  console.log("maxCarNumber", no);
-  return +no;
-});
-
 const drawer = ref();
 function openDrawer() {
   model.value = {
@@ -173,6 +179,24 @@ function openDrawer() {
   };
   drawer.value.popup.open();
 }
+
+// LeftStatus:
+// tempAssign：仅允许临时派车，展示不装运、临时装运，两个按钮
+// canAssign：可派车，展示不装运、按重量、按车次，三个按钮
+// noLimit：不限制装运量，展示不装运、按重量、按车次，三个按钮
+// limitReached：派车量已达上限，展示不装运，一个按钮
+// other：其他，只展示不装运一个按钮，比如物料管控中，或断网情况但未开启离线派单功能
+// tempAssign、noLimit、other类型没有>这个符号，不可点击
+const limitDrawer = ref();
+// 哪些状态的副标题可以点击
+const subTitleCanClickType = ref(["canAssign", "limitReached"]);
+// 点击副标题
+function clickSubTitle() {
+  if (!unref(subTitleCanClickType).includes(model.value.LeftStatus)) return;
+
+  unref(limitDrawer).open();
+}
+
 async function typeChange() {
   await nextTick();
   drawer.value.resize();
@@ -215,6 +239,24 @@ async function confirm() {
   }
 }
 
+.material-drawer-title {
+  .main-title {
+    line-height: 48rpx;
+    margin-bottom: 8rpx;
+  }
+  .sub-title {
+    display: flex;
+    align-items: center;
+    font-weight: 400;
+    font-size: 26rpx;
+    color: var(--content-color);
+    line-height: 32rpx;
+    .numgreen {
+      color: var(--dark-main);
+      font-family: misans600;
+    }
+  }
+}
 .drawer-form {
   padding: 0 32rpx;
 }

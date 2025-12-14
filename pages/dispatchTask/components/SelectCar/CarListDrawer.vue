@@ -106,7 +106,7 @@ const props = defineProps({
     default: () => [],
   },
 });
-const emits = defineEmits(["update:modelValue", "change"]);
+const emits = defineEmits(["update:modelValue", "change", "changeList"]);
 
 const drawer = ref(null);
 
@@ -132,6 +132,7 @@ async function getList() {
       carno: unref(carno),
     });
     list.value = res || [];
+    emits("changeList", unref(list));
   } catch {
   } finally {
     loading.value = false;

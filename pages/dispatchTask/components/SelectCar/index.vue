@@ -1,8 +1,9 @@
 <template>
   <view class="select-car-wrapper" @click="openDrawer">
-    <view class="placeholder" v-if="selectedList.length === 0"
-      >全部绑定车辆</view
-    >
+    <view class="placeholder" v-if="selectedList.length === 0">
+      <template v-if="carList.length === 0">请先添加车辆</template>
+      <template v-else>全部绑定车辆</template>
+    </view>
     <view v-else class="input-text">{{ inputText }}</view>
     <uv-icon
       name="/static/images/arrow.png"
@@ -15,6 +16,7 @@
     ref="carListDrawer"
     v-model="selectedList"
     @change="tagChange"
+    @changeList="changeList"
   />
 </template>
 
@@ -22,7 +24,7 @@
 import { ref, unref, watch, computed } from "vue";
 import CarListDrawer from "./CarListDrawer.vue";
 
-const emits = defineEmits(["update:modelValue"]);
+const emits = defineEmits(["update:modelValue", "changeList"]);
 const props = defineProps({
   modelValue: {
     type: Array,
@@ -42,6 +44,14 @@ watch(
   }
 );
 
+// 获取车辆列表
+const carList = ref([]);
+function changeList(list) {
+  console.log("changeList", list);
+  carList.value = list;
+  emits("changeList", list);
+}
+
 const carListDrawer = ref(null);
 function openDrawer() {
   carListDrawer.value.open();
@@ -59,6 +69,11 @@ const inputText = computed(() => {
 async function tagChange(list) {
   emits("update:modelValue", list);
 }
+
+defineExpose({
+  carList,
+  open: openDrawer,
+});
 </script>
 
 <style lang="scss" scoped>

@@ -117,3 +117,38 @@ page {
 .clickable {
   background-color: var(--clickable);
 }
+
+//item
+.my-item {
+  height: 112rpx;
+  padding: 0 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 24rpx;
+  background-color: #ffffff;
+  font-size: 28rpx;
+  margin-bottom: 20rpx;
+  &-title {
+    color: var(--content-color);
+  }
+  &-value {
+    font-weight: 600;
+    color: var(--title-color);
+  }
+}
+
+.my-item-list {
+  border-radius: 24rpx;
+  background-color: #ffffff;
+  padding: 0 24rpx;
+  margin-bottom: 20rpx;
+  .my-item {
+    border-radius: 0;
+    padding: 0 4rpx;
+    &:not(:last-child) {
+      border-bottom: 1rpx solid var(--divider);
+      margin-bottom: 16rpx;
+    }
+  }
+}
