@@ -30,7 +30,6 @@
               placeholder="请输入，最多 6 字"
               inputAlign="right"
               border="none"
-              maxlength="6"
             />
           </uv-form-item>
         </uv-form>
@@ -84,6 +83,10 @@ const rules = ref({
     {
       required: true,
       message: "请填写标签名称",
+    },
+    {
+      max: 6,
+      message: "标签名称最多 6 个字",
     },
   ],
 });

@@ -8,7 +8,7 @@
     <view class="status">
       <template v-if="modelValue.Limittype === '0'">不装运</template>
       <template v-if="modelValue.Limittype === '1'"
-        >{{ modelValue.EstimiteWeight }} 吨</template
+        >{{ modelValue.EstimiteWeight }} {{ modelValue.Unit }}</template
       >
       <template v-if="modelValue.Limittype === '2'"
         >{{ modelValue.EstimiteTimes }} 车次</template
@@ -48,14 +48,6 @@
           />
         </view>
       </view>
-      <!-- <view
-        style="font-size: 26rpx; color: var(--sub-color); line-height: 32rpx"
-      >
-        <template v-if="model.LeftWeight"
-          >订单剩余量 {{ model.LeftWeight }} 吨</template
-        >
-        <template v-else>不限制装运量</template>
-      </view> -->
     </template>
     <view class="drawer-form">
       <uv-form
@@ -92,10 +84,11 @@
               v-model="model.EstimiteWeight"
               decimal-length="2"
               :max="model.LeftWeight !== null ? model.LeftWeight : undefined"
-              :max-limit-msg="(max) => `重量最多为${max}吨`"
+              :max-limit-msg="(max) => `重量最多为${max}${model.Unit}`"
               :min="model.minWgtLeft"
-              :min-limit-msg="(min) => `重量最少为${min}吨`"
+              :min-limit-msg="(min) => `重量最少为${min}${model.Unit}`"
               :step="10"
+              :unit="model.Unit"
             />
           </view>
         </uv-form-item>

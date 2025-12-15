@@ -61,7 +61,9 @@ const list = computed(() => {
   if (!props.order) return [];
   return props.order.MaterialsList.filter((m) => m.Limittype !== "0").map(
     (m) => {
-      if (m.Limittype === "1") m._weight = m.EstimiteWeight;
+      if (m.Limittype === "1") {
+        m._weight = big(m.EstimiteWeight || 0).toNumber();
+      }
       if (m.Limittype === "2")
         m._weight = big(m.EstimiteTimes || 0)
           .times(props.order.SingleWeight || 0)

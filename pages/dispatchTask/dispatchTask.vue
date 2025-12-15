@@ -263,7 +263,10 @@
                   : formatNumberToThousand(totalPrice)
               }}
             </text>
-            <view style="float: right; margin-left: 8rpx; margin-top: 16rpx">
+            <view
+              v-if="supplyIsOffline === '0'"
+              style="float: right; margin-left: 8rpx; margin-top: 16rpx"
+            >
               <uv-icon
                 name="arrow-right"
                 color="var(--red-color)"
@@ -291,7 +294,10 @@
                   : formatNumberToThousand(balancePrice)
               }}</text
             >
-            <view style="float: right; margin-left: 8rpx; margin-top: 16rpx">
+            <view
+              v-if="supplyIsOffline === '0'"
+              style="float: right; margin-left: 8rpx; margin-top: 16rpx"
+            >
               <uv-icon
                 name="arrow-right"
                 color="var(--sub-color)"
@@ -736,6 +742,10 @@ const tipContent = computed(() => {
 
 const accountLimit = ref(null);
 function handleAccountLimit() {
+  if (["1", "2"].includes(supplyIsOffline.value)) {
+    return;
+  }
+
   if (!model.OwnerId) {
     uni.showToast({
       title: "请先确定货主公司",
@@ -747,6 +757,9 @@ function handleAccountLimit() {
 }
 const estimatePrice = ref(null);
 function handleEstimatePrice() {
+  if (["1", "2"].includes(supplyIsOffline.value)) {
+    return;
+  }
   console.log("order", order.value);
 
   if (!unref(order)) {

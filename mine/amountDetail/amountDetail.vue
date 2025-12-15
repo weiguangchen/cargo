@@ -82,7 +82,7 @@
         </view>
       </view>
       <uv-load-more
-        :status="noMore ? 'nomore' : loading ? 'loading' : 'loadmore'"
+        :status="!HasNextPage ? 'nomore' : loading ? 'loading' : 'loadmore'"
       />
     </view>
     <template v-else>

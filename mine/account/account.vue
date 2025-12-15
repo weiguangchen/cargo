@@ -378,6 +378,7 @@ page {
   max-width: 375px !important;
   .uv-toast__content__text {
     max-width: 375px !important;
+    width: auto !important;
   }
 }
 </style>
