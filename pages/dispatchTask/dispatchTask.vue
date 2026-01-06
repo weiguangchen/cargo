@@ -181,11 +181,13 @@
       </uv-form-item>
     </view>
     <view class="form-item-wrapper">
-      <uv-form-item label="车辆类型限制" prop="CarType">
-        <view style="display: flex; justify-content: flex-end">
-          <SelectCarType v-model="model.CarType" />
-        </view>
-      </uv-form-item>
+      <view class="my-border-bottom">
+        <uv-form-item label="车辆类型限制" prop="CarType">
+          <view style="display: flex; justify-content: flex-end">
+            <SelectCarType v-model="model.CarType" />
+          </view>
+        </uv-form-item>
+      </view>
       <uv-form-item label="车牌限制" prop="Carno">
         <view style="display: flex; justify-content: flex-end">
           <SelectCar ref="selectCarRef" v-model="model.Carno" />
@@ -260,20 +262,18 @@
               {{
                 Big(totalPrice).eq(0)
                   ? "0.00"
-                  : formatNumberToThousand(totalPrice)
+                  : formatNumberToThousand(totalPrice, 2)
               }}
             </text>
-            <view
+            <uv-icon
               v-if="supplyIsOffline === '0'"
-              style="float: right; margin-left: 8rpx; margin-top: 16rpx"
-            >
-              <uv-icon
-                name="arrow-right"
-                color="var(--red-color)"
-                bold
-                size="18rpx"
-              />
-            </view>
+              name="/static/images/dispatchTask/footer-arrow2.png"
+              width="16rpx"
+              height="32rpx"
+              :customStyle="{
+                marginLeft: '8rpx',
+              }"
+            />
           </view>
         </view>
       </view>
@@ -291,20 +291,18 @@
               {{
                 Big(balancePrice).eq(0)
                   ? "0.00"
-                  : formatNumberToThousand(balancePrice)
+                  : formatNumberToThousand(balancePrice, 2)
               }}</text
             >
-            <view
+            <uv-icon
               v-if="supplyIsOffline === '0'"
-              style="float: right; margin-left: 8rpx; margin-top: 16rpx"
-            >
-              <uv-icon
-                name="arrow-right"
-                color="var(--sub-color)"
-                bold
-                size="18rpx"
-              />
-            </view>
+              name="/static/images/dispatchTask/footer-arrow1.png"
+              width="16rpx"
+              height="32rpx"
+              :customStyle="{
+                marginLeft: '8rpx',
+              }"
+            />
           </view>
         </view>
       </view>
@@ -588,6 +586,7 @@ async function getCargpOptions() {
       res?.list?.map((m) => ({
         value: m.Id,
         label: m.Ownername,
+        ...m,
       })) ?? [];
     // 设置结束时间范围
     model.validHour = res?.validHour ?? "";
@@ -620,9 +619,12 @@ function cargoDisabledClick() {
     icon: "none",
   });
 }
-function cargoChange(val) {
+function cargoChange(val, item) {
+  console.log("cargoCHange", val, item);
   order.value = null;
   orderList.value = [];
+  const { value, label, ...rest } = item;
+  owner.value = rest;
   getOrder();
 }
 // 选择订单
@@ -694,8 +696,11 @@ const totalPrice = computed(() => {
 // 可用
 const balancePrice = computed(() => {
   let price = Big(0).toFixed(2);
-  if (!owner.value) return price;
-  return owner.value.Balance || 0;
+  if (unref(owner)) {
+    return unref(owner).Balance || 0;
+  } else {
+    return price;
+  }
 });
 // 底部警告横幅
 const FOOTER_TIP_TYPE = {
@@ -725,10 +730,14 @@ const tipContent = computed(() => {
       return "可用额度不足，无法派车，请及时充值";
     }
     // 「预估」-「可用」小于「订单中的AlertBalance」
+    console.log(
+      "tipContent",
+      Big(unref(totalPrice)).minus(unref(balancePrice)).toNumber()
+    );
     if (
       existMat &&
-      Big(unref(totalPrice))
-        .minus(unref(balancePrice))
+      Big(unref(balancePrice))
+        .minus(unref(totalPrice))
         .lt(unref(owner).AlertBalance)
     ) {
       tipType.value = FOOTER_TIP_TYPE.WARNING;
@@ -1189,6 +1198,10 @@ page {
       margin-left: 12rpx;
       font-size: 28rpx;
       font-family: misans500;
+      .price-box {
+        display: flex;
+        align-items: center;
+      }
     }
 
     .price1 {

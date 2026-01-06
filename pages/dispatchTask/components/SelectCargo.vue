@@ -88,7 +88,7 @@ function showDrawer() {
 function select(item) {
   innerValue.value = item.value;
   emits("update:modelValue", innerValue.value);
-  emits("change", innerValue.value);
+  emits("change", innerValue.value, item);
   ctx.$uv.formValidate(ctx, "change");
   drawer.value.popup.close();
 }

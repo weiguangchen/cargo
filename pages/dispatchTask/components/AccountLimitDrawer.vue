@@ -95,11 +95,13 @@ const props = defineProps({
 
 // 判断是否是负数
 function isNegative(num) {
-  return Big(num).lt(0);
+  return Big(num || 0).lt(0);
 }
 // bigjs把负数变成正数，正数不处理
 function abs(num) {
-  return Big(num).abs().toNumber();
+  return Big(num || 0)
+    .abs()
+    .toNumber();
 }
 
 const drawer = ref(null);
