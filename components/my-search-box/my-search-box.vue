@@ -14,6 +14,7 @@
       @update:modelValue="updateModelValue"
       @search="search"
       @clear="clear"
+      @change="change"
     />
     <view class="btn-wrapper" v-if="showBtn">
       <slot>
@@ -52,6 +53,7 @@ const emits = defineEmits([
   "search",
   "clear",
   "rightClick",
+  "change",
 ]);
 defineProps({
   placeholder: {
@@ -95,6 +97,9 @@ function clear() {
 }
 function rightClick() {
   emits("rightClick");
+}
+function change(value) {
+  emits("change", value);
 }
 </script>
 

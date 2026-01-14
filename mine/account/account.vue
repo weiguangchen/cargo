@@ -11,7 +11,7 @@
     text="暂无账户"
     height="100%"
   />
-  <template v-else>
+  <view class="account-list" v-else>
     <view
       class="account-item"
       v-for="item in list"
@@ -39,7 +39,12 @@
         >
         <text class="symbol">¥</text>
         <text class="num">{{
-          formatNumberToThousand(item.OwnerAccount.Banlance, 2)
+          formatNumberToThousand(
+            Big(item.OwnerAccount.Banlance || 0)
+              .abs()
+              .toNumber(),
+            2
+          )
         }}</text>
       </view>
       <view class="table-wrapper">
@@ -54,7 +59,10 @@
               >
               <text class="symbol">¥</text>
               <text class="num">{{
-                formatNumberToThousand(item.OwnerAccount.TotalBanlance, 2)
+                formatNumberToThousand(
+                  Big(item.OwnerAccount.TotalBanlance).abs().toNumber(),
+                  2
+                )
               }}</text>
             </view>
           </view>
@@ -68,7 +76,10 @@
               >
               <text class="symbol">¥</text>
               <text class="num">{{
-                formatNumberToThousand(item.OwnerAccount.Owing, 2)
+                formatNumberToThousand(
+                  Big(item.OwnerAccount.Owing).abs().toNumber(),
+                  2
+                )
               }}</text>
             </view>
           </view>
@@ -84,7 +95,10 @@
               >
               <text class="symbol">¥</text>
               <text class="num">{{
-                formatNumberToThousand(item.OwnerAccount.CreditAmount, 2)
+                formatNumberToThousand(
+                  Big(item.OwnerAccount.CreditAmount).abs().toNumber(),
+                  2
+                )
               }}</text>
             </view>
           </view>
@@ -98,7 +112,10 @@
               >
               <text class="symbol">¥</text>
               <text class="num">{{
-                formatNumberToThousand(item.OwnerAccount.AlertAmount, 2)
+                formatNumberToThousand(
+                  Big(item.OwnerAccount.AlertAmount).abs().toNumber(),
+                  2
+                )
               }}</text>
             </view>
           </view>
@@ -126,6 +143,7 @@
         </view>
         <view
           class="button-item"
+          style="margin-left: 20rpx"
           v-if="item.OwnerAccount.IsUseBillVerf === '1'"
         >
           <uv-button
@@ -145,40 +163,8 @@
         </view>
       </view>
     </view>
-    <!-- <view class="account-item" v-for="item in list" :key="item.supplyId">
-      <view
-        class="custom-item"
-        v-for="(custom, index) in item.OwnerAccountList"
-        :key="index"
-      >
-        <view class="custom-header">
-          <view class="custom-title">{{ custom.OwnerName }}</view>
-          <view class="link" @click="toDetail(custom, item)">
-            看账单
-            <uv-icon name="/static/images/arrow/green.png" size="28rpx" />
-          </view>
-        </view>
-        <view class="custom-info">
-          <view class="info-item">
-            <view class="info-title">账户余额 (元)</view>
-            <view class="info-number">{{
-              Big(custom.Balance).toFixed(2)
-            }}</view>
-          </view>
-          <view class="info-item" v-if="custom.Credit > 0">
-            <view class="info-title">授信额度 (元)</view>
-            <view class="info-number">{{ Big(custom.Credit).toFixed(2) }}</view>
-          </view>
-        </view>
-      </view>
-      <view class="from-info">
-        <text class="text">来自与</text>
-        <text class="uv-line-1 company">{{ item.supplyName }}</text>
-        <text class="text">的签约</text>
-      </view>
-    </view> -->
     <uv-load-more status="nomore" />
-  </template>
+  </view>
 
   <uv-toast ref="toast" />
 </template>
@@ -241,17 +227,26 @@ function toDetail(custom, item) {
 }
 
 function toBillVerf(item) {
-  uni.showToast({
-    title: "暂未开放",
-    icon: "none",
+  uni.navigateTo({
+    url: `/mine/account/checkBill?cusId=${item.OwnerAccount.OwnerId}&supplyId=${item.SupplyId}`,
+    events: {
+      success: function () {
+        console.log("我的账户刷新");
+        getInfo();
+      },
+    },
   });
 }
 </script>
 
 <style lang="scss">
 page {
-  padding: 24rpx;
   height: 100vh;
+}
+
+.account-list {
+  padding: 24rpx 24rpx max(var(--safe-area-inset-bottom), var(--safe-bottom));
+  min-height: 100vh;
 }
 .account-item {
   padding: 30rpx 20rpx 20rpx;
@@ -366,9 +361,6 @@ page {
     display: flex;
     .button-item {
       flex: 1;
-      &:first-child {
-        margin-right: 20rpx;
-      }
     }
   }
 }

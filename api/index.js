@@ -351,3 +351,57 @@ export function BatchOwnerUserCarno(data) {
 export function GetOwnerCarByLabel(data) {
   return request.post("/api/permission/WechatApi/GetOwnerCarByLabel", data);
 }
+
+/**
+ * 根据待核对的账单列表
+ */
+export function BillToBeCheckedList(data) {
+  return request.post("/api/permission/WechatApi/BillToBeCheckedList", data);
+}
+
+/**
+ * 根据对账列表合计
+ */
+export function CheckAllGetTotal(data) {
+  return request.post("/api/permission/WechatApi/CheckAllGetTotal", data);
+}
+
+/**
+ * 获取对账协议
+ */
+export function GetAgreement(data) {
+  return request.get("/api/permission/WechatApi/GetAgreement", {
+    params: data,
+  });
+}
+/**
+ * 上传图片
+ */
+export function UploadSign(params, filePath) {
+  return request.upload("/api/Ht/Common/UploadImg", {
+    params,
+    filePath,
+    name: "file",
+  });
+}
+
+/**
+ * 提交对账
+ */
+export function CheckBill(data) {
+  return request.post("/api/permission/WechatApi/CheckBill", data);
+}
+
+/**
+ * 获取对账记录
+ */
+export function ReconciliationList(data) {
+  return request.post("/api/permission/WechatApi/ReconciliationList", data);
+}
+
+/**
+ * 获取对账记录详情
+ */
+export function BillVerifiedList(data) {
+  return request.post("/api/permission/WechatApi/BillVerifiedList", data);
+}

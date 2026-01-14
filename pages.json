@@ -150,6 +150,13 @@
         "navigationBarTitleText": "添加车辆",
         "navigationBarBackgroundColor": "#ffffff"
       }
+    },
+    {
+      "path": "pages/richText/richText",
+      "style": {
+        "navigationBarTitleText": "",
+        "navigationBarBackgroundColor": "#ffffff"
+      }
     }
   ],
   "subPackages": [
@@ -160,6 +167,20 @@
           "path": "account/account",
           "style": {
             "navigationBarTitleText": "我的账户",
+            "navigationBarBackgroundColor": "#ffffff"
+          }
+        },
+        {
+          "path": "account/checkBill",
+          "style": {
+            "navigationBarTitleText": "账单核对",
+            "navigationBarBackgroundColor": "#ffffff"
+          }
+        },
+        {
+          "path": "account/recordDetail",
+          "style": {
+            "navigationBarTitleText": "对账记录",
             "navigationBarBackgroundColor": "#ffffff"
           }
         },

@@ -33,6 +33,27 @@
             @click="handleClose"
           />
         </view>
+        <!-- <view class="header-wrapper" :style="titleStyle" v-if="showTitle">
+          <slot name="title" v-if="$slots.header"></slot>
+          <template v-else>
+            <view class="title-wrapper">
+              <slot name="title" v-if="$slots.title"></slot>
+              <template v-else>{{ title }}</template>
+            </view>
+            <view class="sub-title-wrapper" v-if="showSubTitle">
+              <slot name="sub-title" v-if="$slots.subTitle"></slot>
+              <template v-else>{{ subTitle }}</template>
+            </view>
+          </template>
+          <uv-icon
+            v-if="closeable"
+            name="/static/images/ui/closeable.png"
+            width="64rpx"
+            height="64rpx"
+            :custom-style="{ position: 'absolute', right: '24rpx', top: '24rpx' }"
+            @click="handleClose"
+          />
+        </view> -->
         <slot v-if="customScrollView"></slot>
         <scroll-view
           v-else
@@ -73,6 +94,13 @@ const props = defineProps({
   title: {
     default: "",
   },
+  // subTitle: {
+  //   default: "",
+  // },
+  // showSubTitle: {
+  //   default: false,
+  //   type: Boolean,
+  // },
   titleStyle: {
     default: {},
   },
@@ -217,6 +245,25 @@ defineExpose({
     font-weight: bold;
     height: 112rpx;
   }
+
+  // .header-wrapper {
+  //   padding: 32rpx 24rpx 32rpx 32rpx;
+  //   .title-wrapper {
+  //     height: 48rpx;
+  //     display: flex;
+  //     align-items: center;
+  //     justify-content: space-between;
+  //     color: var(--title-color);
+  //     font-size: 34rpx;
+  //     font-weight: bold;
+  //   }
+  //   .sub-title-wrapper {
+  //     margin-top: 8rpx;
+  //     height: 32rpx;
+  //     color: var(--sub-color);
+  //     font-size: 26rpx;
+  //   }
+  // }
 
   .scroll-view {
   }
