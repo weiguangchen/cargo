@@ -377,7 +377,7 @@ export function GetAgreement(data) {
 /**
  * 上传图片
  */
-export function UploadSign(params, filePath) {
+export function UploadImg(params, filePath) {
   return request.upload("/api/Ht/Common/UploadImg", {
     params,
     filePath,
@@ -404,4 +404,61 @@ export function ReconciliationList(data) {
  */
 export function BillVerifiedList(data) {
   return request.post("/api/permission/WechatApi/BillVerifiedList", data);
+}
+
+/**
+ * 印鉴列表
+ */
+export function GetSealList(data) {
+  return request.post("/api/permission/WechatApi/GetSealList", data);
+}
+/**
+ * 添加修改印鉴
+ */
+export function UptSeal(data) {
+  return request.post("/api/permission/WechatApi/UptSeal", data);
+}
+
+/**
+ * 单位成员列表
+ */
+export function GetCusStaff(data) {
+  return request.post("/api/permission/WechatApi/GetCusStaff", data);
+}
+
+/**
+ * 根据curId获取成员
+ */
+export function GetStaffByCusId(data) {
+  return request.post("/api/permission/WechatApi/GetStaffByCusId", data);
+}
+
+/**
+ * 根据手机号获取成员名称
+ */
+export function GetNickNameByMobile(params) {
+  return request.get("/api/permission/WechatApi/GetNickNameByMobile", {
+    params,
+  });
+}
+
+/**
+ * 获取成员角色、数据权限
+ */
+export function GetPerList(params) {
+  return request.get("/api/permission/WechatApi/GetPerList", { params });
+}
+
+/**
+ * 添加修改成员
+ */
+export function OprCusStaff(data) {
+  return request.post("/api/permission/WechatApi/OprCusStaff", data);
+}
+
+/**
+ * 修改成员
+ */
+export function UptCusStaff(data) {
+  return request.post("/api/permission/WechatApi/UptCusStaff", data);
 }

@@ -134,6 +134,26 @@
         />
         <view class="name">卸货地址</view>
       </view>
+      <view class="menu" @click="navigate('单位成员')">
+        <uv-image
+          src="/static/images/mine/member.png"
+          width="56rpx"
+          height="56rpx"
+          :custom-style="{ marginBottom: '4rpx' }"
+          :duration="0"
+        />
+        <view class="name">单位成员</view>
+      </view>
+      <view class="menu" @click="navigate('印鉴管理')">
+        <uv-image
+          src="/static/images/mine/seal.png"
+          width="56rpx"
+          height="56rpx"
+          :custom-style="{ marginBottom: '4rpx' }"
+          :duration="0"
+        />
+        <view class="name">印鉴管理</view>
+      </view>
       <view class="menu" @click="navigate('司机黑名单')">
         <uv-image
           src="/static/images/mine/forbidden.png"
@@ -143,26 +163,6 @@
           :duration="0"
         />
         <view class="name">司机黑名单</view>
-      </view>
-      <view class="menu" @click="navigate('成员管理')">
-        <uv-image
-          src="/static/images/mine/member.png"
-          width="56rpx"
-          height="56rpx"
-          :custom-style="{ marginBottom: '4rpx' }"
-          :duration="0"
-        />
-        <view class="name">成员管理</view>
-      </view>
-      <view class="menu">
-        <uv-image
-          src="/static/images/mine/wechat.png"
-          width="56rpx"
-          height="56rpx"
-          :custom-style="{ marginBottom: '4rpx' }"
-          :duration="0"
-        />
-        <view class="name">关注公众号</view>
       </view>
       <button
         class="menu"
@@ -205,6 +205,16 @@
         />
         <view class="name">问题反馈</view>
       </button>
+      <view class="menu">
+        <uv-image
+          src="/static/images/mine/wechat.png"
+          width="56rpx"
+          height="56rpx"
+          :custom-style="{ marginBottom: '4rpx' }"
+          :duration="0"
+        />
+        <view class="name">关注公众号</view>
+      </view>
       <view class="menu" @click="navigate('设置')">
         <uv-image
           src="/static/images/mine/setting.png"
@@ -286,14 +296,14 @@ function navigate(type) {
         url: "/mine/forbidden/forbidden",
       });
       break;
-    case "成员管理":
-      uni.showToast({
-        title: "敬请期待",
-        icon: "none",
-      });
-      return;
+    case "单位成员":
       uni.navigateTo({
-        url: "/mine/member/member",
+        url: "/mine/members/members",
+      });
+      break;
+    case "印鉴管理":
+      uni.navigateTo({
+        url: "/mine/seal/seal",
       });
       break;
     case "我的订单":

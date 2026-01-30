@@ -222,6 +222,29 @@
           "style": {
             "navigationBarTitleText": "关联设置"
           }
+        },
+        {
+          "path": "members/members",
+          "style": {
+            "navigationBarTitleText": "单位成员",
+            "navigationBarBackgroundColor": "#ffffff"
+          }
+        },
+        {
+          "path": "members/membersList",
+          "style": {
+            "navigationBarTitleText": "",
+            "navigationBarBackgroundColor": "#ffffff",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "seal/seal",
+          "style": {
+            "navigationBarTitleText": "印鉴管理",
+            "navigationBarBackgroundColor": "#ffffff",
+            "backgroundColor": "#F2F4F7"
+          }
         }
       ]
     }

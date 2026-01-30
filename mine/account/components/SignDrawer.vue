@@ -78,7 +78,7 @@
 
 <script setup>
 import { ref, unref } from "vue";
-import { UploadSign, CheckBill } from "@/api/index.js";
+import { UploadImg, CheckBill } from "@/api/index.js";
 
 const props = defineProps({
   supplyId: {
@@ -152,7 +152,7 @@ async function handleConfirm() {
       }
 
       try {
-        const fileRes = await UploadSign(
+        const fileRes = await UploadImg(
           {
             businessType: "Reconciliation",
             supplyId: props.supplyId,

@@ -24,7 +24,7 @@
           placeholder="请输入，提交后不可修改"
           border="none"
           maxlength="30"
-          placeholder-style="color:var(--intr-color);font-weight:bold;"
+          placeholder-style="color:var(--intr-color);"
         />
       </uv-form-item>
       <uv-form-item

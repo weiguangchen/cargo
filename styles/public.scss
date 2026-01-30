@@ -9,6 +9,7 @@ view {
   /* 警告色 */
   --red-color: #f15948;
   --light-red: #fff0ee;
+  --warn-color: #fc7e2c;
   /* 灰度 */
   --title-color: #1a1b1c;
   --content-color: #4e5356;
@@ -115,7 +116,7 @@ page {
 }
 
 .clickable {
-  background-color: var(--clickable);
+  background-color: var(--clickable) !important;
 }
 
 //item
@@ -133,7 +134,7 @@ page {
     color: var(--content-color);
   }
   &-value {
-    font-weight: 600;
+    font-weight: bold;
     color: var(--title-color);
   }
 }

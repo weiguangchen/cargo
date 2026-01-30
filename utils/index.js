@@ -1,4 +1,5 @@
 import Big from "big.js";
+import { ref } from "vue";
 
 export function sleep(time = 2000) {
   return new Promise((resolve, reject) => {
@@ -103,4 +104,23 @@ export function showToast(msg, timer = 1500) {
 // 判断数字是不是负数
 export function isNegativeNumber(num) {
   return Big(num).lt(0);
+}
+
+// 手机号脱敏函数
+export function desensitizePhone(phone) {
+  return phone.replace(/^(\d{3})\d{4}(\d{4})$/, "$1****$2");
+}
+
+// 自带重置的ref
+export function useResetable(initialValue) {
+  const data = ref(JSON.parse(JSON.stringify(initialValue)));
+
+  function reset() {
+    data.value = JSON.parse(JSON.stringify(initialValue));
+  }
+
+  return {
+    data,
+    reset,
+  };
 }
