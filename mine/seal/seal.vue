@@ -12,14 +12,14 @@
     height="100vh"
   />
   <view class="seal-container">
-    <view class="notice-bar-wrapper">
-      <uv-notice-bar
-        v-if="topTip"
+    <view class="notice-bar-wrapper" v-if="topTip">
+      <my-custom-notice
         :text="topTip"
         bg-color="#FFF1E8"
         color="var(--warn-color)"
         fontSize="24rpx"
         :icon="false"
+        :speed="50"
       />
     </view>
     <scroll-view class="scroll-view" scroll-y>

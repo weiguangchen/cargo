@@ -16,6 +16,7 @@
     </template>
     <view class="upload-wrapper">
       <uv-upload
+        ref="uploadRef"
         :fileList="fileList"
         :maxCount="1"
         width="606rpx"
@@ -23,8 +24,12 @@
         imageMode="aspectFit"
         :deletable="false"
         :capture="['album']"
+        :sizeType="['original']"
+        :maxSize="2 * 1024 * 1024"
+        :beforeRead="beforeRead"
         @afterRead="afterRead"
         @delete="deletePic"
+        @oversize="oversize"
       >
         <view class="upload-placeholder">
           <uv-icon
@@ -140,8 +145,12 @@ async function handleConfirm() {
     loading.value = false;
   }
 }
+
+const uploadRef = ref(null);
 function handleCancel() {
   fileList.value = [];
+
+  unref(uploadRef).chooseFile();
 }
 // 删除图片
 function deletePic(event) {
@@ -176,6 +185,26 @@ async function afterRead(event) {
     );
     fileListLen++;
   }
+}
+
+function beforeRead(file) {
+  // 或者检查文件名后缀
+  if (!file.url?.toLowerCase().endsWith(".png")) {
+    uni.showToast({
+      title: "只能上传PNG格式的图片",
+      icon: "none",
+    });
+    return false;
+  }
+
+  return true; // 允许上传
+}
+
+function oversize() {
+  uni.showToast({
+    title: "文件大小不能超过2M",
+    icon: "none",
+  });
 }
 
 async function uploadFilePromise(url) {

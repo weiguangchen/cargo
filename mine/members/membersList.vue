@@ -17,7 +17,7 @@
         <my-search-box
           v-model="keyword"
           :showBtn="false"
-          placeholder="成员姓名/手机号码"
+          placeholder="成员姓名/手机号码/显示名称"
           @search="handleSearch"
           @clear="handleSearch"
         />
@@ -80,11 +80,11 @@
                 <view class="info">
                   <view class="name">
                     <view class="username uv-line-1">{{
-                      staff.StaffNickName || "未设置"
+                      staff.StaffName
                     }}</view>
                     <view class="realname"
                       >（<text class="text uv-line-1">{{
-                        staff.StaffName
+                        staff.StaffNickName || "未设置"
                       }}</text
                       >）</view
                     >
@@ -100,10 +100,14 @@
                   <view class="tag me" v-if="staff.Mine === '1'">我</view>
                 </view>
               </view>
-              <view class="permission-wrapper">
+              <view
+                class="permission-wrapper"
+                v-if="staff.AssignLabel || staff.DataLabel"
+              >
                 <view class="title">权限：</view>
                 <view class="tags">
                   <view
+                    v-if="staff.AssignLabel"
                     class="tag"
                     :class="{
                       green: staff.AssignLabelType === 1,
@@ -114,12 +118,13 @@
                     >{{ staff.AssignLabel }}</view
                   >
                   <view
+                    v-if="staff.DataLabel"
                     class="tag"
                     :class="{
-                      green: staff.AssignLabelType === 1,
-                      'light-green': staff.AssignLabelType === 2,
-                      red: staff.AssignLabelType === 3,
-                      warn: staff.AssignLabelType === 4,
+                      green: staff.DataLabelType === 1,
+                      'light-green': staff.DataLabelType === 2,
+                      red: staff.DataLabelType === 3,
+                      warn: staff.DataLabelType === 4,
                     }"
                     >{{ staff.DataLabel }}</view
                   >
@@ -223,7 +228,7 @@ function handleEditMember(staff) {
   let formMode = "read";
   const IsLeader = unref(cus).IsLeader;
   if (IsLeader === "1") {
-    if (staff.Mine === "1") {
+    if (staff.Leader === "1") {
       formMode = "read";
     } else {
       formMode = "edit";
@@ -295,7 +300,6 @@ function handleSuccess() {
       .member-info {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 24rpx;
         .avatar {
           width: 96rpx;
           height: 96rpx;
@@ -372,6 +376,7 @@ function handleSuccess() {
         }
       }
       .permission-wrapper {
+        margin-top: 24rpx;
         .title {
           font-weight: bold;
           font-size: 26rpx;

@@ -221,14 +221,6 @@ const IsLeader = ref("0");
 const cusId = ref("");
 
 const form = ref(null);
-// const model = ref({
-//   staffName: "",
-//   nickName: "",
-//   staffMobile: "",
-//   leader: "",
-//   assignPer: "",
-//   dataPer: "",
-// });
 const { data: model, reset: resetModel } = useResetable({
   staffName: "",
   nickName: "",
@@ -312,6 +304,7 @@ async function handleAssignPerChange(value) {
     };
     await UptCusStaff(params);
     model.value.assignPer = value;
+    emits("success", unref(model));
   } catch (err) {
     console.log("提交失败", err);
     uni.showToast({
