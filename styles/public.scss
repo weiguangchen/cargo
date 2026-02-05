@@ -21,6 +21,8 @@ view {
 
   // 安卓底部安全距离
   --safe-bottom: 40rpx;
+  // 通用底部安全距离
+  --safe-area-bottom: max(var(--safe-area-inset-bottom), var(--safe-bottom));
 }
 
 page {
@@ -70,6 +72,7 @@ page {
   border-right-width: 1px !important;
   border-right-style: solid;
 }
+
 .page-footer {
   position: fixed;
   left: 0;

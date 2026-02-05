@@ -245,6 +245,14 @@
             "navigationBarBackgroundColor": "#ffffff",
             "backgroundColor": "#F2F4F7"
           }
+        },
+        {
+          "path": "settlement/pending",
+          "style": {
+            "navigationBarTitleText": "待确认文件",
+            "navigationBarBackgroundColor": "#ffffff",
+            "backgroundColor": "#F2F4F7"
+          }
         }
       ]
     }

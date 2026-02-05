@@ -214,12 +214,39 @@
         />
       </view>
       <!-- end -->
-      <!-- 登录弹窗 -->
-      <my-login-drawer ref="loginDrawer" @success="loginSuccess" />
-      <!-- tabbar -->
-      <my-tabbar @change="tabbarChange" />
     </view>
+    <!-- tabbar -->
+    <my-tabbar @change="tabbarChange" />
   </scroll-view>
+
+  <!-- 首页底部提示框容器 -->
+  <view class="bottom-tips">
+    <!-- 待结算文件 -->
+    <view class="pending-settlement" v-if="docConInfo">
+      <uv-icon
+        name="/static/images/index/pending-settlement.png"
+        width="92rpx"
+        height="92rpx"
+      />
+      <view class="content">
+        <view class="title">{{ docConInfo.tipTitle }}</view>
+        <view class="subtitle">{{ docConInfo.tipRemark }}</view>
+      </view>
+      <uv-button
+        text="查看"
+        color="var(--dark-main)"
+        :customStyle="{
+          height: '60rpx',
+          width: '116rpx',
+          borderRadius: '30rpx',
+        }"
+        :customTextStyle="{ fontSize: '26rpx', fontWeight: 'bold' }"
+        @click="navigate('待确认文件')"
+      />
+    </view>
+  </view>
+  <!-- 登录弹窗 -->
+  <my-login-drawer ref="loginDrawer" @success="loginSuccess" />
 </template>
 
 <script setup>
@@ -230,8 +257,12 @@ import { getWxSetting, getLocationInfo } from "@/utils/authorize.js";
 import { useAppStore } from "@/stores/app.js";
 import { useUserStore } from "@/stores/user.js";
 import { getToken } from "@/utils/token.js";
-import { GetGoodsOrderCount, GetNumberOfOnGoing } from "@/api/index.js";
-import { sleep } from "@/utils/index.js";
+import {
+  GetGoodsOrderCount,
+  GetNumberOfOnGoing,
+  GetDocConInfo,
+} from "@/api/index.js";
+import { sleep, useResetable } from "@/utils/index.js";
 import { storeToRefs } from "pinia";
 const { ctx } = getCurrentInstance();
 
@@ -253,11 +284,13 @@ onShow(() => {
     return;
   }
   getCount();
+  getDocConInfoTip();
 });
 onLoad(async () => {
   if (!getToken()) {
     return;
   }
+
   try {
     // 定位授权
     await getLocationInfo();
@@ -284,6 +317,19 @@ async function getCount() {
   AssignNum.value = res.AssignNum;
   OnwayNum.value = res.OnwayNum;
 }
+
+// 获取待确认文件弹窗
+const docConInfo = ref(null);
+async function getDocConInfoTip() {
+  try {
+    const res = await GetDocConInfo();
+    console.log("获取待确认文件弹窗", res);
+    docConInfo.value = res;
+  } catch (error) {
+    console.error("获取待确认文件弹窗失败:", error);
+  }
+}
+
 function toTask(index = 0) {
   if (reloadTaskInit.value) {
     uni.$emit("task:reload", {
@@ -389,6 +435,17 @@ function navigate(type) {
     case "扫码助手":
       uni.scanCode({});
       break;
+    case "待确认文件":
+      uni.navigateTo({
+        url: `/mine/settlement/pending?settleId=${docConInfo.value.settleId}&supplyId=${docConInfo.value.supplyId}`,
+        events: {
+          success: function (res) {
+            console.log("待确认文件 success");
+            getDocConInfoTip();
+          },
+        },
+      });
+      break;
   }
 }
 </script>
@@ -400,6 +457,38 @@ function navigate(type) {
   width: 750rpx;
   .page-wrapper {
     padding: 40rpx 24rpx 20rpx;
+  }
+}
+
+.bottom-tips {
+  position: fixed;
+  z-index: 200;
+  bottom: calc(50px + max(var(--safe-area-inset-bottom), var(--safe-bottom)));
+  left: 32rpx;
+  right: 32rpx;
+  padding-bottom: 32rpx;
+
+  .pending-settlement {
+    display: flex;
+    align-items: center;
+    padding: 16rpx 28rpx 16rpx 16rpx;
+    border-radius: 16rpx;
+    background: rgba(0, 0, 0, 0.8);
+    .content {
+      flex: 1;
+      margin-left: 16rpx;
+      .title {
+        color: #ffffff;
+        font-size: 28rpx;
+        font-weight: bold;
+        line-height: 40rpx;
+      }
+      .subtitle {
+        font-size: 24rpx;
+        color: #c8d4df;
+        line-height: 36rpx;
+      }
+    }
   }
 }
 
@@ -463,7 +552,7 @@ function navigate(type) {
       position: absolute;
       left: 24rpx;
       bottom: 0;
-      width: 400rpx;
+      width: 380rpx;
       padding: 0 0 0 24rpx;
       height: 84rpx;
       border-radius: 16rpx 0rpx 0rpx 16rpx;

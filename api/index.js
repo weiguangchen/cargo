@@ -462,3 +462,24 @@ export function OprCusStaff(data) {
 export function UptCusStaff(data) {
   return request.post("/api/permission/WechatApi/UptCusStaff", data);
 }
+
+/**
+ * 首页待确认文件弹窗
+ */
+export function GetDocConInfo(data) {
+  return request.post("api/permission/WechatApi/GetDocConInfo", data);
+}
+
+/**
+ * 获取待确认文件列表
+ */
+export function GetDocListBySetId(data) {
+  return request.post("/api/permission/WechatApi/GetDocListBySetId", data);
+}
+
+/**
+ * 获取待确认文件列表
+ */
+export function DocConfirm(data) {
+  return request.post("/api/permission/WechatApi/DocConfirm", data);
+}
