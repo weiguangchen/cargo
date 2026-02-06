@@ -55,13 +55,13 @@
         />
         <view class="info">
           <view class="title uv-line-1">{{ item.reportName }}</view>
-          <view class="content uv-line-1">{{ item.supplyName }}</view>
+          <view class="content uv-line-1">{{ item.cusName }}</view>
         </view>
       </view>
-      <view class="total-num">
-        -&nbsp;共&nbsp;<text class="num">{{ count }}</text
-        >&nbsp;人&nbsp;-
-      </view>
+    </view>
+    <view class="total-num">
+      -&nbsp;共&nbsp;<text class="num">{{ count }}</text
+      >&nbsp;文件&nbsp;-
     </view>
   </view>
 
@@ -240,17 +240,17 @@ function handleClickItem(item) {
         }
       }
     }
+  }
 
-    .total-num {
-      padding: 28rpx 0;
-      text-align: center;
-      font-size: 26rpx;
-      line-height: 1;
-      color: var(--sub-color);
-      .num {
-        font-family: misans500;
-        color: var(--dark-main);
-      }
+  .total-num {
+    padding: 28rpx 0;
+    text-align: center;
+    font-size: 26rpx;
+    line-height: 1;
+    color: var(--sub-color);
+    .num {
+      font-family: misans500;
+      color: var(--dark-main);
     }
   }
 }
