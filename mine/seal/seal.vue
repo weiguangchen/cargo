@@ -124,7 +124,7 @@ async function openUploadDrawer(seal, item) {
       agrType: "Seal",
       supplyId: item.SupplyId,
     });
-    agreementInfo = res.Id ? res : null;
+    agreementInfo = res && res.Id ? res : null;
   } finally {
     uni.hideLoading();
   }

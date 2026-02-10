@@ -162,7 +162,7 @@ async function handleConfirm() {
         console.log("上传签名", fileRes);
         const params = {
           ...formValues.value,
-          imgList: [fileRes],
+          imgList: fileRes?.imgModel ? [fileRes.imgModel] : [],
         };
         console.log("确认对账参数", params);
         const checkRes = await CheckBill(params);

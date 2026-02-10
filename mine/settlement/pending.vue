@@ -112,6 +112,8 @@ async function getList() {
 const confirm = ref(null);
 function handleClickItem(item) {
   console.log(item);
+  let filePath = `${wx.env.USER_DATA_PATH}/${item.fileName}`;
+  console.log("filePath", filePath);
 
   uni.showActionSheet({
     itemList: ["确认无误（加盖印鉴）", "预览", "下载"],
@@ -149,45 +151,60 @@ function handleClickItem(item) {
           },
         });
       } else if (res.tapIndex === 1) {
+        console.log("预览");
         wx.downloadFile({
-          // 示例 url，并非真实存在
           url: item.reportUrl,
+          filePath,
           success: function (res) {
-            const filePath = res.tempFilePath;
-            wx.openDocument({
-              filePath: filePath,
-              success: function (res) {
-                console.log("打开文档成功");
-              },
-            });
+            console.log("下载成功", res);
+            if (res.statusCode === 200) {
+              const filePath = res.filePath;
+              console.log("预览文件filePath", filePath);
+              wx.openDocument({
+                filePath,
+                success: function (res) {
+                  console.log("打开文档成功", res);
+                },
+                fail: function (err) {
+                  console.log("打开文档失败", err);
+                },
+              });
+            }
+          },
+          fail: function (err) {
+            console.log("下载失败", err);
           },
         });
-
-        console.log("预览");
       } else if (res.tapIndex === 2) {
         console.log("下载");
         wx.downloadFile({
-          // 示例 url，并非真实存在
           url: item.reportUrl,
+          filePath,
           success: function (res) {
-            const filePath = res.tempFilePath;
-            unref(confirm).confirm({
-              title: "文件已下载",
-              content:
-                "文件已下载至本地，可将文件分享给好友或发送至「文件传输助手」进行保存。",
-              cancelText: "暂不保存",
-              confirmText: "发送保存",
-              confirmBgColor: "var(--main-color)",
-              closeOnClickOverlay: false,
-              async confirm() {
-                wx.shareFileMessage({
-                  filePath,
-                  fail: console.error,
-                });
-              },
-            });
+            console.log("下载成功", res);
+            if (res.statusCode === 200) {
+              const filePath = res.filePath;
+              unref(confirm).confirm({
+                title: "文件已下载",
+                content:
+                  "文件已下载至本地，可将文件分享给好友或发送至「文件传输助手」进行保存。",
+                cancelText: "暂不保存",
+                confirmText: "发送保存",
+                confirmBgColor: "var(--main-color)",
+                closeOnClickOverlay: false,
+                async confirm() {
+                  console.log("分享文件filePath", filePath);
+                  wx.shareFileMessage({
+                    filePath,
+                    fail: console.error,
+                  });
+                },
+              });
+            }
           },
-          fail: console.error,
+          fail: function (err) {
+            console.log("下载失败", err);
+          },
         });
       }
     },

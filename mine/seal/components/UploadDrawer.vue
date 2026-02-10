@@ -125,7 +125,6 @@ async function handleConfirm() {
     }),
   };
   console.log("params", params);
-
   try {
     loading.value = true;
     await UptSeal(params);
@@ -179,8 +178,8 @@ async function afterRead(event) {
       Object.assign(item, {
         status: "ok",
         message: "",
-        url: result.url,
-        result,
+        url: result?.imgUrl ?? "",
+        result: result?.imgModel ?? {},
       })
     );
     fileListLen++;
@@ -222,13 +221,12 @@ function open(res) {
   agreement.value = res.agreementInfo;
   seal.value = res.seal;
   item.value = res.item;
-
   if (res.seal.SealImg) {
     const result = res?.seal?.imgList?.[0] ?? {};
     fileList.value = [
       {
         result,
-        url: result.url,
+        url: res.seal.SealImg,
         status: "ok",
         message: "",
       },
